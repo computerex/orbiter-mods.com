@@ -1,15 +1,17 @@
 <?php
 
 include '../app/vendor/autoload.php';
-$foo = new App\Acme\Foo();
 
-?><!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="utf-8">
-        <title>Docker <?php echo $foo->getName(); ?></title>
-    </head>
-    <body>
-        <h1>Docker <?php echo $foo->getName(); ?></h1>
-    </body>
-</html>
+error_reporting(E_ALL ^ E_DEPRECATED);
+
+use \Psr\Http\Message\ServerRequestInterface as Request;
+use \Psr\Http\Message\ResponseInterface as Response;
+
+$app = new \Slim\App;
+$app->get('/hello/{name}', function (Request $request, Response $response, array $args) {
+    $name = $args['name'];
+    $response->getBody()->write("Hello, $name");
+
+    return $response;
+});
+$app->run();
