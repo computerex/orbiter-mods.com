@@ -1,27 +1,19 @@
 <?php
 
+use Slim\Http\Response;
+use App\Utils\DB;
+
 include '../app/vendor/autoload.php';
 
 error_reporting(E_ALL ^ E_DEPRECATED);
 
-use \Psr\Http\Message\ServerRequestInterface as Request;
-use \Psr\Http\Message\ResponseInterface as Response;
-
 $app = new \Slim\App(['settings' => ['displayErrorDetails' => true]]);
 
-function get_pdo() {
-    $dsn = "mysql:host=mysql;dbname=app;charset=UTF8";
-    $options = [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION];
-	return new PDO($dsn, "root", "root", $options);
-}
-
-$app->get('/hello/{name}', function (Request $request, Response $response, array $args) {
-    $name = $args['name'];
-    $pdo = get_pdo();
-    $statement = $pdo->prepare("SELECT * FROM todos");
-    $statement->execute();
-    $todos = $statement->fetchAll(PDO::FETCH_ASSOC);
-    // return todos as json
-    return $response->withJson($todos);
+$app->get('/todos', function ($request, Response $response, array $args) {
+    // fetch all todos from the mysql todos table using pdo
+    $pdo = DB::getInstance();
+    $stmt = $pdo->query('SELECT * FROM todos');
+    $todos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    return $response->withJson($todos, 200);
 });
 $app->run();

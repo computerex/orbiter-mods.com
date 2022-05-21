@@ -46,8 +46,8 @@ code-sniff:
 composer-up:
 	@docker run --rm -v $(shell pwd)/web/app:/app composer update
 
-composer-install:
-	@docker run --rm -v $(shell pwd)/web/app:/app composer require $(package)
+composer-dump:
+	@docker run --rm -v $(shell pwd)/web/app:/app composer dump
 
 docker-start: init
 	docker-compose up -d
