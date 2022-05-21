@@ -23,13 +23,17 @@ USE `app`;
 CREATE TABLE IF NOT EXISTS `todos` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
   `task_desc` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `done` tinyint unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Dumping data for table app.todos: ~0 rows (approximately)
-INSERT INTO `todos` (`id`, `task_desc`) VALUES
-	(1, 'First todo'),
-	(2, 'Second todo');
+INSERT INTO `todos` (`id`, `task_desc`, `done`) VALUES
+	(3, 'Learn SQL', 0),
+	(4, 'Learn PHP', 0),
+	(5, 'Learn JavasScript', 1),
+	(6, 'Make an app', 0),
+	(7, 'Make money', 0);
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
