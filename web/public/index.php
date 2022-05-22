@@ -9,6 +9,13 @@ error_reporting(E_ALL ^ E_DEPRECATED ^ E_WARNING);
 
 $app = new \Slim\App(['settings' => ['displayErrorDetails' => true]]);
 
+$app->get('/', function ($request, Response $response) {
+    // serve static index html file
+    return $response
+        ->withHeader('Content-Type', 'text/html')
+        ->write(file_get_contents('index.html'));
+});
+
 $app->get('/todos', function ($request, Response $response, array $args) {
     // fetch all todos from the mysql todos table using pdo
     $pdo = DB::getInstance();

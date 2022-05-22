@@ -1,0 +1,30 @@
+{
+  "name": "orbiter-mods.com",
+  "version": "1.0.0",
+  "description": " ",
+  "main": "index.js",
+  "directories": {
+    "doc": "doc"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "bundle": "esbuild --bundle --minify web/app/frontend/js/index.js --outfile=web/public/bundle.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/computerex/orbiter-mods.com.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/computerex/orbiter-mods.com/issues"
+  },
+  "homepage": "https://github.com/computerex/orbiter-mods.com#readme",
+  "devDependencies": {
+    "esbuild": "^0.14.39"
+  },
+  "dependencies": {
+    "jquery": "^3.6.0",
+    "underscore": "^1.13.3"
+  }
+}

@@ -24,3 +24,6 @@ nbproject/
 
 # SSL Certs
 etc/ssl/
+
+node_modules/
+web/public/bundle.js
