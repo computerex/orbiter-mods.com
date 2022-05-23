@@ -4,9 +4,63 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>orbiter mods</title>
+        <link rel="stylesheet" href="https://unpkg.com/chota">
+        <script src="https://use.fontawesome.com/4051b80d16.js"></script>
+        <style>
+            .col {
+                position: relative;
+            }
+            .download-icon {
+                position: absolute;
+                right: 45px;
+                bottom: 3px;
+                color: white;
+            }
+            
+            .download-count {
+                position: absolute;
+                right: 15px;
+                bottom: 0px;
+                color: white;
+            }
+
+            .mod-title {
+                position: absolute;
+                left: 0px;
+                top: 0px;
+                color: white;
+            }
+            
+        </style>
     </head>
     <body>
-        <h1 class="test">hello world</h1>
+        <div class="container" style="max-width:720px;">
+            <section>
+                <h1 style="text-align:center">orbiter-mods.com</h1>
+            </section>
+            <section>
+                <div class="row">
+                    <div class="col">
+                        <img src="/images/mod.jpg">
+                        <i class="fa fa-cloud-download download-icon"></i>
+                        <span class="download-count">45k</span>
+                        <div class="mod-overlay">
+                            <span class="mod-title">Deltaglider XR1</span>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <img src="/images/mod.jpg">
+                        <i class="fa fa-cloud-download download-icon"></i>
+                        <span class="download-count">45k</span>
+                    </div>
+                    <div class="col">
+                        <img src="/images/mod.jpg">
+                        <i class="fa fa-cloud-download download-icon"></i>
+                        <span class="download-count">45k</span>
+                    </div>
+                </div>
+            </section>
+        </div>
         <script src="bundle.js"></script>
     </body>
 </html>
