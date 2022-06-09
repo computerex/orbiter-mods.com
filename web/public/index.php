@@ -21,6 +21,11 @@ $app->get('/redirect', function ($request, Response $response) {
     // get url from query params
     $url = $request->getQueryParam('url');
     // redirect to url with referrer set to orbiter-forum.com
+    ob_start();
+    header('Referer: https://orbiter-forum.com');
+    header('Location: '.$url);
+    ob_end_flush();
+    die();
     return $response->withRedirect($url, 301, ['Referrer' => 'https://orbiter-forum.com/']);
 });
 
