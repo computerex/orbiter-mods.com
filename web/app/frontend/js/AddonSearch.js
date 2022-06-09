@@ -30,7 +30,7 @@ export class AddonSearch {
             const urls = this.addons[result];
             for (let inx = 0; inx < urls.length; inx++) {
                 const url = urls[inx];
-                $('#results').append(`<div><a target="_blank" href="${url}">${result}</a></div>`);
+                $('#results').append(`<div><a target="_blank" href="/redirect?url=${url}">${result}</a></div>`);
             }
         });
     };

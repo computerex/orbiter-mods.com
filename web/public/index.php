@@ -17,6 +17,13 @@ $app->get('/', function ($request, Response $response) {
         ->write(file_get_contents('index.html'));
 });
 
+$app->get('/redirect', function ($request, Response $response) {
+    // get url from query params
+    $url = $request->getQueryParam('url');
+    // redirect to url with referrer set to orbiter-forum.com
+    return $response->withRedirect($url, 301, ['Referrer' => 'https://orbiter-forum.com/']);
+});
+
 // create endpoint post /api/user to create new user, save user to users table in mysql db using pdo
 $app->post('/user', function ($request, $response) {
     $data = $request->getParsedBody();
