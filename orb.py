@@ -58,8 +58,9 @@ def should_generate_hash(path):
         return False
     if path.name == 'Orbiter2016.json':
         return False
-    # ignore files in orb_cache
-    if path.parent.name == 'orb_cache':
+    full_path = str(path)
+    # skip orb_cache
+    if full_path.startswith('./orb_cache') or full_path.startswith('orb_cache'):
         return False
     return True
 
