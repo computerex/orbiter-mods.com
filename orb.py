@@ -32,7 +32,7 @@ def download_zip(url, file_name=None):
         return
 
     print(f'downloading {url}')
-    r = requests.get(url)
+    r = requests.get(url, allow_redirects=True)
     if 'Content-Disposition' in r.headers:
         zip_file_name = r.headers['Content-Disposition'].split('filename=')[1]
     else:
@@ -83,6 +83,7 @@ def generate_orbiter_hash(output_hash_file):
 def verify_orbiter_hash(hash_file):
     with open(hash_file, 'r') as f:
         files = json.load(f)
+    files_to_revert = []
     for path in Path('./').rglob('*.*'):
         try:
             if not should_generate_hash(path):
@@ -94,16 +95,41 @@ def verify_orbiter_hash(hash_file):
                 continue
             if files[full_path] != generate_file_hash(full_path):
                 print(f'{full_path} has changed')
+                files_to_revert.append(full_path)
         except Exception as e:
             print(e)
-    # sleep 
-    time.sleep(3)
+    return files_to_revert
+
+def reset_orbiter():
+    # ask user to confirm as doing this action will destroy the current orbiter install
+    test = input('Are you sure you want to reset the orbiter install? (y/n): ')
+    if test.lower() != 'y':
+        print('aborting orbiter install reset')
+        time.sleep(3)
+        return
+    # verify current orbiter install hash using ./Orbiter2016.json as reference hash_file
+    files_to_revert = verify_orbiter_hash('./Orbiter2016.json')
+
     
 # fetch experiences from https://orbiter-mods.com/fetch_experiences
 def fetch_experiences():
     r = requests.get('https://orbiter-mods.com/fetch_experiences')
     return r.json()
 
+def download_orbiter_2016_if_needed():
+    # check if orbiter 2016 is already downloaded and unzipped in orb_cache
+    if os.path.exists('./orb_cache/Orbiter2016'):
+        pass
+    else:
+        # check if Orbiter2016.zip is in orb_cache
+        if is_file_cached('Orbiter2016.zip'):
+            print('Orbiter2016.zip is already in cache')
+        else:
+            download_zip('https://orbiter-mods.com/downloads/Orbiter2016.zip', 'Orbiter2016.zip')
+            # unzip Orbiter2016.zip
+            with zipfile.ZipFile(f'orb_cache/Orbiter2016.zip', 'r') as zip_ref:
+                zip_ref.extractall('./orb_cache/')
+    
 def main():
     #generate_orbiter_hash('Orbiter2016.json')
     #verify_orbiter_hash('Orbiter2016.json')
@@ -129,7 +155,7 @@ def main():
 
     experience = experiences[mod_index]
     experience_script_url = experience['experience_script']
-    # fetch experience_script_url and save it in orb_cache/experiences
+    # fetch experience_script_url and save it in orb_cache
     experience_script_file_name = experience_script_url.split('/')[-1]
     if not is_file_cached(experience_script_file_name):
         download_zip(experience_script_url, experience_script_file_name)
