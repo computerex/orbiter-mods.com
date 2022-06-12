@@ -9,9 +9,9 @@ import importlib.util
 from pathlib import Path
 import json
 
-def load_experience_module(experience_module_name):
-    module_name = experience_module_name[:-3]
-    spec = importlib.util.spec_from_file_location(module_name, f'experiences/{experience_module_name}')
+def load_experience_module(experience_module_path):
+    module_name = experience_module_path[:-3]
+    spec = importlib.util.spec_from_file_location(module_name, experience_module_path)
     mod = importlib.util.module_from_spec(spec)
     sys.modules[module_name] = mod
     spec.loader.exec_module(mod)
@@ -131,10 +131,6 @@ def download_orbiter_2016_if_needed():
                 zip_ref.extractall('./orb_cache/')
     
 def main():
-    #generate_orbiter_hash('Orbiter2016.json')
-    #verify_orbiter_hash('Orbiter2016.json')
-    #time.sleep(20)
-    #sys.exit(0)
     experiences = fetch_experiences()
     
     if not os.path.exists('orb_cache'):
@@ -160,7 +156,7 @@ def main():
     if not is_file_cached(experience_script_file_name):
         download_zip(experience_script_url, experience_script_file_name)
     # load experience_script_file_name
-    mod = load_experience_module(experience_script_file_name)
+    mod = load_experience_module(f'orb_cache/{experience_script_file_name}')
 
     if mod.requires_fresh_install():
         print('This experience requires a fresh install')
