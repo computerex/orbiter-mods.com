@@ -99,23 +99,25 @@ def verify_orbiter_hash(hash_file):
     # sleep 
     time.sleep(3)
     
+# fetch experiences from https://orbiter-mods.com/fetch_experiences
+def fetch_experiences():
+    r = requests.get('https://orbiter-mods.com/fetch_experiences')
+    return r.json()
 
 def main():
     #generate_orbiter_hash('Orbiter2016.json')
-    verify_orbiter_hash('Orbiter2016.json')
-    time.sleep(20)
-    sys.exit(0)
-    experiences = {}
-    counter = 0
+    #verify_orbiter_hash('Orbiter2016.json')
+    #time.sleep(20)
+    #sys.exit(0)
+    experiences = fetch_experiences()
+    
     if not os.path.exists('orb_cache'):
         os.mkdir('orb_cache')
 
-    for experience in os.listdir('experiences'):
-        if experience.lower()[-3:] == '.py':
-            experiences[experience] = mod = load_experience_module(experience)
-            print(f'{counter+1}: {mod.get_name()}')        
-            counter += 1
-
+    for inx, experience in enumerate(experiences):
+        print(f'{inx+1}: {experience["name"]}')
+        print(f'    {experience["description"]}')
+        print(f'    {experience["external_link"]}')
 
     user_input = input('\nEnter the number of the experience you want to use: ')
 
@@ -125,7 +127,14 @@ def main():
         print('Invalid input')
         sys.exit(1)
 
-    mod = experiences[list(experiences.keys())[mod_index]]
+    experience = experiences[mod_index]
+    experience_script_url = experience['experience_script']
+    # fetch experience_script_url and save it in orb_cache/experiences
+    experience_script_file_name = experience_script_url.split('/')[-1]
+    if not is_file_cached(experience_script_file_name):
+        download_zip(experience_script_url, experience_script_file_name)
+    # load experience_script_file_name
+    mod = load_experience_module(experience_script_file_name)
 
     if mod.requires_fresh_install():
         print('This experience requires a fresh install')
