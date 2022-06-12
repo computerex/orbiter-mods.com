@@ -64,13 +64,6 @@ $app->get('/fetch_experiences', function ($request, $response) {
     return $response->withJson([
         [
             'id' => 1,
-            'name' => 'XR2 Ravenstar by dbeachy/coolhand',
-            'external_links' => ['https://www.alteaaerospace.com/index-3.html'],
-            'experience_script' => "$host/experiences/xr2.py",
-            'description' => 'Needs no description. You know what it is. All rights reserved to dbeachy/coolhand.'
-        ],
-        [
-            'id' => 2,
             'name' => 'Orbiter essentials: XR fleet, XRSound, Soundbridge (dbeachy, face)',
             'external_links' => [
                 'https://www.alteaaerospace.com/index-3.html',
