@@ -230,8 +230,8 @@ def main():
             print('ok, bye!')
             time.sleep(3)
             sys.exit(1)
-    
-    reset_orbiter()
+        print('reseting orbiter')
+        reset_orbiter()
     mod.main(download_from_of, download_zip, install_zip, enable_modules)
     print('ok, bye!')
     time.sleep(3)
