@@ -1,8 +1,6 @@
-def main(download_from_ohm, download_zip):
+def main(download_from_ohm, download_zip, install_zip):
     download_zip('https://www.alteaaerospace.com/ccount/click.php?id=3', 'XR2 Ravenstar.zip')
-
-def get_name():
-    return 'XR2 Ravenstar'
+    install_zip('XR2 Ravenstar.zip')
 
 def requires_fresh_install():
     return True

@@ -3,6 +3,7 @@ import os
 import time
 import hashlib
 import zipfile
+import shutil
 import requests
 import re
 import importlib.util
@@ -57,6 +58,9 @@ def should_generate_hash(path):
         return False
     if path.name == 'Orbiter2016.json':
         return False
+    # ignore files in orb_cache
+    if path.parent.name == 'orb_cache':
+        return False
     return True
 
 def generate_file_hash(full_path):
@@ -100,22 +104,6 @@ def verify_orbiter_hash(hash_file):
             print(e)
     return files_to_revert
 
-def reset_orbiter():
-    # ask user to confirm as doing this action will destroy the current orbiter install
-    test = input('Are you sure you want to reset the orbiter install? (y/n): ')
-    if test.lower() != 'y':
-        print('aborting orbiter install reset')
-        time.sleep(3)
-        return
-    # verify current orbiter install hash using ./Orbiter2016.json as reference hash_file
-    files_to_revert = verify_orbiter_hash('./Orbiter2016.json')
-
-    
-# fetch experiences from https://orbiter-mods.com/fetch_experiences
-def fetch_experiences():
-    r = requests.get('https://orbiter-mods.com/fetch_experiences')
-    return r.json()
-
 def download_orbiter_2016_if_needed():
     # check if orbiter 2016 is already downloaded and unzipped in orb_cache
     if os.path.exists('./orb_cache/Orbiter2016'):
@@ -125,10 +113,36 @@ def download_orbiter_2016_if_needed():
         if is_file_cached('Orbiter2016.zip'):
             print('Orbiter2016.zip is already in cache')
         else:
-            download_zip('https://orbiter-mods.com/downloads/Orbiter2016.zip', 'Orbiter2016.zip')
-            # unzip Orbiter2016.zip
-            with zipfile.ZipFile(f'orb_cache/Orbiter2016.zip', 'r') as zip_ref:
-                zip_ref.extractall('./orb_cache/')
+            download_zip('http://localhost:8000/Orbiter2016.zip', 'Orbiter2016.zip')
+        # unzip Orbiter2016.zip to orb_cache/Orbiter2016
+        print('unzipping Orbiter2016.zip')
+        with zipfile.ZipFile(f'orb_cache/Orbiter2016.zip', 'r') as zip_ref:
+            zip_ref.extractall('./orb_cache/Orbiter2016')
+
+def reset_orbiter():
+    # ask user to confirm as doing this action will destroy the current orbiter install
+    test = input('Are you sure you want to reset the orbiter install? (y/n): ')
+    if test.lower() != 'y':
+        print('aborting orbiter install reset')
+        time.sleep(3)
+        return
+    # verify current orbiter install hash using ./Orbiter2016.json as reference hash_file
+    files_to_revert = verify_orbiter_hash('./Orbiter2016.json')
+    download_orbiter_2016_if_needed()
+    for file_to_revert in files_to_revert:
+        print(f'reverting {file_to_revert}')
+        os.remove(file_to_revert)
+        # copy removed file from orb_cache/Orbiter2016 to ./
+        shutil.copy(f'orb_cache/Orbiter2016/{file_to_revert}', file_to_revert)
+
+def install_zip(file):
+    with zipfile.ZipFile(f'orb_cache/{file}', 'r') as zip_ref:
+        zip_ref.extractall('./')
+
+# fetch experiences from https://orbiter-mods.com/fetch_experiences
+def fetch_experiences():
+    r = requests.get('https://orbiter-mods.com/fetch_experiences')
+    return r.json()
     
 def main():
     experiences = fetch_experiences()
@@ -165,7 +179,9 @@ def main():
             print('ok, bye!')
             time.sleep(3)
             sys.exit(1)
-    mod.main(download_from_of, download_zip)
+    
+    reset_orbiter()
+    mod.main(download_from_of, download_zip, install_zip)
     print('ok, bye!')
     time.sleep(3)
 
