@@ -53,6 +53,19 @@ $app->post('/user', function ($request, $response) {
     return $response->withJson(['status' => 'success']);
 });
 
+// add endpoint /experiences to return all currently available experiences as json array
+$app->get('/fetch_experiences', function ($request, $response) {
+    return $response->withJson([
+        [
+            'id' => 1,
+            'name' => 'XR2 Ravenstar by dbeachy/coolhand',
+            'external_link' => 'https://www.alteaaerospace.com/index-3.html',
+            'experience_script' => '/experiences/xr2.py',
+            'description' => 'Needs no description. You know what it is. All rights reserved to dbeachy/coolhand.'
+        ],
+    ]);
+});
+
 // create post /login endpoint
 $app->post('/login', function ($request, $response) {
     $data = $request->getParsedBody();
