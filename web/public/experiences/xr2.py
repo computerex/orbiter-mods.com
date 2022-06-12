@@ -3,7 +3,7 @@ def main(download_from_ohm, download_zip, install_zip):
     install_zip('XR2 Ravenstar.zip')
 
 def requires_fresh_install():
-    return True
+    return False
 
 if __name__ == '__main__':
     main()

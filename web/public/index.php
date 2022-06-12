@@ -55,13 +55,29 @@ $app->post('/user', function ($request, $response) {
 
 // add endpoint /experiences to return all currently available experiences as json array
 $app->get('/fetch_experiences', function ($request, $response) {
+    $host = 'https://orbiter-mods.com';
+
+    if (true) {
+        $host = 'http://localhost:8000';
+    }
+
     return $response->withJson([
         [
             'id' => 1,
             'name' => 'XR2 Ravenstar by dbeachy/coolhand',
-            'external_link' => 'https://www.alteaaerospace.com/index-3.html',
-            'experience_script' => 'https://orbiter-mods.com/experiences/xr2.py',
+            'external_links' => ['https://www.alteaaerospace.com/index-3.html'],
+            'experience_script' => "$host/experiences/xr2.py",
             'description' => 'Needs no description. You know what it is. All rights reserved to dbeachy/coolhand.'
+        ],
+        [
+            'id' => 2,
+            'name' => 'Orbiter essentials: XR fleet, XRSound, Soundbridge (dbeachy, face)',
+            'external_links' => [
+                'https://www.alteaaerospace.com/index-3.html',
+                'https://www.orbiter-forum.com/resources/soundbridge.204/'
+            ],
+            'experience_script' => "$host/experiences/essentials.py",
+            'description' => 'Installs the wonderful XR fleet by Doug Beachy as well as XRSound, and Soundbridge by Face.'
         ],
     ]);
 });

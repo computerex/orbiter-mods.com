@@ -10,6 +10,8 @@ import importlib.util
 from pathlib import Path
 import json
 
+DEBUG = 0
+
 def load_experience_module(experience_module_path):
     module_name = experience_module_path[:-3]
     spec = importlib.util.spec_from_file_location(module_name, experience_module_path)
@@ -114,7 +116,10 @@ def download_orbiter_2016_if_needed():
         if is_file_cached('Orbiter2016.zip'):
             print('Orbiter2016.zip is already in cache')
         else:
-            download_zip('http://localhost:8000/Orbiter2016.zip', 'Orbiter2016.zip')
+            host = 'https://orbiter-mods.com'
+            if DEBUG == 1:
+                host = 'http://localhost:8000'
+            download_zip(f'{host}/Orbiter2016.zip', 'Orbiter2016.zip')
         # unzip Orbiter2016.zip to orb_cache/Orbiter2016
         print('unzipping Orbiter2016.zip')
         with zipfile.ZipFile(f'orb_cache/Orbiter2016.zip', 'r') as zip_ref:
@@ -142,10 +147,54 @@ def install_zip(file):
 
 # fetch experiences from https://orbiter-mods.com/fetch_experiences
 def fetch_experiences():
-    r = requests.get('https://orbiter-mods.com/fetch_experiences')
+    host = 'https://orbiter-mods.com'
+    if DEBUG == 1:
+        host = 'http://localhost:8000'
+    r = requests.get(f'{host}/fetch_experiences')
     return r.json()
     
+def enable_modules(module_names):
+    # open Orbiter.cfg for reading
+    module_list = []
+    output_cfg_lines = []
+    with open('./Orbiter.cfg', 'r') as f:
+        collect_modules = False
+        for line in f:
+            # check if line starts with ACTIVE_MODULES
+            if line.startswith('ACTIVE_MODULES'):
+                collect_modules = True
+                continue
+            # check if line starts with END_MODULES
+            if line.startswith('END_MODULES'):
+                collect_modules = False
+                break
+            if collect_modules:
+                module_list.append(line.strip())
+                continue
+            output_cfg_lines.append(line)
+
+    for module_name in module_names:
+        # check if module is already enabled
+        if module_name in module_list:
+            continue
+        module_list.append(module_name)
+    
+    # re-write Orbiter.cfg
+    with open('./Orbiter.cfg', 'w') as f:
+        for line in output_cfg_lines:
+            f.write(line)
+        f.write('ACTIVE_MODULES\n')
+        for module_name in module_list:
+            f.write(f'  {module_name}\n')
+        f.write('END_MODULES\n')
+
+
 def main():
+    global DEBUG
+    if '--debug' in sys.argv:
+        DEBUG = 1
+        print('turning on debug mode')
+        
     experiences = fetch_experiences()
     
     if not os.path.exists('orb_cache'):
@@ -154,7 +203,8 @@ def main():
     for inx, experience in enumerate(experiences):
         print(f'{inx+1}: {experience["name"]}')
         print(f'    {experience["description"]}')
-        print(f'    {experience["external_link"]}')
+        for link in experience["external_links"]:
+            print(f'    {link}')
 
     user_input = input('\nEnter the number of the experience you want to use: ')
 
@@ -182,7 +232,7 @@ def main():
             sys.exit(1)
     
     reset_orbiter()
-    mod.main(download_from_of, download_zip, install_zip)
+    mod.main(download_from_of, download_zip, install_zip, enable_modules)
     print('ok, bye!')
     time.sleep(3)
 
