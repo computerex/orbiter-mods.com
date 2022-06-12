@@ -37,6 +37,10 @@ export class AddonSearch {
 
     do_search() {
         const search = $('#search').val();
+        if (search.length === 0) {
+            this.render([]);
+            return;
+        }
         const results = _.filter(Object.keys(this.addons), function(item) {
             return item.fuzzy(search, 0.7);
         });
