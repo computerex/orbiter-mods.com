@@ -6,6 +6,7 @@ export class AddonSearch {
         this.addons = {};
         $.get('/addons.json', (data) => {
             this.addons = data;
+            $('#index_count').text(`${Object.keys(this.addons).length} mods in index`);
           });
 
         this.do_search_lazy = _.debounce(this.do_search, 500);
