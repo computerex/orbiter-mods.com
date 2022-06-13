@@ -8,6 +8,7 @@ export class AddonSearch {
             this.addons = data;
             $('#index_count').text(`${Object.keys(this.addons).length} mods in index`);
             document.getElementById('search').focus();
+            this.do_search();
           });
 
         this.do_search_lazy = _.debounce(this.do_search, 500);
