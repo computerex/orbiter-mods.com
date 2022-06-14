@@ -12,6 +12,7 @@ import json
 import webbrowser
 import tkinter as tk
 from tkinter import filedialog
+from distutils.dir_util import copy_tree
 
 DEBUG = 0
 
@@ -94,7 +95,7 @@ def download_zip(url, file_name=None):
     if file_name is None:
         file_name = url.split('/')[-1]
 
-    if is_file_cached(file_name):
+    if not file_name.endswith('.py') and is_file_cached(file_name):
         print(f'{file_name} is already in cache')
         return
 
@@ -126,6 +127,9 @@ def should_generate_hash(path):
         return False
     if path.name == 'Orbiter.cfg':
         return False
+    if path.name == 'Orbiter_NG.cfg':
+        return False
+
     full_path = str(path)
     # skip orb_cache
     if full_path.startswith('./orb_cache') or full_path.startswith('orb_cache'):
@@ -185,11 +189,26 @@ def download_orbiter_2016_if_needed():
             host = 'https://orbiter-mods.com'
             if DEBUG == 1:
                 host = 'http://localhost:8000'
+
+            # ask user if they want to continue to download Orbiter2016
+            print('Orbiter2016 is not in cache. would you like to download it?')
+            if input('(y/n) ') != 'y':
+                print('aborting orbiter2016 download')
+                return        
             download_zip(f'{host}/Orbiter2016.zip', 'Orbiter2016.zip')
         # unzip Orbiter2016.zip to orb_cache/Orbiter2016
         print('unzipping Orbiter2016.zip')
         with zipfile.ZipFile(f'orb_cache/Orbiter2016.zip', 'r') as zip_ref:
             zip_ref.extractall('./orb_cache/Orbiter2016')
+    # check if orbiter.exe is in the current folder
+    if not os.path.exists('orbiter.exe'):
+        # ask user if they'd like to install a fresh copy of orbiter 2016
+        print('orbiter.exe is not in the current folder. would you like to install a fresh copy of orbiter 2016?')
+        if input('(y/n): ') == 'y':
+            # copy all files from orb_cache/Orbiter2016 to current folder keeping directory structure in tact
+            print('copying files from Orbiter2016 to current folder')
+            copy_tree(os.path.join('orb_cache', 'Orbiter2016'), '.')
+
 
 def reset_orbiter():
     # ask user to confirm as doing this action will destroy the current orbiter install
@@ -219,44 +238,59 @@ def fetch_experiences():
     r = requests.get(f'{host}/fetch_experiences')
     return r.json()
     
-def enable_modules(module_names):
+def enable_modules(module_names, enable_for_orbiter_ng=False):
     # open Orbiter.cfg for reading
     module_list = []
     output_cfg_lines = []
-    try:
-        with open('./Orbiter.cfg', 'r') as f:
-            collect_modules = False
-            for line in f:
-                # check if line starts with ACTIVE_MODULES
-                if line.startswith('ACTIVE_MODULES'):
-                    collect_modules = True
-                    continue
-                # check if line starts with END_MODULES
-                if line.startswith('END_MODULES'):
-                    collect_modules = False
-                    break
-                if collect_modules:
-                    module_list.append(line.strip())
-                    continue
-                output_cfg_lines.append(line)
-    except Exception as e:
-        print(e)
-        return
-
-    for module_name in module_names:
-        # check if module is already enabled
-        if module_name in module_list:
-            continue
-        module_list.append(module_name)
+    config_file = 'Orbiter.cfg'
+    if enable_for_orbiter_ng:
+        config_file = 'Orbiter_NG.cfg'
     
-    # re-write Orbiter.cfg
-    with open('./Orbiter.cfg', 'w') as f:
-        for line in output_cfg_lines:
-            f.write(line)
-        f.write('ACTIVE_MODULES\n')
-        for module_name in module_list:
-            f.write(f'  {module_name}\n')
-        f.write('END_MODULES\n')
+    # check if config file exists
+    if not os.path.exists(config_file):
+        print(f'{config_file} does not exist')
+        # create config file and add the ACTIVE_MODULES
+        with open(config_file, 'w') as f:
+            f.write('ACTIVE_MODULES\n')
+            for module_name in module_names:
+                f.write(f'{module_name}\n')
+            f.write('END_MODULES\n')
+        pass
+    else:
+        try:
+            with open(config_file, 'r') as f:
+                collect_modules = False
+                for line in f:
+                    # check if line starts with ACTIVE_MODULES
+                    if line.startswith('ACTIVE_MODULES'):
+                        collect_modules = True
+                        continue
+                    # check if line starts with END_MODULES
+                    if line.startswith('END_MODULES'):
+                        collect_modules = False
+                        break
+                    if collect_modules:
+                        module_list.append(line.strip())
+                        continue
+                    output_cfg_lines.append(line)
+        except Exception as e:
+            print(e)
+            return
+
+        for module_name in module_names:
+            # check if module is already enabled
+            if module_name in module_list:
+                continue
+            module_list.append(module_name)
+    
+        # re-write Orbiter.cfg
+        with open(config_file, 'w') as f:
+            for line in output_cfg_lines:
+                f.write(line)
+            f.write('ACTIVE_MODULES\n')
+            for module_name in module_list:
+                f.write(f'  {module_name}\n')
+            f.write('END_MODULES\n')
 
 
 def main():
@@ -264,6 +298,8 @@ def main():
     if '--debug' in sys.argv:
         DEBUG = 1
         print('turning on debug mode')
+
+    download_orbiter_2016_if_needed()
 
     experiences = fetch_experiences()
     

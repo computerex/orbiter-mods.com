@@ -6,7 +6,7 @@ def main(download_from_of, download_zip, install_zip, enable_modules):
     print('downloading from OF')
     download_from_of('https://www.orbiter-forum.com/resources/soundbridge.204/download', 'SoundBridge1.1.zip')
     install_zip('SoundBridge1.1.zip')
-    enable_modules(['OrbiterSound', 'XRSound'])
+    enable_modules(['OrbiterSound', 'XRSound', 'ScnEditor', 'transx', 'Rcontrol', 'ExtMFD'])
 
 def requires_fresh_install():
     return False
