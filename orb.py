@@ -9,6 +9,7 @@ import re
 import importlib.util
 from pathlib import Path
 import json
+import webbrowser
 
 DEBUG = 0
 
@@ -23,8 +24,17 @@ def load_experience_module(experience_module_path):
 def is_file_cached(file_name):
     return os.path.exists(f'orb_cache/{file_name}')
 
-def download_from_of(url):
-    print(f'downloading from OF {url}')
+def download_from_of(url, expected_zip_name):
+    print(f'opening browser to download from OF: {url}')
+    webbrowser.open(url)
+    sys.exit(0)
+
+# get download folder path for the user
+def get_download_folder_path():
+    if os.name == 'nt':
+        return os.path.join(os.environ['USERPROFILE'], 'Downloads')
+    else:
+        return os.path.join(os.environ['HOME'], 'Downloads')
 
 def download_zip(url, file_name=None):
     if file_name is None:
@@ -157,21 +167,25 @@ def enable_modules(module_names):
     # open Orbiter.cfg for reading
     module_list = []
     output_cfg_lines = []
-    with open('./Orbiter.cfg', 'r') as f:
-        collect_modules = False
-        for line in f:
-            # check if line starts with ACTIVE_MODULES
-            if line.startswith('ACTIVE_MODULES'):
-                collect_modules = True
-                continue
-            # check if line starts with END_MODULES
-            if line.startswith('END_MODULES'):
-                collect_modules = False
-                break
-            if collect_modules:
-                module_list.append(line.strip())
-                continue
-            output_cfg_lines.append(line)
+    try:
+        with open('./Orbiter.cfg', 'r') as f:
+            collect_modules = False
+            for line in f:
+                # check if line starts with ACTIVE_MODULES
+                if line.startswith('ACTIVE_MODULES'):
+                    collect_modules = True
+                    continue
+                # check if line starts with END_MODULES
+                if line.startswith('END_MODULES'):
+                    collect_modules = False
+                    break
+                if collect_modules:
+                    module_list.append(line.strip())
+                    continue
+                output_cfg_lines.append(line)
+    except Exception as e:
+        print(e)
+        return
 
     for module_name in module_names:
         # check if module is already enabled
