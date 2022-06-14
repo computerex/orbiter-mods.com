@@ -65,6 +65,10 @@ def locate_file(expected_zip_name):
     return open_select_file_dialog()
 
 def download_from_of(url, expected_zip_name):
+    if is_file_cached(expected_zip_name):
+        print(f'{expected_zip_name} is already in cache')
+        return
+
     print(f'opening browser to download from OF: {url}')
     webbrowser.open(url)
 
