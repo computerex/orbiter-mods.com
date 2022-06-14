@@ -1,3 +1,4 @@
 C:\Users\lenovo\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\Scripts\pyinstaller.exe --distpath \\wsl$\Ubuntu\home\mohd\projects\orbiter-mods.com\dist --specpath \\wsl$\Ubuntu\home\mohd\projects\orbiter-mods.com\ --paths=C:\Users\lenovo\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages --onefile \\wsl$\Ubuntu\home\mohd\projects\orbiter-mods.com\orb.py
 move \\wsl$\Ubuntu\home\mohd\projects\orbiter-mods.com\dist\orb.exe \\wsl$\Ubuntu\home\mohd\projects\orbiter-mods.com\orb.exe
 copy \\wsl$\Ubuntu\home\mohd\projects\orbiter-mods.com\orb.exe E:\Orbiter2016
+copy \\wsl$\Ubuntu\home\mohd\projects\orbiter-mods.com\orb.py E:\Orbiter2016

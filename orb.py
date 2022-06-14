@@ -10,8 +10,17 @@ import importlib.util
 from pathlib import Path
 import json
 import webbrowser
+import tkinter as tk
+from tkinter import filedialog
 
 DEBUG = 0
+
+def open_select_file_dialog():
+    root = tk.Tk()
+    root.withdraw()
+
+    file_path = filedialog.askopenfilename()
+    return file_path
 
 def load_experience_module(experience_module_path):
     module_name = experience_module_path[:-3]
@@ -24,10 +33,51 @@ def load_experience_module(experience_module_path):
 def is_file_cached(file_name):
     return os.path.exists(f'orb_cache/{file_name}')
 
+def wait_for_file_download(file_path):
+    # wait for the file_path file to be created
+    print('waiting for file to be created')
+    while not os.path.exists(file_path):
+        time.sleep(1)
+
+    # check the file's last modified timestamp
+    last_modified = os.path.getmtime(file_path)
+    # return file_path when file's last modified timestamp has remained unchanged
+    while True:
+        print(f'sleeping for 5 seconds, checking if {file_path} is fully downloaded')
+        time.sleep(5)
+        if os.path.getmtime(file_path) == last_modified:
+            return file_path
+    return file_path
+
+def locate_file(expected_zip_name):
+    download_folder_path = get_download_folder_path()
+    file_path = os.path.join(download_folder_path, expected_zip_name)
+    print(f'trying to find download in download folder: {file_path}')
+    if os.path.exists(file_path):
+        return file_path
+    print('trying to find crdownload file in download folder')
+    if os.path.exists(f'{file_path}.crdownload'):
+        print(f'found {file_path}.crdownload')
+        return file_path
+    print('unable to automatically locate file. please wait for the download to finish, and then press any key to continue')
+    input()
+    # ask user to specify the download file location by using the open file dialog
+    return open_select_file_dialog()
+
 def download_from_of(url, expected_zip_name):
     print(f'opening browser to download from OF: {url}')
     webbrowser.open(url)
-    sys.exit(0)
+
+    # wait for the download to start
+    print('waiting for download to start')
+    time.sleep(5)
+    file_path = locate_file(expected_zip_name)
+    if file_path == '':
+        print('unable to locate file')
+        return
+    wait_for_file_download(file_path)
+    # copy file at file_path to orb_cache
+    shutil.copy(file_path, f'orb_cache/{expected_zip_name}')
 
 # get download folder path for the user
 def get_download_folder_path():
@@ -69,6 +119,8 @@ def should_generate_hash(path):
     if path.name == 'orb':
         return False
     if path.name == 'Orbiter2016.json':
+        return False
+    if path.name == 'Orbiter.cfg':
         return False
     full_path = str(path)
     # skip orb_cache
@@ -208,7 +260,7 @@ def main():
     if '--debug' in sys.argv:
         DEBUG = 1
         print('turning on debug mode')
-        
+
     experiences = fetch_experiences()
     
     if not os.path.exists('orb_cache'):
@@ -246,7 +298,11 @@ def main():
             sys.exit(1)
         print('reseting orbiter')
         reset_orbiter()
-    mod.main(download_from_of, download_zip, install_zip, enable_modules)
+    try:
+        mod.main(download_from_of, download_zip, install_zip, enable_modules)
+    except Exception as e:
+        print(f'Please contact the author of this experience script: {str(e)}')
+
     print('ok, bye!')
     time.sleep(3)
 
