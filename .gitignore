@@ -27,3 +27,9 @@ etc/ssl/
 
 node_modules/
 web/public/bundle.js
+
+build
+orb_cache
+orb.spec
+orb.exe
+orb

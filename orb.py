@@ -2,6 +2,7 @@ import sys
 import os
 import time
 import hashlib
+from unittest import skip
 import zipfile
 import shutil
 import requests
@@ -91,11 +92,11 @@ def get_download_folder_path():
     else:
         return os.path.join(os.environ['HOME'], 'Downloads')
 
-def download_zip(url, file_name=None):
+def download_zip(url, file_name=None, skip_cache=False):
     if file_name is None:
         file_name = url.split('/')[-1]
 
-    if not file_name.endswith('.py') and is_file_cached(file_name):
+    if not skip_cache and is_file_cached(file_name):
         print(f'{file_name} is already in cache')
         return
 
@@ -186,16 +187,16 @@ def download_orbiter_2016_if_needed():
         if is_file_cached('Orbiter2016.zip'):
             print('Orbiter2016.zip is already in cache')
         else:
-            host = 'https://orbiter-mods.com'
+            orbiter_url = 'http://alteaaerospace.com/ccount/click.php?id=47'
             if DEBUG == 1:
-                host = 'http://localhost:8000'
+                orbiter_url = 'http://localhost:8000/Orbiter2016.zip'
 
             # ask user if they want to continue to download Orbiter2016
             print('Orbiter2016 is not in cache. would you like to download it?')
             if input('(y/n) ') != 'y':
                 print('aborting orbiter2016 download')
                 return        
-            download_zip(f'{host}/Orbiter2016.zip', 'Orbiter2016.zip')
+            download_zip(orbiter_url, 'Orbiter2016.zip')
         # unzip Orbiter2016.zip to orb_cache/Orbiter2016
         print('unzipping Orbiter2016.zip')
         with zipfile.ZipFile(f'orb_cache/Orbiter2016.zip', 'r') as zip_ref:
@@ -226,9 +227,18 @@ def reset_orbiter():
         # copy removed file from orb_cache/Orbiter2016 to ./
         shutil.copy(f'orb_cache/Orbiter2016/{file_to_revert}', file_to_revert)
 
-def install_zip(file):
+def install_zip(file, install_subdir=None):
+    output_dir = './'
+    if install_subdir:
+        output_dir = os.path.join('orb_cache', install_subdir)
+
     with zipfile.ZipFile(f'orb_cache/{file}', 'r') as zip_ref:
-        zip_ref.extractall('./')
+        zip_ref.extractall(output_dir)
+    
+    if install_subdir:
+        # copy all files from orb_cache/install_subdir to current folder keeping directory structure in tact
+        print('copying files from ' + os.path.join('orb_cache', install_subdir, install_subdir) + ' to current folder')
+        copy_tree(os.path.join('orb_cache', install_subdir, install_subdir), '.')
 
 # fetch experiences from https://orbiter-mods.com/fetch_experiences
 def fetch_experiences():
@@ -299,12 +309,15 @@ def main():
         DEBUG = 1
         print('turning on debug mode')
 
+    if not os.path.exists('orb_cache'):
+        # set current working dir to parent directory of this file
+        print('moving up dir')
+        os.chdir("..")
+        print(os.getcwd())
+
     download_orbiter_2016_if_needed()
 
     experiences = fetch_experiences()
-    
-    if not os.path.exists('orb_cache'):
-        os.mkdir('orb_cache')
 
     for inx, experience in enumerate(experiences):
         print(f'{inx+1}: {experience["name"]}')
@@ -324,8 +337,7 @@ def main():
     experience_script_url = experience['experience_script']
     # fetch experience_script_url and save it in orb_cache
     experience_script_file_name = experience_script_url.split('/')[-1]
-    if not is_file_cached(experience_script_file_name):
-        download_zip(experience_script_url, experience_script_file_name)
+    download_zip(experience_script_url, experience_script_file_name, skip_cache=True)
     # load experience_script_file_name
     mod = load_experience_module(f'orb_cache/{experience_script_file_name}')
 

@@ -6,6 +6,9 @@ def main(download_from_of, download_zip, install_zip, enable_modules):
     print('downloading from OF')
     download_from_of('https://www.orbiter-forum.com/resources/soundbridge.204/download', 'SoundBridge1.1.zip')
     install_zip('SoundBridge1.1.zip')
+    download_zip('http://users.kymp.net/~p501474a/D3D9Client/D3D9ClientR4.25-forOrbiter2016(r1446).zip', 'D3D9ClientR4.25-forOrbiter2016(r1446).zip')
+    install_zip('D3D9ClientR4.25-forOrbiter2016(r1446).zip')
+    
     enable_modules(['OrbiterSound', 'XRSound', 'ScnEditor', 'transx', 'Rcontrol', 'ExtMFD'])
 
 def requires_fresh_install():
