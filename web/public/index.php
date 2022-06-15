@@ -57,7 +57,7 @@ $app->post('/user', function ($request, $response) {
 $app->get('/fetch_experiences', function ($request, $response) {
     $host = 'https://orbiter-mods.com';
 
-    if (true) {
+    if (getenv('DEBUG') == '1') {
         $host = 'http://localhost:8000';
     }
 
