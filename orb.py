@@ -245,6 +245,7 @@ def fetch_experiences():
     host = 'https://orbiter-mods.com'
     if DEBUG == 1:
         host = 'http://localhost:8000'
+    print(f'fetching {host}/fetch_experiences')
     r = requests.get(f'{host}/fetch_experiences')
     return r.json()
     

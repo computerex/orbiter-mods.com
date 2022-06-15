@@ -8,8 +8,9 @@ def main(download_from_of, download_zip, install_zip, enable_modules):
     install_zip('SoundBridge1.1.zip')
     download_zip('http://users.kymp.net/~p501474a/D3D9Client/D3D9ClientR4.25-forOrbiter2016(r1446).zip', 'D3D9ClientR4.25-forOrbiter2016(r1446).zip')
     install_zip('D3D9ClientR4.25-forOrbiter2016(r1446).zip')
-    
-    enable_modules(['OrbiterSound', 'XRSound', 'ScnEditor', 'transx', 'Rcontrol', 'ExtMFD'])
+
+    enable_modules(['OrbiterSound', 'XRSound', 'ScnEditor', 'transx', 'ExtMFD'])
+    enable_modules(['D3D9Client', 'GenericCamera', 'transx', 'OrbiterSound', 'XRSound', 'DX9ExtMFD', 'ScnEditor'], enable_for_orbiter_ng=True)
 
 def requires_fresh_install():
     return False
