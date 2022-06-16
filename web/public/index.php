@@ -64,13 +64,14 @@ $app->get('/fetch_experiences', function ($request, $response) {
     return $response->withJson([
         [
             'id' => 1,
-            'name' => 'Orbiter essentials: XR fleet, XRSound, Soundbridge (dbeachy, face)',
+            'name' => 'Orbiter essentials: XR fleet, XRSound, Soundbridge, D3D9Client (dbeachy, face, jarmonik)',
             'external_links' => [
                 'https://www.alteaaerospace.com/index-3.html',
-                'https://www.orbiter-forum.com/resources/soundbridge.204/'
+                'https://www.orbiter-forum.com/resources/soundbridge.204/',
+                'http://users.kymp.net/~p501474a/D3D9Client/'
             ],
             'experience_script' => "$host/experiences/essentials.py",
-            'description' => 'Installs the wonderful XR fleet by Doug Beachy as well as XRSound, and Soundbridge by Face.'
+            'description' => 'Installs the wonderful XR fleet by Doug Beachy as well as XRSound, and Soundbridge by Face. And the D3D9Client by Jarmonik.',
         ],
     ]);
 });
