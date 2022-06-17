@@ -309,7 +309,7 @@ def main():
     if '--debug' in sys.argv:
         DEBUG = 1
         print('turning on debug mode')
-
+    
     if not os.path.exists('orb_cache'):
         # set current working dir to parent directory of this file
         print('moving up dir')
@@ -319,6 +319,18 @@ def main():
     download_orbiter_2016_if_needed()
 
     experiences = fetch_experiences()
+
+    # find all *.py files in orb_cache dir
+    if '--enable-unknown-source' in sys.argv:
+        print('enabling unknown source')
+        experience_files  = [f for f in os.listdir('orb_cache') if f.endswith('.py')]
+        for experience_file in experience_files:
+            experiences.append({
+                'name': f'{experience_file} (orb_cache)',
+                'description': f'unknown experience script orb_cache/{experience_file} run with care',
+                'external_links': [],
+                'experience_script': f'orb_cache/{experience_file}'
+            })
 
     for inx, experience in enumerate(experiences):
         print(f'{inx+1}: {experience["name"]}')
