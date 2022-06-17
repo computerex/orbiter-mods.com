@@ -27,6 +27,7 @@ etc/ssl/
 
 node_modules/
 web/public/bundle.js
+search/app/public/bundle.js
 
 build
 orb_cache
