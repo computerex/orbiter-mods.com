@@ -4,7 +4,8 @@
   "description": "search services for orbiter by orbiter.mods.com",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "bundle": "esbuild --bundle --minify frontend/index.js --outfile=public/bundle.js"
   },
   "repository": {
     "type": "git",
@@ -23,6 +24,11 @@
   "homepage": "https://github.com/computerex/orbiter-mods.com#readme",
   "dependencies": {
     "body-parser": "^1.20.0",
-    "express": "^4.18.1"
+    "express": "^4.18.1",
+    "jquery": "^3.6.0",
+    "underscore": "^1.13.3"
+  },
+  "devDependencies": {
+    "esbuild": "^0.14.39"
   }
 }
