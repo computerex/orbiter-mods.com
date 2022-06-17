@@ -239,6 +239,21 @@ def reset_orbiter():
         # copy removed file from orb_cache/Orbiter2016 to ./
         shutil.copy(f'orb_cache/Orbiter2016/{file_to_revert}', file_to_revert)
 
+def install_exe(file):
+    # check if file is in current folder
+    if not os.path.exists(file):
+        # check if file is in orb_cache
+        if not is_file_cached(file):
+            print(f'{file} is not in cache or current folder - have you downloaded it?')
+            return
+    else:
+        # move file to orb_cache
+        print(f'{file} is in current folder. moving to cache')
+        shutil.move(file, f'orb_cache/{file}')
+    # run the downloaded exe at orb_cache/file with subprocess run
+    print(f'running {file}')
+    subprocess.run(f'orb_cache/{file}')
+
 def install_zip(file, install_subdir=None):
     output_dir = './'
     if install_subdir:
@@ -256,7 +271,7 @@ def install_rar(file, install_subdir=None):
     output_dir = './'
     if install_subdir:
         output_dir = os.path.join('orb_cache', install_subdir)
-        
+
     subprocess.run(f'{os.path.join("orb_cache", "unarr.exe")} {os.path.join("orb_cache", file)} .')
     
     if install_subdir:
@@ -331,10 +346,10 @@ def enable_modules(module_names, enable_for_orbiter_ng=False):
 def main():
     global DEBUG
 
-    # if launched as admin or root, terminate
-    if is_user_admin():
-        print('Running the program in admin mode is not supported for security reasons')
-        return
+    # # if launched as admin or root, terminate
+    # if is_user_admin():
+    #     print('Running the program in admin mode is not supported for security reasons')
+    #     return
 
     if '--debug' in sys.argv:
         DEBUG = 1
@@ -395,7 +410,7 @@ def main():
         print('reseting orbiter')
         reset_orbiter()
     try:
-        mod.main(download_from_of, download_zip, install_zip, enable_modules, install_rar)
+        mod.main(download_from_of, download_zip, install_zip, enable_modules, install_rar, install_exe)
     except Exception as e:
         print(f'Please contact the author of this experience script: {str(e)}')
 
