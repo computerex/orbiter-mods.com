@@ -338,7 +338,8 @@ def main():
     experience_script_url = experience['experience_script']
     # fetch experience_script_url and save it in orb_cache
     experience_script_file_name = experience_script_url.split('/')[-1]
-    download_zip(experience_script_url, experience_script_file_name, skip_cache=True)
+    if not is_file_cached(experience_script_file_name):
+        download_zip(experience_script_url, experience_script_file_name, skip_cache=True)
     # load experience_script_file_name
     mod = load_experience_module(f'orb_cache/{experience_script_file_name}')
 
