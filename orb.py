@@ -14,8 +14,20 @@ import webbrowser
 import tkinter as tk
 from tkinter import filedialog
 from distutils.dir_util import copy_tree
+import subprocess
+import ctypes
+
 
 DEBUG = 0
+
+def is_user_admin():
+    try:
+        is_admin = os.getuid() == 0
+    except AttributeError:
+        is_admin = ctypes.windll.shell32.IsUserAnAdmin() != 0
+    
+    return is_admin
+
 
 def open_select_file_dialog():
     root = tk.Tk()
@@ -240,6 +252,18 @@ def install_zip(file, install_subdir=None):
         print('copying files from ' + os.path.join('orb_cache', install_subdir, install_subdir) + ' to current folder')
         copy_tree(os.path.join('orb_cache', install_subdir, install_subdir), '.')
 
+def install_rar(file, install_subdir=None):
+    output_dir = './'
+    if install_subdir:
+        output_dir = os.path.join('orb_cache', install_subdir)
+        
+    subprocess.run(f'{os.path.join("orb_cache", "unarr.exe")} {os.path.join("orb_cache", file)} .')
+    
+    if install_subdir:
+        # copy all files from orb_cache/install_subdir to current folder keeping directory structure in tact
+        print('copying files from ' + os.path.join('orb_cache', install_subdir, install_subdir) + ' to current folder')
+        copy_tree(os.path.join('orb_cache', install_subdir, install_subdir), '.')
+
 # fetch experiences from https://orbiter-mods.com/fetch_experiences
 def fetch_experiences():
     host = 'https://orbiter-mods.com'
@@ -306,6 +330,12 @@ def enable_modules(module_names, enable_for_orbiter_ng=False):
 
 def main():
     global DEBUG
+
+    # if launched as admin or root, terminate
+    if is_user_admin():
+        print('Running the program in admin mode is not supported for security reasons')
+        return
+
     if '--debug' in sys.argv:
         DEBUG = 1
         print('turning on debug mode')
@@ -365,7 +395,7 @@ def main():
         print('reseting orbiter')
         reset_orbiter()
     try:
-        mod.main(download_from_of, download_zip, install_zip, enable_modules)
+        mod.main(download_from_of, download_zip, install_zip, enable_modules, install_rar)
     except Exception as e:
         print(f'Please contact the author of this experience script: {str(e)}')
 
