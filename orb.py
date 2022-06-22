@@ -16,6 +16,7 @@ from tkinter import filedialog
 from distutils.dir_util import copy_tree
 import subprocess
 import ctypes
+import traceback
 
 
 DEBUG = 0
@@ -59,8 +60,10 @@ def wait_for_file_download(file_path):
     while True:
         print(f'sleeping for 5 seconds, checking if {file_path} is fully downloaded')
         time.sleep(5)
-        if os.path.getmtime(file_path) == last_modified:
+        cur_time = os.path.getmtime(file_path)
+        if cur_time == last_modified:
             return file_path
+        last_modified = cur_time
     return file_path
 
 def locate_file(expected_zip_name):
@@ -78,7 +81,7 @@ def locate_file(expected_zip_name):
     # ask user to specify the download file location by using the open file dialog
     return open_select_file_dialog()
 
-def download_from_of(url, expected_zip_name):
+def download_from_of(self, url, expected_zip_name):
     if is_file_cached(expected_zip_name):
         print(f'{expected_zip_name} is already in cache')
         return
@@ -104,7 +107,7 @@ def get_download_folder_path():
     else:
         return os.path.join(os.environ['HOME'], 'Downloads')
 
-def download_zip(url, file_name=None, skip_cache=False):
+def download_zip(self, url, file_name=None, skip_cache=False):
     if file_name is None:
         file_name = url.split('/')[-1]
 
@@ -239,7 +242,7 @@ def reset_orbiter():
         # copy removed file from orb_cache/Orbiter2016 to ./
         shutil.copy(f'orb_cache/Orbiter2016/{file_to_revert}', file_to_revert)
 
-def install_exe(file):
+def install_exe(self, file):
     # check if file is in current folder
     if not os.path.exists(file):
         # check if file is in orb_cache
@@ -254,7 +257,7 @@ def install_exe(file):
     print(f'running {file}')
     subprocess.run(f'orb_cache/{file}')
 
-def install_zip(file, install_subdir=None):
+def install_zip(self, file, install_subdir=None):
     output_dir = './'
     if install_subdir:
         output_dir = os.path.join('orb_cache', install_subdir)
@@ -267,7 +270,7 @@ def install_zip(file, install_subdir=None):
         print('copying files from ' + os.path.join('orb_cache', install_subdir, install_subdir) + ' to current folder')
         copy_tree(os.path.join('orb_cache', install_subdir, install_subdir), '.')
 
-def install_rar(file, install_subdir=None):
+def install_rar(self, file, install_subdir=None):
     output_dir = './'
     if install_subdir:
         output_dir = os.path.join('orb_cache', install_subdir)
@@ -288,7 +291,7 @@ def fetch_experiences():
     r = requests.get(f'{host}/fetch_experiences')
     return r.json()
     
-def enable_modules(module_names, enable_for_orbiter_ng=False):
+def enable_modules(self, module_names, enable_for_orbiter_ng=False):
     # open Orbiter.cfg for reading
     module_list = []
     output_cfg_lines = []
@@ -341,9 +344,6 @@ def enable_modules(module_names, enable_for_orbiter_ng=False):
             for module_name in module_list:
                 f.write(f'  {module_name}\n')
             f.write('END_MODULES\n')
-
-def get_orb_functions():
-    return download_from_of, download_zip, install_zip, enable_modules, install_rar, install_exe
 
 def main():
     global DEBUG
@@ -411,10 +411,19 @@ def main():
             sys.exit(1)
         print('reseting orbiter')
         reset_orbiter()
-    try:
-        mod.main(get_orb_functions)
+    try:        
+        orb = type('',(object,),{
+            "download_from_of": lambda *args: download_from_of(*args),
+            "download_zip": lambda *args: download_zip(*args),
+            "install_zip": lambda *args: install_zip(*args),
+            "enable_modules": lambda *args: enable_modules(*args),
+            "install_rar": lambda *args: install_rar(*args),
+            "install_exe": lambda *args: install_exe(*args)
+        })()
+        mod.main(orb)
     except Exception as e:
         print(f'Please contact the author of this experience script: {str(e)}')
+        traceback.print_exc()
 
     print('ok, bye!')
     time.sleep(3)
