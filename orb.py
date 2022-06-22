@@ -342,6 +342,8 @@ def enable_modules(module_names, enable_for_orbiter_ng=False):
                 f.write(f'  {module_name}\n')
             f.write('END_MODULES\n')
 
+def get_orb_functions():
+    return download_from_of, download_zip, install_zip, enable_modules, install_rar, install_exe
 
 def main():
     global DEBUG
@@ -410,7 +412,7 @@ def main():
         print('reseting orbiter')
         reset_orbiter()
     try:
-        mod.main(download_from_of, download_zip, install_zip, enable_modules, install_rar, install_exe)
+        mod.main(get_orb_functions)
     except Exception as e:
         print(f'Please contact the author of this experience script: {str(e)}')
 
