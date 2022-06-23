@@ -48,6 +48,10 @@ def main(orb):
     orb.download_from_of('https://www.orbiter-forum.com/resources/boca-chica-base.778/download' , 'boca_chica_base_220304.zip')  
     orb.install_zip('boca_chica_base_220304.zip')
 
+    orb.enable_modules(['CrewDragonMFD'])
+    orb.enable_modules(['CrewDragonMFD'], True)
+
+
 
 def requires_fresh_install():
     return False
