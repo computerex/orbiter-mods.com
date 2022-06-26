@@ -76,7 +76,7 @@ def locate_file(expected_zip_name):
     if os.path.exists(f'{file_path}.crdownload'):
         print(f'found {file_path}.crdownload')
         return file_path
-    print('unable to automatically locate file. please wait for the download to finish, and then press any key to continue')
+    print('unable to automatically locate file. please wait for the download to finish, and then press enter to continue')
     input()
     # ask user to specify the download file location by using the open file dialog
     return open_select_file_dialog()
