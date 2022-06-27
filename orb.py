@@ -290,60 +290,62 @@ def fetch_experiences():
     print(f'fetching {host}/fetch_experiences')
     r = requests.get(f'{host}/fetch_experiences')
     return r.json()
-    
-def enable_modules(self, module_names, enable_for_orbiter_ng=False):
-    # open Orbiter.cfg for reading
-    module_list = []
+
+def edit_cfg_file(self, cfg, start_tag, end_tag, new_lines):
+    current_list = []
     output_cfg_lines = []
-    config_file = 'Orbiter.cfg'
-    if enable_for_orbiter_ng:
-        config_file = 'Orbiter_NG.cfg'
     
     # check if config file exists
-    if not os.path.exists(config_file):
-        print(f'{config_file} does not exist')
-        # create config file and add the ACTIVE_MODULES
-        with open(config_file, 'w') as f:
-            f.write('ACTIVE_MODULES\n')
-            for module_name in module_names:
-                f.write(f'{module_name}\n')
-            f.write('END_MODULES\n')
-        pass
+    if not os.path.exists(cfg):
+        print(f'{cfg} does not exist')
+        # create config file and add the start/end tags
+        with open(cfg, 'w') as f:
+            f.write(f'{start_tag}\n')
+            for line in new_lines:
+                f.write(f'{line}\n')
+            f.write(f'{end_tag}\n')
     else:
         try:
-            with open(config_file, 'r') as f:
-                collect_modules = False
+            with open(cfg, 'r') as f:
+                collect_lines = False
                 for line in f:
-                    # check if line starts with ACTIVE_MODULES
-                    if line.startswith('ACTIVE_MODULES'):
-                        collect_modules = True
+                    # check if line starts with start_tag
+                    if line.startswith(start_tag):
+                        collect_lines = True
                         continue
-                    # check if line starts with END_MODULES
-                    if line.startswith('END_MODULES'):
-                        collect_modules = False
+                    # check if line starts with end_tag
+                    if line.startswith(end_tag):
+                        collect_lines = False
                         break
-                    if collect_modules:
-                        module_list.append(line.strip())
+                    if collect_lines:
+                        current_list.append(line.strip())
                         continue
                     output_cfg_lines.append(line)
         except Exception as e:
             print(e)
             return
 
-        for module_name in module_names:
-            # check if module is already enabled
-            if module_name in module_list:
+        for line in new_lines:
+            # check if line is already in the file
+            if line in current_list:
                 continue
-            module_list.append(module_name)
+            current_list.append(line)
     
-        # re-write Orbiter.cfg
-        with open(config_file, 'w') as f:
+        # re-write cfg
+        with open(cfg, 'w') as f:
             for line in output_cfg_lines:
                 f.write(line)
-            f.write('ACTIVE_MODULES\n')
-            for module_name in module_list:
-                f.write(f'  {module_name}\n')
-            f.write('END_MODULES\n')
+            f.write(f'{start_tag}\n')
+            for line in current_list:
+                f.write(f'  {line}\n')
+            f.write(f'{end_tag}\n')
+
+
+def enable_modules(self, module_names, enable_for_orbiter_ng=False):
+    config_file = 'Orbiter.cfg'
+    if enable_for_orbiter_ng:
+        config_file = 'Orbiter_NG.cfg'
+    edit_cfg_file(self, config_file, 'ACTIVE_MODULES', 'END_MODULES', module_names)
 
 def main():
     global DEBUG

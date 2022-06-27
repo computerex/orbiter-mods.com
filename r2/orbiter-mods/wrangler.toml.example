@@ -1,0 +1,10 @@
+name = "orbiter-mods"
+main = "src/index.js"
+compatibility_date = "2022-06-26"
+
+account_id = "<account_id>"
+workers_dev = true
+
+[[r2_buckets]]
+binding = 'MY_BUCKET'
+bucket_name = 'orbiter-mods'
