@@ -35,3 +35,4 @@ orb.spec
 orb.exe
 orb
 wrangler.toml
+secrets.json
