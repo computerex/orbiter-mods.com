@@ -241,16 +241,17 @@ class Orb:
             # copy all files from orb_cache/install_subdir to current folder keeping directory structure in tact
             print('copying files from ' + os.path.join('orb_cache', install_subdir, install_subdir) + ' to current folder')
             copy_tree(os.path.join('orb_cache', install_subdir, install_subdir), '.')
-        
-        print(scn_files)
+
         # create new directory in Scenarios/ folder named self.scn_dir
-        print(f'creating new directory in Scenarios/ folder named {self.scn_dir}')
-        try:
-            os.makedirs(os.path.join('Scenarios', self.scn_dir))
-        except Exception as e:
-            print(str(e))
+        if not os.path.exists(os.path.join('.', 'Scenarios', self.scn_dir)):
+            print(f'creating new directory in Scenarios/ folder named {self.scn_dir}')
+            try:
+                os.makedirs(os.path.join('Scenarios', self.scn_dir))
+            except Exception as e:
+                pass
         # copy all scn_files to Scenarios/self.scn_dir
-        print(f'copying all .scn files to Scenarios/{self.scn_dir}')
+        if len(scn_files) > 0:
+            print(f'copying all .scn files to Scenarios/{self.scn_dir}')
         for scn_file in scn_files:
             print(f'copying {scn_file} to {os.path.join("Scenarios", self.scn_dir)}')
             shutil.copy(os.path.join('.', 'Scenarios', scn_file), os.path.join('.', 'Scenarios', self.scn_dir))
