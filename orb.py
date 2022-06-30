@@ -17,6 +17,7 @@ from distutils.dir_util import copy_tree
 import subprocess
 import ctypes
 import traceback
+import progressbar
 
 
 DEBUG = 0
@@ -28,7 +29,6 @@ def is_user_admin():
         is_admin = ctypes.windll.shell32.IsUserAnAdmin() != 0
     
     return is_admin
-
 
 def open_select_file_dialog():
     root = tk.Tk()
@@ -81,51 +81,13 @@ def locate_file(expected_zip_name):
     # ask user to specify the download file location by using the open file dialog
     return open_select_file_dialog()
 
-def download_from_of(self, url, expected_zip_name):
-    if is_file_cached(expected_zip_name):
-        print(f'{expected_zip_name} is already in cache')
-        return
-
-    print(f'opening browser to download from OF: {url}')
-    webbrowser.open(url)
-
-    # wait for the download to start
-    print('waiting for download to start')
-    time.sleep(5)
-    file_path = locate_file(expected_zip_name)
-    if file_path == '':
-        print('unable to locate file')
-        return
-    wait_for_file_download(file_path)
-    # copy file at file_path to orb_cache
-    shutil.copy(file_path, f'orb_cache/{expected_zip_name}')
-
 # get download folder path for the user
 def get_download_folder_path():
     if os.name == 'nt':
         return os.path.join(os.environ['USERPROFILE'], 'Downloads')
     else:
         return os.path.join(os.environ['HOME'], 'Downloads')
-
-def download_zip(self, url, file_name=None, skip_cache=False):
-    if file_name is None:
-        file_name = url.split('/')[-1]
-
-    if not skip_cache and is_file_cached(file_name):
-        print(f'{file_name} is already in cache')
-        return
-
-    print(f'downloading {url}')
-    r = requests.get(url, allow_redirects=True)
-    if 'Content-Disposition' in r.headers:
-        zip_file_name = r.headers['Content-Disposition'].split('filename=')[1]
-    else:
-        zip_file_name = file_name
-
-    # lunar.industries
-    with open(f'orb_cache/{zip_file_name}', "wb") as f:
-        f.write(r.content)
-    
+  
 def should_generate_hash(path):
     # check if path is a dir or file
     if path.is_dir():
@@ -193,7 +155,7 @@ def verify_orbiter_hash(hash_file):
             print(e)
     return files_to_revert
 
-def download_orbiter_2016_if_needed():
+def download_orbiter_2016_if_needed(orb):
     # check if orbiter 2016 is already downloaded and unzipped in orb_cache
     if os.path.exists('./orb_cache/Orbiter2016'):
         pass
@@ -211,7 +173,7 @@ def download_orbiter_2016_if_needed():
             if input('(y/n) ') != 'y':
                 print('aborting orbiter2016 download')
                 return        
-            download_zip(orbiter_url, 'Orbiter2016.zip')
+            orb.download_zip(orbiter_url, 'Orbiter2016.zip')
         # unzip Orbiter2016.zip to orb_cache/Orbiter2016
         print('unzipping Orbiter2016.zip')
         with zipfile.ZipFile(f'orb_cache/Orbiter2016.zip', 'r') as zip_ref:
@@ -224,7 +186,6 @@ def download_orbiter_2016_if_needed():
             # copy all files from orb_cache/Orbiter2016 to current folder keeping directory structure in tact
             print('copying files from Orbiter2016 to current folder')
             copy_tree(os.path.join('orb_cache', 'Orbiter2016'), '.')
-
 
 def reset_orbiter():
     # ask user to confirm as doing this action will destroy the current orbiter install
@@ -242,45 +203,166 @@ def reset_orbiter():
         # copy removed file from orb_cache/Orbiter2016 to ./
         shutil.copy(f'orb_cache/Orbiter2016/{file_to_revert}', file_to_revert)
 
-def install_exe(self, file):
-    # check if file is in current folder
-    if not os.path.exists(file):
-        # check if file is in orb_cache
-        if not is_file_cached(file):
-            print(f'{file} is not in cache or current folder - have you downloaded it?')
+class Orb:
+    def __init__(self, scn_dir=None):
+        self.scn_dir = scn_dir
+
+    def install_exe(self, file):
+        # check if file is in current folder
+        if not os.path.exists(file):
+            # check if file is in orb_cache
+            if not is_file_cached(file):
+                print(f'{file} is not in cache or current folder - have you downloaded it?')
+                return
+        else:
+            # move file to orb_cache
+            print(f'{file} is in current folder. moving to cache')
+            shutil.move(file, f'orb_cache/{file}')
+        # run the downloaded exe at orb_cache/file with subprocess run
+        print(f'running {file}')
+        subprocess.run(f'orb_cache/{file}')
+
+    def install_zip(self, file, install_subdir=None):
+        output_dir = './'
+        if install_subdir:
+            output_dir = os.path.join('orb_cache', install_subdir)
+
+        scn_files = []
+        with zipfile.ZipFile(f'orb_cache/{file}', 'r') as zip_ref:
+            zip_ref.extractall(output_dir)
+            # get list of all files in zip
+            files = zip_ref.namelist()
+            # find all files ending with .scn file extension
+            scn_files = [
+                file[file.find('Scenarios/')+10:] for file in files if file.lower().endswith('.scn') and file.find('Scenarios/') != -1
+            ]
+        
+        if install_subdir:
+            # copy all files from orb_cache/install_subdir to current folder keeping directory structure in tact
+            print('copying files from ' + os.path.join('orb_cache', install_subdir, install_subdir) + ' to current folder')
+            copy_tree(os.path.join('orb_cache', install_subdir, install_subdir), '.')
+        
+        print(scn_files)
+        # create new directory in Scenarios/ folder named self.scn_dir
+        print(f'creating new directory in Scenarios/ folder named {self.scn_dir}')
+        try:
+            os.makedirs(os.path.join('Scenarios', self.scn_dir))
+        except Exception as e:
+            print(str(e))
+        # copy all scn_files to Scenarios/self.scn_dir
+        print(f'copying all .scn files to Scenarios/{self.scn_dir}')
+        for scn_file in scn_files:
+            print(f'copying {scn_file} to {os.path.join("Scenarios", self.scn_dir)}')
+            shutil.copy(os.path.join('.', 'Scenarios', scn_file), os.path.join('.', 'Scenarios', self.scn_dir))
+
+    def install_rar(self, file, install_subdir=None):
+        output_dir = './'
+        if install_subdir:
+            output_dir = os.path.join('orb_cache', install_subdir)
+
+        subprocess.run(f'{os.path.join("orb_cache", "unarr.exe")} {os.path.join("orb_cache", file)} .')
+        
+        if install_subdir:
+            # copy all files from orb_cache/install_subdir to current folder keeping directory structure in tact
+            print('copying files from ' + os.path.join('orb_cache', install_subdir, install_subdir) + ' to current folder')
+            copy_tree(os.path.join('orb_cache', install_subdir, install_subdir), '.')
+    
+    def edit_cfg_file(self, cfg, start_tag, end_tag, new_lines):
+        current_list = []
+        output_cfg_lines = []
+        
+        # check if config file exists
+        if not os.path.exists(cfg):
+            print(f'{cfg} does not exist')
+            # create config file and add the start/end tags
+            with open(cfg, 'w') as f:
+                f.write(f'{start_tag}\n')
+                for line in new_lines:
+                    f.write(f'{line}\n')
+                f.write(f'{end_tag}\n')
+        else:
+            try:
+                with open(cfg, 'r') as f:
+                    collect_lines = False
+                    for line in f:
+                        # check if line starts with start_tag
+                        if line.startswith(start_tag):
+                            collect_lines = True
+                            continue
+                        # check if line starts with end_tag
+                        if line.startswith(end_tag):
+                            collect_lines = False
+                            break
+                        if collect_lines:
+                            current_list.append(line.strip())
+                            continue
+                        output_cfg_lines.append(line)
+            except Exception as e:
+                print(e)
+                return
+
+            for line in new_lines:
+                # check if line is already in the file
+                if line in current_list:
+                    continue
+                current_list.append(line)
+        
+            # re-write cfg
+            with open(cfg, 'w') as f:
+                for line in output_cfg_lines:
+                    f.write(line)
+                f.write(f'{start_tag}\n')
+                for line in current_list:
+                    f.write(f'  {line}\n')
+                f.write(f'{end_tag}\n')
+
+
+    def enable_modules(self, module_names, enable_for_orbiter_ng=False):
+        config_file = 'Orbiter.cfg'
+        if enable_for_orbiter_ng:
+            config_file = 'Orbiter_NG.cfg'
+        self.edit_cfg_file(config_file, 'ACTIVE_MODULES', 'END_MODULES', module_names)
+
+    def download_zip(self, url, file_name=None, skip_cache=False):
+        if file_name is None:
+            file_name = url.split('/')[-1]
+
+        if not skip_cache and is_file_cached(file_name):
+            print(f'{file_name} is already in cache')
             return
-    else:
-        # move file to orb_cache
-        print(f'{file} is in current folder. moving to cache')
-        shutil.move(file, f'orb_cache/{file}')
-    # run the downloaded exe at orb_cache/file with subprocess run
-    print(f'running {file}')
-    subprocess.run(f'orb_cache/{file}')
 
-def install_zip(self, file, install_subdir=None):
-    output_dir = './'
-    if install_subdir:
-        output_dir = os.path.join('orb_cache', install_subdir)
+        print(f'downloading {url}')
+        r = requests.get(url, allow_redirects=True)
+        if 'Content-Disposition' in r.headers:
+            zip_file_name = r.headers['Content-Disposition'].split('filename=')[1]
+        else:
+            zip_file_name = file_name
 
-    with zipfile.ZipFile(f'orb_cache/{file}', 'r') as zip_ref:
-        zip_ref.extractall(output_dir)
+        # lunar.industries
+        with open(f'orb_cache/{zip_file_name}', "wb") as f:
+            f.write(r.content)
+
+    def download_from_of(self, url, expected_zip_name):
+        if is_file_cached(expected_zip_name):
+            print(f'{expected_zip_name} is already in cache')
+            return
+
+        print(f'opening browser to download from OF: {url}')
+        webbrowser.open(url)
+
+        # wait for the download to start
+        print('waiting for download to start')
+        time.sleep(5)
+        file_path = locate_file(expected_zip_name)
+        if file_path == '':
+            print('unable to locate file')
+            return
+        wait_for_file_download(file_path)
+        # copy file at file_path to orb_cache
+        shutil.copy(file_path, f'orb_cache/{expected_zip_name}')
     
-    if install_subdir:
-        # copy all files from orb_cache/install_subdir to current folder keeping directory structure in tact
-        print('copying files from ' + os.path.join('orb_cache', install_subdir, install_subdir) + ' to current folder')
-        copy_tree(os.path.join('orb_cache', install_subdir, install_subdir), '.')
-
-def install_rar(self, file, install_subdir=None):
-    output_dir = './'
-    if install_subdir:
-        output_dir = os.path.join('orb_cache', install_subdir)
-
-    subprocess.run(f'{os.path.join("orb_cache", "unarr.exe")} {os.path.join("orb_cache", file)} .')
-    
-    if install_subdir:
-        # copy all files from orb_cache/install_subdir to current folder keeping directory structure in tact
-        print('copying files from ' + os.path.join('orb_cache', install_subdir, install_subdir) + ' to current folder')
-        copy_tree(os.path.join('orb_cache', install_subdir, install_subdir), '.')
+    def set_scn_dir(self, scn_dir):
+        self.scn_dir = scn_dir
 
 # fetch experiences from https://orbiter-mods.com/fetch_experiences
 def fetch_experiences():
@@ -290,62 +372,6 @@ def fetch_experiences():
     print(f'fetching {host}/fetch_experiences')
     r = requests.get(f'{host}/fetch_experiences')
     return r.json()
-
-def edit_cfg_file(self, cfg, start_tag, end_tag, new_lines):
-    current_list = []
-    output_cfg_lines = []
-    
-    # check if config file exists
-    if not os.path.exists(cfg):
-        print(f'{cfg} does not exist')
-        # create config file and add the start/end tags
-        with open(cfg, 'w') as f:
-            f.write(f'{start_tag}\n')
-            for line in new_lines:
-                f.write(f'{line}\n')
-            f.write(f'{end_tag}\n')
-    else:
-        try:
-            with open(cfg, 'r') as f:
-                collect_lines = False
-                for line in f:
-                    # check if line starts with start_tag
-                    if line.startswith(start_tag):
-                        collect_lines = True
-                        continue
-                    # check if line starts with end_tag
-                    if line.startswith(end_tag):
-                        collect_lines = False
-                        break
-                    if collect_lines:
-                        current_list.append(line.strip())
-                        continue
-                    output_cfg_lines.append(line)
-        except Exception as e:
-            print(e)
-            return
-
-        for line in new_lines:
-            # check if line is already in the file
-            if line in current_list:
-                continue
-            current_list.append(line)
-    
-        # re-write cfg
-        with open(cfg, 'w') as f:
-            for line in output_cfg_lines:
-                f.write(line)
-            f.write(f'{start_tag}\n')
-            for line in current_list:
-                f.write(f'  {line}\n')
-            f.write(f'{end_tag}\n')
-
-
-def enable_modules(self, module_names, enable_for_orbiter_ng=False):
-    config_file = 'Orbiter.cfg'
-    if enable_for_orbiter_ng:
-        config_file = 'Orbiter_NG.cfg'
-    edit_cfg_file(self, config_file, 'ACTIVE_MODULES', 'END_MODULES', module_names)
 
 def main():
     global DEBUG
@@ -365,7 +391,9 @@ def main():
         os.chdir("..")
         print(os.getcwd())
 
-    download_orbiter_2016_if_needed()
+    orb = Orb()
+
+    download_orbiter_2016_if_needed(orb)
 
     experiences = fetch_experiences()
 
@@ -397,10 +425,13 @@ def main():
 
     experience = experiences[mod_index]
     experience_script_url = experience['experience_script']
+    experience_name = experience['name']
+    orb.set_scn_dir(experience_name[:255])
+
     # fetch experience_script_url and save it in orb_cache
     experience_script_file_name = experience_script_url.split('/')[-1]
     if not is_file_cached(experience_script_file_name):
-        download_zip(experience_script_url, experience_script_file_name, skip_cache=True)
+        orb.download_zip(experience_script_url, experience_script_file_name, skip_cache=True)
     # load experience_script_file_name
     mod = load_experience_module(f'orb_cache/{experience_script_file_name}')
 
@@ -414,14 +445,6 @@ def main():
         print('reseting orbiter')
         reset_orbiter()
     try:        
-        orb = type('',(object,),{
-            "download_from_of": lambda *args: download_from_of(*args),
-            "download_zip": lambda *args: download_zip(*args),
-            "install_zip": lambda *args: install_zip(*args),
-            "enable_modules": lambda *args: enable_modules(*args),
-            "install_rar": lambda *args: install_rar(*args),
-            "install_exe": lambda *args: install_exe(*args)
-        })()
         mod.main(orb)
     except Exception as e:
         print(f'Please contact the author of this experience script: {str(e)}')
