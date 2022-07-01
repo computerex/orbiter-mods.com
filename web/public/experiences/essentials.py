@@ -11,7 +11,7 @@ def main(orb):
     orb.download_zip('http://users.kymp.net/~p501474a/D3D9Client/MicroTextures.zip', 'MicroTextures.zip')
     orb.install_zip('MicroTextures.zip')
 
-    orb.download_from_of('https://www.orbiter-forum.com/resources/multistage2015-for-orbiter-2016.398/', 'Multistage2015_forOrbiter2016.zip')
+    orb.download_from_of('https://www.orbiter-forum.com/resources/multistage2015-for-orbiter-2016.398/download', 'Multistage2015_forOrbiter2016.zip')
     orb.install_zip('Multistage2015_forOrbiter2016.zip')
 
     orb.enable_modules(['OrbiterSound', 'XRSound', 'ScnEditor', 'transx', 'ExtMFD', 'Multistage2015_MFD'])

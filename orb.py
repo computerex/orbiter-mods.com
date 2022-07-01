@@ -13,7 +13,6 @@ import json
 import webbrowser
 import tkinter as tk
 from tkinter import filedialog
-from distutils.dir_util import copy_tree
 import subprocess
 import ctypes
 import traceback
@@ -185,7 +184,7 @@ def download_orbiter_2016_if_needed(orb):
         if input('(y/n): ') == 'y':
             # copy all files from orb_cache/Orbiter2016 to current folder keeping directory structure in tact
             print('copying files from Orbiter2016 to current folder')
-            copy_tree(os.path.join('orb_cache', 'Orbiter2016'), '.')
+            shutil.copytree(os.path.join('orb_cache', 'Orbiter2016'), '.', dirs_exist_ok=True)
 
 def reset_orbiter():
     # ask user to confirm as doing this action will destroy the current orbiter install
@@ -240,7 +239,7 @@ class Orb:
         if install_subdir:
             # copy all files from orb_cache/install_subdir to current folder keeping directory structure in tact
             print('copying files from ' + os.path.join('orb_cache', install_subdir, install_subdir) + ' to current folder')
-            copy_tree(os.path.join('orb_cache', install_subdir, install_subdir), '.')
+            shutil.copytree(os.path.join('orb_cache', install_subdir, install_subdir), '.', dirs_exist_ok=True)
 
         # create new directory in Scenarios/ folder named self.scn_dir
         if not os.path.exists(os.path.join('.', 'Scenarios', self.scn_dir)):
@@ -257,17 +256,29 @@ class Orb:
             shutil.copy(os.path.join('.', 'Scenarios', scn_file), os.path.join('.', 'Scenarios', self.scn_dir))
 
     def install_rar(self, file, install_subdir=None):
-        output_dir = './'
-        if install_subdir:
-            output_dir = os.path.join('orb_cache', install_subdir)
+        output_dir = os.path.join('orb_cache', os.path.splitext(file)[0])
 
-        subprocess.run(f'{os.path.join("orb_cache", "unarr.exe")} {os.path.join("orb_cache", file)} .')
-        
+        # extract the rar in orb_cache. We need to do this for automatic scenario copying
+        subprocess.run(f'{os.path.join("orb_cache", "unarr.exe")} {os.path.join("orb_cache", file)} {output_dir}')
+
         if install_subdir:
-            # copy all files from orb_cache/install_subdir to current folder keeping directory structure in tact
-            print('copying files from ' + os.path.join('orb_cache', install_subdir, install_subdir) + ' to current folder')
-            copy_tree(os.path.join('orb_cache', install_subdir, install_subdir), '.')
-    
+            output_dir = os.path.join(output_dir, install_subdir)
+        
+        # recursively copy all files from output_dir to current folder keeping directory structure in tact
+        print('copying files from ' + output_dir + ' to current folder')
+        shutil.copytree(output_dir, '.', dirs_exist_ok=True)
+
+        scn_files = []
+        # recursively get a list of all .scn files in output_dir
+        for root, dirs, files in os.walk(output_dir):
+            for file in files:
+                if file.lower().endswith('.scn'):
+                    scn_files.append(os.path.join(root, file))
+        
+        for scn in scn_files:
+            print(f'copying {scn} to Scenarios/{self.scn_dir}')
+            shutil.copy(scn, os.path.join('Scenarios', self.scn_dir))
+
     def edit_cfg_file(self, cfg, start_tag, end_tag, new_lines):
         current_list = []
         output_cfg_lines = []
