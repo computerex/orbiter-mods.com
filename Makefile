@@ -66,6 +66,9 @@ mysql-dump:
 	@docker exec $(shell docker-compose ps -q mysqldb) mysqldump --databases app -u"$(MYSQL_ROOT_USER)" -p"$(MYSQL_ROOT_PASSWORD)" > db_dump.sql 2>/dev/null	
 	@make resetOwner
 
+mysql-mig:
+	@docker exec -i $(shell docker-compose ps -q php) php /migs/$(MIG)
+
 mysql-restore:
 	@docker exec -i $(shell docker-compose ps -q mysqldb) mysql -u"$(MYSQL_ROOT_USER)" -p"$(MYSQL_ROOT_PASSWORD)" < db_dump.sql 2>/dev/null
 
