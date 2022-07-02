@@ -51,6 +51,8 @@ def main(orb):
     orb.enable_modules(['CrewDragonMFD'])
     orb.enable_modules(['CrewDragonMFD'], True)
 
+    orb.install_orbiter_mods_experience(1)
+
 
 
 def requires_fresh_install():

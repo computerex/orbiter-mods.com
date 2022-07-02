@@ -313,19 +313,15 @@ class Orb:
                     for line in f:
                         if line.strip() == new_line.strip():
                             exists = True
-                            print(f'{line} is the same as {new_line}')
                             lines = []
                             break
                         lines.append(line)
                 if not exists:
                     lines.append(new_line + '\n')
-                    print(f'writing these lines')
                     
                     with open(cfg, 'w') as f:
                         for line in lines:
                             f.write(line)
-                else:
-                    print(f'exists is true')
             except Exception as e:
                 print(e)
                 return
@@ -429,6 +425,16 @@ class Orb:
     
     def set_scn_dir(self, scn_dir):
         self.scn_dir = scn_dir
+    
+    def set_experience_list(self, experiences):
+        self.experience_list = experiences
+
+    def install_orbiter_mods_experience(self, experience_id):
+        xp = [x for x in self.experience_list if 'id' in x and x['id'] == experience_id]
+        if len(xp) == 0:
+            print(f'experience {experience_id} not found')
+            return
+        execute_script(self.experience_list, xp[0])
 
 # fetch experiences from https://orbiter-mods.com/fetch_experiences
 def fetch_experiences():
@@ -438,6 +444,36 @@ def fetch_experiences():
     print(f'fetching {host}/fetch_experiences')
     r = requests.get(f'{host}/fetch_experiences')
     return r.json()
+
+def execute_script(all_experiences, experience):
+    experience_script_url = experience['experience_script']
+    experience_script_file_name = experience_script_url.split('/')[-1]
+    experience_name = experience['name']
+    orb = Orb()
+    orb.set_scn_dir(experience_script_file_name)
+    orb.set_experience_list(all_experiences)
+
+    # fetch experience_script_url and save it in orb_cache
+    experience_script_file_name = experience_script_url.split('/')[-1]
+    if not is_file_cached(experience_script_file_name):
+        orb.download_zip(experience_script_url, experience_script_file_name, skip_cache=True)
+    # load experience_script_file_name
+    mod = load_experience_module(f'orb_cache/{experience_script_file_name}')
+
+    if mod.requires_fresh_install():
+        print('This experience requires a fresh install')
+        test = input('continue? (y/n): ')
+        if test.lower() != 'y':
+            print('ok, bye!')
+            time.sleep(3)
+            sys.exit(1)
+        print('reseting orbiter')
+        reset_orbiter()
+    try:        
+        mod.main(orb)
+    except Exception as e:
+        print(f'Please contact the author of this experience script: {str(e)}')
+        traceback.print_exc()
 
 def main():
     global DEBUG
@@ -490,31 +526,7 @@ def main():
         sys.exit(1)
 
     experience = experiences[mod_index]
-    experience_script_url = experience['experience_script']
-    experience_name = experience['name']
-    orb.set_scn_dir(experience_name[:255])
-
-    # fetch experience_script_url and save it in orb_cache
-    experience_script_file_name = experience_script_url.split('/')[-1]
-    if not is_file_cached(experience_script_file_name):
-        orb.download_zip(experience_script_url, experience_script_file_name, skip_cache=True)
-    # load experience_script_file_name
-    mod = load_experience_module(f'orb_cache/{experience_script_file_name}')
-
-    if mod.requires_fresh_install():
-        print('This experience requires a fresh install')
-        test = input('continue? (y/n): ')
-        if test.lower() != 'y':
-            print('ok, bye!')
-            time.sleep(3)
-            sys.exit(1)
-        print('reseting orbiter')
-        reset_orbiter()
-    try:        
-        mod.main(orb)
-    except Exception as e:
-        print(f'Please contact the author of this experience script: {str(e)}')
-        traceback.print_exc()
+    execute_script(experiences, experience)
 
     print('ok, bye!')
     time.sleep(3)
