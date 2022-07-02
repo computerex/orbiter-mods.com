@@ -14,6 +14,9 @@ def main(orb):
     orb.download_from_of('https://www.orbiter-forum.com/resources/multistage2015-for-orbiter-2016.398/download', 'Multistage2015_forOrbiter2016.zip')
     orb.install_zip('Multistage2015_forOrbiter2016.zip')
 
+    orb.edit_cfg_file_add_line('Orbiter.cfg', 'DisableFontSmoothing = FALSE')
+    orb.edit_cfg_file_add_line('Orbiter_NG.cfg', 'DisableFontSmoothing = FALSE')
+
     orb.enable_modules(['OrbiterSound', 'XRSound', 'ScnEditor', 'transx', 'ExtMFD', 'Multistage2015_MFD'])
     orb.enable_modules(['D3D9Client', 'GenericCamera', 'transx', 'OrbiterSound', 'XRSound', 'DX9ExtMFD', 'ScnEditor', 'Multistage2015_MFD'], True)
 

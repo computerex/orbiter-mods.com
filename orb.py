@@ -16,7 +16,7 @@ from tkinter import filedialog
 import subprocess
 import ctypes
 import traceback
-import progressbar
+from clint.textui import progress
 
 
 DEBUG = 0
@@ -279,7 +279,58 @@ class Orb:
             print(f'copying {scn} to Scenarios/{self.scn_dir}')
             shutil.copy(scn, os.path.join('Scenarios', self.scn_dir))
 
-    def edit_cfg_file(self, cfg, start_tag, end_tag, new_lines):
+    def edit_cfg_file_remove_line(self, cfg, new_line):
+        # check if config file exists
+        if not os.path.exists(cfg):
+            print(f'{cfg} does not exist')
+            pass
+        else:
+            try:
+                lines = []
+                with open(cfg, 'r') as f:
+                    for line in f:
+                       if line.strip() != new_line.strip():
+                           lines.append(line)
+                with open(cfg, 'w') as f:
+                    f.writelines(lines)
+            except Exception as e:
+                print(e)
+                return
+
+    def edit_cfg_file_add_line(self, cfg, new_line):
+        # check if config file exists
+        if not os.path.exists(cfg):
+            print(f'{cfg} does not exist')
+            # create config file and add the start/end tags
+            with open(cfg, 'w') as f:
+                f.write(f'{new_line}\n')
+        else:
+            try:
+                lines = []
+                exists = False
+                print(f'opening {cfg}')
+                with open(cfg, 'r') as f:
+                    for line in f:
+                        if line.strip() == new_line.strip():
+                            exists = True
+                            print(f'{line} is the same as {new_line}')
+                            lines = []
+                            break
+                        lines.append(line)
+                if not exists:
+                    lines.append(new_line + '\n')
+                    print(f'writing these lines')
+                    
+                    with open(cfg, 'w') as f:
+                        for line in lines:
+                            f.write(line)
+                else:
+                    print(f'exists is true')
+            except Exception as e:
+                print(e)
+                return
+
+    def edit_cfg_file_section(self, cfg, start_tag, end_tag, new_lines):
         current_list = []
         output_cfg_lines = []
         
@@ -304,7 +355,7 @@ class Orb:
                         # check if line starts with end_tag
                         if line.startswith(end_tag):
                             collect_lines = False
-                            break
+                            continue
                         if collect_lines:
                             current_list.append(line.strip())
                             continue
@@ -333,7 +384,7 @@ class Orb:
         config_file = 'Orbiter.cfg'
         if enable_for_orbiter_ng:
             config_file = 'Orbiter_NG.cfg'
-        self.edit_cfg_file(config_file, 'ACTIVE_MODULES', 'END_MODULES', module_names)
+        self.edit_cfg_file_section(config_file, 'ACTIVE_MODULES', 'END_MODULES', module_names)
 
     def download_zip(self, url, file_name=None, skip_cache=False):
         if file_name is None:
@@ -344,15 +395,18 @@ class Orb:
             return
 
         print(f'downloading {url}')
-        r = requests.get(url, allow_redirects=True)
+        r = requests.get(url, allow_redirects=True, stream=True)
         if 'Content-Disposition' in r.headers:
             zip_file_name = r.headers['Content-Disposition'].split('filename=')[1]
         else:
             zip_file_name = file_name
 
-        # lunar.industries
-        with open(f'orb_cache/{zip_file_name}', "wb") as f:
-            f.write(r.content)
+        with open(f'orb_cache/{zip_file_name}', 'wb') as f:
+            total_length = int(r.headers.get('content-length'))
+            for chunk in progress.bar(r.iter_content(chunk_size=1024), expected_size=(total_length/1024) + 1): 
+                if chunk:
+                    f.write(chunk)
+                    f.flush()
 
     def download_from_of(self, url, expected_zip_name):
         if is_file_cached(expected_zip_name):
