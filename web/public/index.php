@@ -60,32 +60,14 @@ $app->get('/fetch_experiences', function ($request, $response) {
     if (getenv('DEBUG') == '1') {
         $host = 'http://localhost:8000';
     }
-
-    return $response->withJson([
-        [
-            'id' => 1,
-            'name' => 'Orbiter essentials',
-            'external_links' => [
-                'https://www.alteaaerospace.com/index-3.html',
-                'https://www.orbiter-forum.com/resources/soundbridge.204/',
-                'http://users.kymp.net/~p501474a/D3D9Client/',
-                'XR fleet, XRSound, Soundbridge, D3D9Client (dbeachy, face, jarmonik)'
-            ],
-            'experience_script' => "$host/experiences/essentials.py",
-            'description' => 'Installs the wonderful XR fleet by Doug Beachy as well as XRSound, and Soundbridge by Face. And the D3D9Client by Jarmonik.',
-        ],
-        [
-            'id' => 2,
-            'name' => 'SpaceX Experience',
-            'external_links' => [
-                'All thanks to BrianJ, Dr.S, Donamy, Marg, francisdrake, Barry, Fred18',
-                'IronRain, Kyle, DaveS, SiameseCat, David413',
-                'GLS, Felix24, Don'
-            ],
-            'experience_script' => "$host/experiences/spacex.py",
-            'description' => 'Installs a bunch of mods for SpaceX missions.',
-        ],
-    ]);
+    $pdo = DB::getInstance();
+    $stmt = $pdo->prepare('SELECT * FROM experiences');
+    $stmt->execute();
+    $experiences = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $stmt = null;
+    return $response->withJson(
+        $experiences
+    );
 });
 
 // create post /login endpoint

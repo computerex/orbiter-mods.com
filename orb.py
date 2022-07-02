@@ -438,24 +438,31 @@ class Orb:
 
 # fetch experiences from https://orbiter-mods.com/fetch_experiences
 def fetch_experiences():
-    host = 'https://orbiter-mods.com'
-    if DEBUG == 1:
-        host = 'http://localhost:8000'
-    print(f'fetching {host}/fetch_experiences')
-    r = requests.get(f'{host}/fetch_experiences')
-    return r.json()
+    try:
+        host = 'https://orbiter-mods.com'
+        if DEBUG == 1:
+            host = 'http://localhost:8000'
+        print(f'fetching {host}/fetch_experiences')
+        r = requests.get(f'{host}/fetch_experiences')
+        return r.json()
+    except Exception as e:
+        print(f'unable to fetch experience index, check your internet connection')
+        pass
+    return []
 
 def execute_script(all_experiences, experience):
-    experience_script_url = experience['experience_script']
+    experience_script = experience['experience_script']
     experience_name = experience['name']
     orb = Orb()
-    orb.set_scn_dir(experience_name[:25])
+    orb.set_scn_dir(experience_name)
     orb.set_experience_list(all_experiences)
 
     # fetch experience_script_url and save it in orb_cache
-    experience_script_file_name = experience_script_url.split('/')[-1]
-    if not is_file_cached(experience_script_file_name):
-        orb.download_zip(experience_script_url, experience_script_file_name, skip_cache=True)
+    experience_script_file_name = experience_name + '.py'
+    # write experience_script to orb_cache
+    with open(f'orb_cache/{experience_script_file_name}', 'w') as f:
+        f.write(experience_script)
+        f.flush()
     # load experience_script_file_name
     mod = load_experience_module(f'orb_cache/{experience_script_file_name}')
 
@@ -506,15 +513,13 @@ def main():
             experiences.append({
                 'name': f'{experience_file} (orb_cache)',
                 'description': f'unknown experience script orb_cache/{experience_file} run with care',
-                'external_links': [],
-                'experience_script': f'orb_cache/{experience_file}'
+                'links': "source unknown",
+                'experience_script': open(f'orb_cache/{experience_file}').read()
             })
 
     for inx, experience in enumerate(experiences):
         print(f'{inx+1}: {experience["name"]}')
-        print(f'    {experience["description"]}')
-        for link in experience["external_links"]:
-            print(f'    {link}')
+        print(f'    {experience["links"]}')
 
     user_input = input('\nEnter the number of the experience you want to use: ')
 
