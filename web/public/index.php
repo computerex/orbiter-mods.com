@@ -69,7 +69,7 @@ $app->get('/fetch_experiences', function ($request, $response) {
                 'https://www.alteaaerospace.com/index-3.html',
                 'https://www.orbiter-forum.com/resources/soundbridge.204/',
                 'http://users.kymp.net/~p501474a/D3D9Client/',
-                ': XR fleet, XRSound, Soundbridge, D3D9Client (dbeachy, face, jarmonik)'
+                'XR fleet, XRSound, Soundbridge, D3D9Client (dbeachy, face, jarmonik)'
             ],
             'experience_script' => "$host/experiences/essentials.py",
             'description' => 'Installs the wonderful XR fleet by Doug Beachy as well as XRSound, and Soundbridge by Face. And the D3D9Client by Jarmonik.',

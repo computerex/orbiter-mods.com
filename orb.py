@@ -447,10 +447,9 @@ def fetch_experiences():
 
 def execute_script(all_experiences, experience):
     experience_script_url = experience['experience_script']
-    experience_script_file_name = experience_script_url.split('/')[-1]
     experience_name = experience['name']
     orb = Orb()
-    orb.set_scn_dir(experience_script_file_name)
+    orb.set_scn_dir(experience_name[:25])
     orb.set_experience_list(all_experiences)
 
     # fetch experience_script_url and save it in orb_cache
