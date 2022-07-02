@@ -62,6 +62,10 @@ gen-certs:
 logs:
 	@docker-compose logs -f
 
+mysql-dump:
+	@docker exec $(shell docker-compose ps -q mysqldb) mysqldump --databases app -u"$(MYSQL_ROOT_USER)" -p"$(MYSQL_ROOT_PASSWORD)" > db_dump.sql 2>/dev/null	
+	@make resetOwner
+
 mysql-restore:
 	@docker exec -i $(shell docker-compose ps -q mysqldb) mysql -u"$(MYSQL_ROOT_USER)" -p"$(MYSQL_ROOT_PASSWORD)" < db_dump.sql 2>/dev/null
 
