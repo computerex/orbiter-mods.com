@@ -163,7 +163,7 @@ def download_orbiter_2016_if_needed(orb):
         if is_file_cached('Orbiter2016.zip'):
             print('Orbiter2016.zip is already in cache')
         else:
-            orbiter_url = 'http://alteaaerospace.com/ccount/click.php?id=47'
+            orbiter_url = 'https://orbiter-mods.com/files/Orbiter2016.zip'
             if DEBUG == 1:
                 orbiter_url = 'http://localhost:8000/Orbiter2016.zip'
 
@@ -174,7 +174,7 @@ def download_orbiter_2016_if_needed(orb):
                 return        
             orb.download_zip(orbiter_url, 'Orbiter2016.zip')
         # unzip Orbiter2016.zip to orb_cache/Orbiter2016
-        print('unzipping Orbiter2016.zip')
+        print('unzipping Orbiter2016.zip - this will only take a bit and will speed things up in the future!')
         with zipfile.ZipFile(f'orb_cache/Orbiter2016.zip', 'r') as zip_ref:
             zip_ref.extractall('./orb_cache/Orbiter2016')
     # check if orbiter.exe is in the current folder
@@ -205,7 +205,12 @@ def reset_orbiter():
 class Orb:
     def __init__(self, scn_dir=None):
         self.scn_dir = scn_dir
+        self.scn_blacklist = []
 
+    def set_scn_blacklist(self, scn_blacklist):
+        self.scn_blacklist += scn_blacklist
+        self.scn_blacklist = list(set(self.scn_blacklist))
+        
     def install_exe(self, file):
         # check if file is in current folder
         if not os.path.exists(file):
@@ -232,10 +237,13 @@ class Orb:
             # get list of all files in zip
             files = zip_ref.namelist()
             # find all files ending with .scn file extension
+            # for files in subdir the prefix isn't necessarily Scenarios/, so extract filename from orbiter Scenarios root
             scn_files = [
-                file[file.find('Scenarios/')+10:] for file in files if file.lower().endswith('.scn') and file.find('Scenarios/') != -1
+                file[file.find('Scenarios/')+10:] for file in files 
+                    if file.lower().endswith('.scn') and file.find('Scenarios/') != -1
             ]
-        
+            scn_files = [s for s in scn_files if s not in self.scn_blacklist]
+            
         if install_subdir:
             # copy all files from orb_cache/install_subdir to current folder keeping directory structure in tact
             print('copying files from ' + os.path.join('orb_cache', install_subdir, install_subdir) + ' to current folder')
@@ -276,6 +284,14 @@ class Orb:
                     scn_files.append(os.path.join(root, file))
         
         for scn in scn_files:
+            blacklisted = False
+            for blacklisted_scn in self.scn_blacklist:
+                if blacklisted_scn in scn:
+                    blacklisted = True
+                    break
+            if blacklisted:
+                print(f'skipping {scn} since it is blacklisted')
+                continue
             print(f'copying {scn} to Scenarios/{self.scn_dir}')
             shutil.copy(scn, os.path.join('Scenarios', self.scn_dir))
 
@@ -516,6 +532,11 @@ def main():
                 'links': "source unknown",
                 'experience_script': open(f'orb_cache/{experience_file}').read()
             })
+
+    if len(experiences) == 0:
+        print('no experiences found, terminating')
+        time.sleep(3)
+        return
 
     for inx, experience in enumerate(experiences):
         print(f'{inx+1}: {experience["name"]}')

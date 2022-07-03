@@ -132,4 +132,45 @@ $app->get('/is_valid_key', function ($request, $response) {
     return $response->withJson(['success' => true], 200);
 });
 
+// create endpoint to update the experiences table
+$app->post('/update_experience', function ($request, $response) {
+    $experience_id = $request->getQueryParam('id');
+    $api_key = $request->getQueryParam('api_key');
+    if (empty($api_key) || empty($experience_id)) {
+        return $response->withJson(['status' => 'false'], 400);
+    }
+    if (getenv('SUPER_ADMIN_SECRET') !== $api_key) {
+        return $response->withJson(['status' => 'false'], 403);
+    }
+
+    $data = $request->getParsedBody();
+
+    $name = $data['name'];
+    $links = $data['links'];
+    $script = $data['experience_script'];
+    $description = $data['description'];
+
+    if (
+        empty($name)
+        || empty($links)
+        || empty($script)
+        || empty($description)
+        ) {
+        return $response->withJson(['status' => 'false'], 400);
+    }
+
+    $db = DB::getInstance();
+    $stmt = $db->prepare('UPDATE experiences
+                            SET name = :name, links = :links, experience_script = :experience_script,
+                            description = :description WHERE id = :id'
+    );
+    $stmt->bindValue(':id', $experience_id, PDO::PARAM_INT);
+    $stmt->bindValue(':name', $name);
+    $stmt->bindValue(':links', $links);
+    $stmt->bindValue(':experience_script', $script);
+    $stmt->bindValue(':description', $description);
+    $stmt->execute();
+    return $response->withJson(['status' => 'success']);
+});
+
 $app->run();

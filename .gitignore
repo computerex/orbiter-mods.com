@@ -36,3 +36,5 @@ orb.exe
 orb
 wrangler.toml
 secrets.json
+
+update-experience.py
