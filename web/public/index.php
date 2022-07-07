@@ -10,6 +10,31 @@ error_reporting(E_ALL ^ E_DEPRECATED ^ E_WARNING);
 
 $app = new \Slim\App(['settings' => ['displayErrorDetails' => true]]);
 
+function get_client_ip() {
+    $ipaddress = '';
+    if (getenv('HTTP_CLIENT_IP'))
+        $ipaddress = getenv('HTTP_CLIENT_IP');
+    else if(getenv('HTTP_X_FORWARDED_FOR'))
+        $ipaddress = getenv('HTTP_X_FORWARDED_FOR');
+    else if(getenv('HTTP_X_FORWARDED'))
+        $ipaddress = getenv('HTTP_X_FORWARDED');
+    else if(getenv('HTTP_FORWARDED_FOR'))
+        $ipaddress = getenv('HTTP_FORWARDED_FOR');
+    else if(getenv('HTTP_FORWARDED'))
+       $ipaddress = getenv('HTTP_FORWARDED');
+    else if(getenv('REMOTE_ADDR'))
+        $ipaddress = getenv('REMOTE_ADDR');
+    else
+        $ipaddress = 'UNKNOWN';
+    return $ipaddress;
+}
+
+$app->get('/ip', function($request, Response $response) {
+    $ip = get_client_ip();
+    $response->getBody()->write($ip);
+    return $response;
+});
+
 $app->get('/', function ($request, Response $response) {
     // serve static index html file
     return $response
