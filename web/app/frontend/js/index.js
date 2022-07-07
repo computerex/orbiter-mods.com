@@ -1,7 +1,7 @@
 
 import { AddonSearch } from './AddonSearch';
 import { UploadAddon } from './UploadAddon';
-import { ViewExperiences } from './ViewExperiences';
+import { ExperienceManager } from './ExperienceManager';
 const location = window.location.pathname;
 
 switch(location) {
@@ -13,8 +13,8 @@ switch(location) {
         const uploadAddon = new UploadAddon();
         uploadAddon.run();
         break;
-    case '/experiences.html':
-        const viewExperiences = new ViewExperiences();
-        viewExperiences.run();
+    case '/orb.html':
+        const experienceManager = new ExperienceManager();
+        experienceManager.run();
         break;
 };

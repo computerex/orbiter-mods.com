@@ -11,44 +11,35 @@
         <meta name="rating" content="general">
         <meta name="language" content="en">
 
-        <title>orbiter mods</title>
+        <title>orbiter mods - orb installer</title>
         <link rel="icon" type="image/x-icon" href="/favicon.ico">
         <link rel="stylesheet" href="/css/chota.min.css">
         <script src="/js/font-awesome.js"></script>
         <style>
-            .col {
-                position: relative;
+            .experience-title {
+                font-size: 2em;
             }
-            .download-icon {
-                position: absolute;
-                right: 45px;
-                bottom: 3px;
-                color: white;
+            .experiences {
+                max-width: 40%;
+                float:left;
             }
-            
-            .download-count {
-                position: absolute;
-                right: 15px;
-                bottom: 0px;
-                color: white;
+            .experience-script {
+                max-width:55%;
+                border: 1px solid grey;
+                float:right;
             }
-
-            .mod-title {
-                position: absolute;
-                left: 0px;
-                top: 0px;
-                color: white;
+            .experience {
+                border: 1px solid lightgray;
+                padding:20px;
             }
-            
+            .experience.selected {
+                background-color: #f0f0f0;
+            }
         </style>
         <meta name="referrer" content="no-referrer" />
     </head>
     <body>
-        <div style="float:right;display:none;">
-            <a href="#">Login</a>
-            <a href="#">Sign Up</a>
-        </div>
-        <div class="container" style="max-width:720px;">
+        <div class="container" style="max-width:90%;">
             <section style="text-align:center;margin-bottom:30px;">
                 <a href="/" title="mods for orbiter, home of the orb installer"><h1 style="margin-bottom:0px">orbiter-mods.com</h1></a>
                 <small style="text-decoration:underline;"><a target="_blank" href="http://orbit.medphys.ucl.ac.uk/" title="Orbiter Space Flight Simulator">orbiter</a></small>
@@ -58,27 +49,12 @@
             </section>
 
             <section>
-                <input type="text" id="search" placeholder="search for mods"></input>
-                <small><span style="float:right" id="index_count">loading...</span></small>
+                <div class="experiences">
+                </div>
+                <div class="experience-script">
+                </div>
             </section>
-            <section id="results">
-            </section>
-
-            <h4 style="margin-top:20px">What is orb installer?</h4>
-
-            <p>
-                Tired of CTD's and tracking down zip files all over the internet? We are too, and that's
-                why we are making orb, so we can spend less time installing mods, and more time playing with them. 
-            </p>
-            <p>
-                We are close to an initial release,
-                follow its progress <a target="_blank" href="https://chat.orbiter-mods.com/topic/2/orbiter-mods-com-work-discussion">here.</a>
-            </p>
-
-            <section>
-                <div style="position: relative; padding-bottom: 56.25%; height: 0;"><iframe src="https://www.loom.com/embed/00c6735755394cfa9283f7e193938814" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe></div>
-            </section>
-
+            
         </div>
         <script src="/bundle.js"></script>
     </body>
