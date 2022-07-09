@@ -49,33 +49,55 @@ $app->post('/user', function ($request, $response) {
     $name = $data['name'];
     $email = $data['email'];
     $password = $data['password'];
+    $password2 = $data['password2'];
 
-    $db = DB::getInstance();
+    // validate that name is not empty and at least 3 characters long
+    if (strlen($name) < 3) {
+        return $response->withJson(['error' => 'Name must be at least 3 characters long']);
+    }
+
+    if (strlen($password) < 6 || $password != $password2) {
+        return $response->withJson(['error' => 'Password must be greater than 6 characters, or passwords do not match']);
+    }
+
+    // validate email is a valid email address
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        return $response->withJson(['error' => 'Email must be a valid email address']);
+    }
+
+    $pdo = DB::getInstance();
+    
+    $stmt = $pdo->prepare('SELECT * FROM users WHERE name = :name');
+    $stmt->bindParam(':name', $name);
+    $stmt->execute();
+    $result = $stmt->fetch(\PDO::FETCH_ASSOC);
+    if (!empty($result)) {
+        return $response->withJson(['error' => 'Name already exists']);
+    }
 
     // check if a user exists in the users table with the matching email
-    $stmt = $db->prepare('SELECT id FROM users WHERE email = :email');
+    $stmt = $pdo->prepare('SELECT id FROM users WHERE email = :email');
     $stmt->bindValue(':email', $email);
     $stmt->execute();
     $user = $stmt->fetch();
 
-    if (empty($user)) {
-        // if user does not exist, insert new user into users table
-        $stmt = $db->prepare('INSERT INTO users (name, email, password) VALUES (:name, :email, :password)');
-        $stmt->bindValue(':name', $name);
-        $stmt->bindValue(':email', $email);
-        $stmt->bindValue(':password', password_hash($password, PASSWORD_DEFAULT));
-        $stmt->execute();
-        $api_key = Auth::generateApiKey();
-        Auth::save_api_key($api_key);
-        return $response->withJson([
-            'success' => true,
-            'api_key' => $api_key
-        ], 200);
-    } else {
-        // if user exists, return error
-        return $response->withJson(['error' => 'User already exists'], 400);
+    if (!empty($user)) {
+        return $response->withJson(['error' => 'Email already exists']);
     }
-    return $response->withJson(['status' => 'success']);
+
+    // if user does not exist, insert new user into users table
+    $stmt = $pdo->prepare('INSERT INTO users (name, email, password) VALUES (:name, :email, :password)');
+    $stmt->bindValue(':name', $name);
+    $stmt->bindValue(':email', $email);
+    $stmt->bindValue(':password', password_hash($password, PASSWORD_DEFAULT));
+    $stmt->execute();
+    $user_id = $pdo->lastInsertId();
+    $api_key = Auth::generateApiKey();
+    Auth::save_api_key($api_key, $user_id);
+    return $response->withJson([
+        'success' => true,
+        'api_key' => $api_key
+    ], 200);
 });
 
 // add endpoint /experiences to return all currently available experiences as json array
@@ -105,20 +127,22 @@ $app->post('/login', function ($request, $response) {
     $db = DB::getInstance();
 
     // check if a user exists in the users table with the matching email
-    $stmt = $db->prepare('SELECT id, password FROM users WHERE email = :email');
+    $stmt = $db->prepare('SELECT `id`, `name`, `password` FROM users WHERE email = :email');
     $stmt->bindValue(':email', $email);
     $stmt->execute();
-    $user = $stmt->fetch();
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!empty($user)) {
         // if user exists, check if password matches
         if (password_verify($password, $user['password'])) {
             // if password matches, generate api key and save to api_keys table
             $api_key = Auth::generateApiKey();
-            Auth::save_api_key($api_key);
+            Auth::save_api_key($api_key, $user['id']);
             return $response->withJson([
                 'success' => true,
-                'api_key' => $api_key
+                'api_key' => $api_key,
+                'username' => $user['name'],
+                'email' => $email
             ], 200);
         } else {
             // if password does not match, return error
@@ -149,8 +173,8 @@ $app->post('/logout', function ($request, $response) {
     return $response->withJson(['status' => 'success'], 200);
 });
 
-// create endpoint is_valid_key to check if api_key is valid
-$app->get('/is_valid_key', function ($request, $response) {
+// create endpoint is_key_valid to check if api_key is valid
+$app->get('/is_key_valid', function ($request, $response) {
     if (!Auth::authenticate($request)) {
         return $response->withJson(['error' => 'Unauthorized'], 401);
     }
@@ -164,8 +188,33 @@ $app->post('/update_experience', function ($request, $response) {
     if (empty($api_key) || empty($experience_id)) {
         return $response->withJson(['status' => 'false'], 400);
     }
-    if (getenv('SUPER_ADMIN_SECRET') !== $api_key) {
-        return $response->withJson(['status' => 'false'], 403);
+    
+    if (!Auth::authenticate($request)) {
+        return $response->withJson(['error' => 'Unauthorized'], 401);
+    }
+
+    $user_id = Auth::get_user_from_api_key($api_key);
+    if (empty($user_id)) {
+        return $response->withJson(['error' => 'Unauthorized'], 401);
+    }
+
+    $user_id = $user_id['user_id'];
+    
+    // get experiences.owner_id for the experience_id
+
+    $pdo = DB::getInstance();
+    $stmt = $pdo->prepare('SELECT owner_id FROM experiences WHERE id = :id');
+    $stmt->bindValue(':id', $experience_id);
+    $stmt->execute();
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (empty($result)) {
+        return $response->withJson(['error' => 'Experience does not exist'], 400);
+    }
+
+    // check if the user_id matches the owner_id
+    if ($user_id != $result['owner_id']) {
+        return $response->withJson(['error' => 'Unauthorized'], 401);
     }
 
     $data = $request->getParsedBody();
@@ -181,7 +230,7 @@ $app->post('/update_experience', function ($request, $response) {
         || empty($script)
         || empty($description)
         ) {
-        return $response->withJson(['status' => 'false'], 400);
+        return $response->withJson(['error' => 'please specify valid `name`, `links`, `experience_script`, `description`'], 400);
     }
 
     $db = DB::getInstance();
@@ -195,7 +244,69 @@ $app->post('/update_experience', function ($request, $response) {
     $stmt->bindValue(':experience_script', $script);
     $stmt->bindValue(':description', $description);
     $stmt->execute();
-    return $response->withJson(['status' => 'success']);
+    return $response->withJson(['success' => true]);
 });
 
+// create endpoint to post /experience and create new experience
+$app->post('/experience', function ($request, $response) {
+    $api_key = $request->getQueryParam('api_key');
+    if (!Auth::authenticate($request)) {
+        return $response->withJson(['error' => 'Unauthorized'], 401);
+    }
+    
+    $user_id = Auth::get_user_from_api_key($api_key);
+    if (empty($user_id)) {
+        return $response->withJson(['error' => 'Unauthorized'], 401);
+    }
+
+    $user_id = $user_id['user_id'];
+
+    $data = $request->getParsedBody();
+    $name = $data['name'];
+    $links = $data['links'];
+    $script = $data['experience_script'];
+    $description = $data['description'];
+
+    if (
+        empty($name)
+        || empty($links)
+        || empty($script)
+        || empty($description)
+        ) {
+        return $response->withJson(['error' => 'you must specify a valid `name`, `links`, `description`, and `experience_script`'], 400);
+    }
+    $db = DB::getInstance();
+    $stmt = $db->prepare('INSERT INTO experiences (`name`, `links`, `experience_script`, `description`, `owner_id`)
+                            VALUES (:name, :links, :experience_script, :description, :owner_id)');
+    $stmt->bindValue(':name', $name);
+    $stmt->bindValue(':links', $links);
+    $stmt->bindValue(':experience_script', $script);
+    $stmt->bindValue(':description', $description);
+    $stmt->bindValue(':owner_id', $user_id);
+    $stmt->execute();
+    $experience_id = $db->lastInsertId();
+    return $response->withJson(['success' => true, 'id' => $experience_id], 200);
+});
+
+// create endpoint to get all experiences for specified user_id
+$app->get('/user_experiences', function ($request, $response) {
+    $api_key = $request->getQueryParam('api_key');
+    if (!Auth::authenticate($request)) {
+        return $response->withJson(['error' => 'Unauthorized'], 401);
+    }
+    
+    $user_id = Auth::get_user_from_api_key($api_key);
+    if (empty($user_id)) {
+        return $response->withJson(['error' => 'Unauthorized'], 401);
+    }
+    
+    $user_id = $user_id['user_id'];
+
+    $db = DB::getInstance();
+    $stmt = $db->prepare('SELECT id FROM experiences WHERE owner_id = :owner_id');
+    $stmt->bindValue(':owner_id', $user_id);
+    $stmt->execute();
+    $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    return $response->withJson(['success' => true, 'ids' => array_column($result, 'id')], 200);
+});
 $app->run();

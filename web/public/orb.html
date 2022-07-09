@@ -17,42 +17,48 @@
         <script src="/js/font-awesome.js"></script>
         <style>
 
-        pre {
-            overflow-x: auto;
-            margin-top:0px;
-        }
+            pre {
+                overflow-x: auto;
+                margin-top:0px;
+            }
 
-        pre::-webkit-scrollbar {
-            background: #b3bccc;
-        }
+            pre::-webkit-scrollbar {
+                background: #b3bccc;
+            }
 
-        pre::-webkit-scrollbar-thumb {
-            background: #eee;
-            border-radius: 5px;
-        }
+            pre::-webkit-scrollbar-thumb {
+                background: #eee;
+                border-radius: 5px;
+            }
 
-        pre {
-            background: #414449;
-            color: #b3bccc;
-            padding: 15px;
-            font-size: 13pt;
-            tab-size: 4;
-            -webkit-box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.75);
-            -moz-box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.75);
-            box-shadow: 0 0 8px 0 rgba(0, 0, 0, .75);
-        }
+            pre {
+                background: #414449;
+                color: #b3bccc;
+                padding: 15px;
+                font-size: 13pt;
+                tab-size: 4;
+                -webkit-box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.75);
+                -moz-box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.75);
+                box-shadow: 0 0 8px 0 rgba(0, 0, 0, .75);
+            }
 
             .experience-title {
                 font-size: 2em;
+                color: #14854f;
+                display:inline-block;
             }
             .experiences {
                 max-width: 40%;
                 float:left;
                 cursor: pointer;
             }
-            .experience-script {
+            .right-pane {
                 max-width:55%;
+                width: 55%;
                 float:right;
+                padding:20px;
+                border: solid 1px lightgray;
+                position: relative;
             }
             .experience {
                 border: 1px solid lightgray;
@@ -60,6 +66,18 @@
             }
             .experience.selected {
                 background-color: #f0f0f0;
+            }
+            
+            .login-link, .user-info {
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                color: #14854f;
+                cursor: pointer;
+            }
+
+            h1 {
+                color: #14854f;
             }
         </style>
         <meta name="referrer" content="no-referrer" />
@@ -75,9 +93,16 @@
             </section>
 
             <section>
+                <p>
+                    These are the mod bundles currently available for the orb installer. It's really easy to create your own bundles.
+                    No uploading required, just tell orb where to get the files. Learn how you can create your own orb bundles to help
+                    players install mods headache free: <a href="/orb-recipes.html">How to create and share orb bundles</a>.
+                </p>
+            </section>
+            <section style="margin-top:50px;">
                 <div class="experiences">
                 </div>
-                <div class="experience-script">
+                <div class="right-pane">
                 </div>
             </section>
             

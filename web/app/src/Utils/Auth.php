@@ -32,11 +32,25 @@ class Auth {
         return self::is_key_valid($api_key);
     }
 
-    public static function save_api_key($api_key) {
+    public static function get_user_from_api_key($api_key) {
+        // find user_id from api_keys table where api_keys.api_key = $api_key
         $db = DB::getInstance();
-        $sql = "INSERT INTO api_keys (api_key) VALUES (:api_key)";
+        $sql = "SELECT user_id
+            FROM api_keys 
+            WHERE api_key = :api_key";
         $stmt = $db->prepare($sql);
         $stmt->bindParam(':api_key', $api_key);
+        $stmt->execute();
+        $result = $stmt->fetch(\PDO::FETCH_ASSOC) ?: [];
+        return $result;
+    }
+
+    public static function save_api_key($api_key, $user_id) {
+        $db = DB::getInstance();
+        $sql = "INSERT INTO api_keys (api_key, user_id) VALUES (:api_key, :user_id)";
+        $stmt = $db->prepare($sql);
+        $stmt->bindParam(':api_key', $api_key);
+        $stmt->bindParam(':user_id', $user_id, \PDO::PARAM_INT);
         $stmt->execute();
         return $stmt->rowCount();
     }
