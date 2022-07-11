@@ -99,7 +99,6 @@ export class LoginRegister {
             password: password
         }, (data) => {
             if (data.success) {
-                console.log(Orb);
                 // login successful
                 Orb.login(data.username, email, data.api_key);
                 this.viewer.render();
@@ -127,7 +126,6 @@ export class LoginRegister {
                 password2: password2,
                 name: username
             }, (data) => {
-                console.log(data);
                 // check if user was created
                 if (data.success) {
                     Orb.login(username, email, data.api_key);

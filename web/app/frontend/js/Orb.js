@@ -50,10 +50,11 @@ export default Orb = {
         $.get(`/user_experiences?api_key=${this.api_key}`, (data) => {
             if (data.success) {
                 this.user_experiences = data.ids;
+                callback(data.ids);
             } else {
                 console.log(data.error);
             }
-            callback();
+            callback([]);
         });
     }
 };

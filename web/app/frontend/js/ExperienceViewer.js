@@ -13,28 +13,22 @@ export class ExperienceViewer {
         this.experiences.push(experience);
     };
 
+    updateExperience(experience) {
+        const index = _.findIndex(this.experiences, {id: experience.id});
+        this.experiences[index] = experience;
+    };
+
     selectExperience(experienceId) {
         $('.right-pane').empty();
         
         if (experienceId == 0) {
-            console.log('selecting upload page');
-            this.uploader.run();
-            return;
         }
-        else {
-            const experience = this.experiences.filter(experience => experience.id == experienceId)[0];
-            const html =
-`
-<pre>
-${experience.experience_script}
-</pre>`;
-            $('.right-pane').append(html);
-            $('.experience').removeClass('selected');
-            $(`.experience[data-experience-id=${experienceId}]`).addClass('selected');
-        }
+        $('.experience').removeClass('selected');
+        $(`.experience[data-experience-id=${experienceId}]`).addClass('selected');
+        this.uploader.run(experienceId, this.experiences);
     };
 
-    render() {
+    render(experienceId) {
         $('.experiences').empty();
 
         const html = `
@@ -65,15 +59,22 @@ ${experience.experience_script}
             const experienceId = $(event.currentTarget).data('experience-id');
             this.selectExperience(experienceId);
         });
-        $(`.experience[data-experience-id=0]`).trigger('click');
+
+        if (experienceId && experienceId != 0) {
+            $(`.experience[data-experience-id=${experienceId}]`).trigger('click');
+            $(`.experience[data-experience-id=${experienceId}]`).addClass('selected');
+        } else {
+            $(`.experience[data-experience-id=0]`).trigger('click');
+        }
+
     };
 
-    run() {
+    run(experienceId) {
         // check if this.experiences is empty
         if (this.experiences.length === 0) {
             $.get('/fetch_experiences', (data) => {
                 this.experiences = data;
-                this.render();
+                this.render(experienceId);
             });
         }
     };

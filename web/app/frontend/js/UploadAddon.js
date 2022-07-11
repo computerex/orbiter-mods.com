@@ -10,6 +10,5 @@ export class UploadAddon {
     };
 
     run() {
-        console.log('upload addons');
     };
 };
