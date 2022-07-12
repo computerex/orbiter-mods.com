@@ -2,14 +2,33 @@ import _ from 'underscore';
 import $ from 'jquery';
 
 export class AddonSearch {
-    constructor() {
-        this.addons = {};
-        $.get('/addons.json', (data) => {
+
+    get_index(callback, cache_bust=false) {
+        let url = '/addons.json';
+        if (cache_bust) {
+            url += '?cache_bust=' + Math.random();
+        }
+
+        $.get(url, (data) => {
             this.addons = data;
             $('#index_count').text(`${Object.keys(this.addons).length} mods in index`);
             document.getElementById('search').focus();
+            callback();
             this.do_search();
-          });
+        });
+    };
+
+    constructor() {
+        this.addons = {};
+        $.get('/mods_count?cache_bust=' + Math.random(), (data) => {
+            const index_count = data.count - 2;
+            this.get_index(() => {
+                if (index_count !== Object.keys(this.addons).length) {
+                    this.get_index(() => {}, true)
+                }
+            });
+        });
+        
 
         this.do_search_lazy = _.debounce(this.do_search, 500);
         String.prototype.fuzzy = function(term, ratio) {

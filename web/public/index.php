@@ -309,4 +309,11 @@ $app->get('/user_experiences', function ($request, $response) {
     $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
     return $response->withJson(['success' => true, 'ids' => array_column($result, 'id')], 200);
 });
+
+// create endpoint to return number of addons in addons.json
+$app->get('/mods_count', function ($request, $response) {
+    $addons = json_decode(file_get_contents('addons.json'), true);
+    return $response->withJson(['success' => true, 'count' => count($addons)], 200);
+});
+
 $app->run();
