@@ -1,0 +1,129 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="Mods/addons for Orbiter Space Flight Simulator. A community to chat about Orbiter, and home of the orb installer.">
+        <meta name="keywords" content="Orbiter, Space Flight Simulator, Mods, orb, orb installer, addons, add-ons, bundles">
+        <meta name="robots" content="index, follow">
+        <meta name="revisit-after" content="1 day">
+        <meta name="distribution" content="global">
+        <meta name="rating" content="general">
+        <meta name="language" content="en">
+
+        <title>orbiter mods - orb installer</title>
+        <link rel="icon" type="image/x-icon" href="/favicon.ico">
+        <link rel="stylesheet" href="/css/chota.min.css">
+        <script src="/js/font-awesome.js"></script>
+        <style>
+
+            pre {
+                overflow-x: auto;
+                margin-top:0px;
+            }
+
+            pre::-webkit-scrollbar {
+                background: #b3bccc;
+            }
+
+            pre::-webkit-scrollbar-thumb {
+                background: #eee;
+                border-radius: 5px;
+            }
+
+            pre {
+                background: #414449;
+                color: #b3bccc;
+                padding: 15px;
+                font-size: 13pt;
+                tab-size: 4;
+                -webkit-box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.75);
+                -moz-box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.75);
+                box-shadow: 0 0 8px 0 rgba(0, 0, 0, .75);
+            }
+
+            h1 {
+                color: #14854f;
+            }
+        </style>
+        <meta name="referrer" content="no-referrer" />
+    </head>
+    <body>
+        <div class="container" style="max-width:90%;">
+            <section style="text-align:center;margin-bottom:30px;">
+                <a href="/" title="mods for orbiter, home of the orb installer"><h1 style="margin-bottom:0px">orbiter-mods.com</h1></a>
+                <small style="text-decoration:underline;"><a target="_blank" href="http://orbit.medphys.ucl.ac.uk/" title="Orbiter Space Flight Simulator">orbiter</a></small>
+                <small style="text-decoration:underline;"><a href="/orb.html" title="bundled mod installs for orbiter">orb</a></small>
+                <small style="text-decoration:underline;"><a href="/downloads.html" title="orbiter goodies">downloads</a></small>
+                <small style="text-decoration:underline;"><a target="_blank" href="https://chat.orbiter-mods.com" title="a place to talk orbiter">chat</a></small>
+            </section>
+
+            <section>
+                <h1>How to create orb bundles</h1>
+                <p>
+                    Orb is basically a tool for automatically installing bundles of add-ons. We create bundles by
+                    writing an <strong>orb recipe</strong>. Here's a simple recipe to download and install the wonderful
+                    XR2 Ravenstar by dbeachy and Coolhand and the Soundbridge addon from Face.
+                </p>
+                <pre>
+# This is a comment! It is ignored by orb
+# You can use comments to share links and explain stuff
+
+def main(orb):
+    orb.download_zip('https://www.alteaaerospace.com/ccount/click.php?id=3', 'XR2 Ravenstar.zip')
+    orb.install_zip('XR2 Ravenstar.zip')
+    orb.download_from_of('https://www.orbiter-forum.com/resources/soundbridge.204/download', 'SoundBridge1.1.zip')
+    orb.install_zip('SoundBridge1.1.zip')
+
+def requires_fresh_install():
+    return False;</pre>
+                <p>
+                    You can use the <code>download_zip</code> to download any file (not just zips) and the 
+                    <code>install_zip</code> to extract the zip into orbiter root. Note, due to Orbiter Forum's
+                    Cloudflare protection, you'll need to use the special <code>download_from_of</code> to Download
+                    files from Orbiter Forum. Pay special attention to the filename, for files downloaded using 
+                    <code>download_from_of</code> it must match the file name of the file on OF.
+                </p>
+                <h1>orb API</h1>
+                <p>
+                    Orb exposes functions to help you install Orbiter mods. Here's the list of functions currently
+                    available. 
+                </p>
+                <p>
+                    These can be used to <strong>download files</strong>, including zips, rars, exes. 
+                </p>
+                <pre>
+download_zip
+download_from_of</pre>
+<p>
+    These functions can be used to <strong>install rars, zips, exes and other orb bundles</strong> (you can install other bundles from your bundle).
+</p>
+<pre>
+install_rar
+install_zip
+install_exe
+install_orbiter_mods_experience</pre>
+
+<p>
+    These functions are used to <strong>edit Orbiter's many cfg files</strong>.
+</p>
+<pre>enable_modules
+edit_cfg_file_section
+edit_cfg_file_add_line
+edit_cfg_file_remove_line</pre>
+
+<p>Orb copies all scenarios installed from mods in a bundle to a new sub-directory for easy access. These two
+    functions allow you to modify this behavior.
+</p>
+<pre>
+set_scn_blacklist # provide a list of scenarios to prevent from being copied into new scenario sub-dir created by orb
+set_scn_dir # override name of the scenario sub-dir (default is name of the bundle)</pre>
+
+<p>
+    Take a look at the offical orbiter-mods created bundles to see how to use these functions: <a href="/orb.html">Orb bundles</a>
+</p>
+            </section>
+        </div>
+        <script src="/bundle.js?v=1"></script>
+    </body>
+</html>
