@@ -3,6 +3,12 @@ import $ from 'jquery';
 
 export class AddonSearch {
 
+    init_search() {
+        $('#index_count').text(`${Object.keys(this.addons).length} mods in index`);
+        document.getElementById('search').focus();
+        this.do_search();
+    };
+
     get_index(callback, cache_bust=false) {
         let url = '/addons.json';
         if (cache_bust) {
@@ -11,20 +17,31 @@ export class AddonSearch {
 
         $.get(url, (data) => {
             this.addons = data;
-            $('#index_count').text(`${Object.keys(this.addons).length} mods in index`);
-            document.getElementById('search').focus();
             callback();
-            this.do_search();
+            this.init_search();
         });
     };
 
     constructor() {
         this.addons = {};
         $.get('/mods_count?cache_bust=' + Math.random(), (data) => {
-            const index_count = data.count - 2;
+            const index_count = data.count;
+            // set this.addons from local storage
+            if (localStorage.getItem('addons')) {
+                this.addons = JSON.parse(localStorage.getItem('addons'));
+                // if number of addons in index is same as in local storage, don't bother refreshing the index
+                if (index_count === Object.keys(this.addons).length) {
+                    this.init_search();
+                    return;
+                }
+            }
             this.get_index(() => {
+                localStorage.setItem('addons', JSON.stringify(this.addons));
                 if (index_count !== Object.keys(this.addons).length) {
-                    this.get_index(() => {}, true)
+                    this.get_index(() => {
+                        // save this.addons into local store
+                        localStorage.setItem('addons', JSON.stringify(this.addons));
+                    }, true)
                 }
             });
         });
