@@ -316,4 +316,42 @@ $app->get('/mods_count', function ($request, $response) {
     return $response->withJson(['success' => true, 'count' => count($addons)], 200);
 });
 
+// create php file upload handler
+$app->post('/upload', function ($request, $response) {
+    $api_key = $request->getQueryParam('api_key');
+    if (!Auth::authenticate($request)) {
+        return $response->withJson(['error' => 'Unauthorized'], 401);
+    }
+    
+    $user_id = Auth::get_user_from_api_key($api_key);
+    if (empty($user_id)) {
+        return $response->withJson(['error' => 'Unauthorized'], 401);
+    }
+    
+    $user_id = $user_id['user_id'];
+    if (isset($_FILES['uploadedFile']) && $_FILES['uploadedFile']['error'] === UPLOAD_ERR_OK) {
+        $fileTmpPath = $_FILES['uploadedFile']['tmp_name'];
+        $fileName = $_FILES['uploadedFile']['name'];
+        $fileSize = $_FILES['uploadedFile']['size'];
+        $fileType = $_FILES['uploadedFile']['type'];
+        $fileNameCmps = explode(".", $fileName);
+        $fileExtension = strtolower(end($fileNameCmps));
+
+        var_dump($fileTmpPath);
+        // vardump cwd
+        var_dump(getcwd());
+        var_dump($fileName);
+        $allowedfileExtensions = array('jpg', 'gif', 'png', 'zip', 'txt', 'xls', 'doc');
+        if (in_array($fileExtension, $allowedfileExtensions)) {
+            if(move_uploaded_file($fileTmpPath, "{$fileName}")) {
+                return $response->withJson(['success' => true, 'file_name' => $fileName], 200);
+            } else {
+                return $response->withJson(['error' => 'could not upload file: ' . $_FILES['uploadedFile']['error']], 400);
+            }   
+        }
+    }
+    return $response->withJson(['success' => true], 200);
+});
+
+
 $app->run();
