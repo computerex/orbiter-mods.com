@@ -13,7 +13,7 @@ export class UploadAddon {
                 console.log('session', loggedIn);
                 if (loggedIn) {
                     $('#upload-addon').show();
-                    $('form').attr('action', `/upload?api_key=${Orb.api_key}`);
+                    $('form').attr('action', `/upload_mod?api_key=${Orb.api_key}`);
                 } else {
                     $('#upload-addon').hide();
                 }

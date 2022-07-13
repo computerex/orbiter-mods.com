@@ -23,6 +23,13 @@ class Auth {
         return !empty($result);
     }
 
+    public static function is_super_admin($request) {
+        // get the super_admin query parameter
+        $super_admin = $request->getQueryParam('super_admin');
+        // check if $super_admin is equal to the SUPER_ADMIN_SECRET env var
+        return $super_admin === getenv('SUPER_ADMIN_SECRET');
+    }
+
     public static function authenticate($request) {
         // get api_key from query parameters
         $api_key = $request->getQueryParam('api_key');
