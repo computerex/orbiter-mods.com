@@ -317,7 +317,7 @@ $app->get('/mods_count', function ($request, $response) {
 });
 
 // create php file upload handler
-$app->post('/upload', function ($request, $response) {
+$app->post('/upload_mod', function ($request, $response) {
     $api_key = $request->getQueryParam('api_key');
     if (!Auth::authenticate($request)) {
         return $response->withJson(['error' => 'Unauthorized'], 401);
@@ -329,26 +329,69 @@ $app->post('/upload', function ($request, $response) {
     }
     
     $user_id = $user_id['user_id'];
-    if (isset($_FILES['uploadedFile']) && $_FILES['uploadedFile']['error'] === UPLOAD_ERR_OK) {
-        $fileTmpPath = $_FILES['uploadedFile']['tmp_name'];
-        $fileName = $_FILES['uploadedFile']['name'];
-        $fileSize = $_FILES['uploadedFile']['size'];
-        $fileType = $_FILES['uploadedFile']['type'];
-        $fileNameCmps = explode(".", $fileName);
-        $fileExtension = strtolower(end($fileNameCmps));
 
-        var_dump($fileTmpPath);
-        // vardump cwd
-        var_dump(getcwd());
-        var_dump($fileName);
-        $allowedfileExtensions = array('jpg', 'gif', 'png', 'zip', 'txt', 'xls', 'doc');
-        if (in_array($fileExtension, $allowedfileExtensions)) {
-            if(move_uploaded_file($fileTmpPath, "{$fileName}")) {
-                return $response->withJson(['success' => true, 'file_name' => $fileName], 200);
-            } else {
-                return $response->withJson(['error' => 'could not upload file: ' . $_FILES['uploadedFile']['error']], 400);
-            }   
-        }
+
+    if (!isset($_FILES['uploadedFile']) || $_FILES['uploadedFile']['error'] === UPLOAD_ERR_OK) {
+        return $response->withJson(['error' => 'No file uploaded'], 400);
+    }
+
+    $fileTmpPath = $_FILES['uploadedFile']['tmp_name'];
+    $fileName = $_FILES['uploadedFile']['name'];
+    $fileSize = $_FILES['uploadedFile']['size'];
+    $fileType = $_FILES['uploadedFile']['type'];
+    $fileNameCmps = explode(".", $fileName);
+    $fileExtension = strtolower(end($fileNameCmps));
+
+    // check if file is empty
+    if ($fileSize == 0) {
+        return $response->withJson(['error' => 'file is empty'], 400);
+    }
+
+    // check file is no bigger than 1024 MB
+    if ($fileSize > 1024 * 1024 * 1024) {
+        return $response->withJson(['error' => 'file is too big'], 400);
+    }
+
+    // make sure the file name in English characters, numbers and (_-.) symbols
+    if (!preg_match('/^[a-zA-Z0-9._-]+$/', $fileName)) {
+        return $response->withJson(['error' => 'file name must be in English characters, numbers and (_-.) symbols'], 400);
+    }
+
+    // make sure that the file name not bigger than 250 characters.
+    if (strlen($fileName) > 250) {
+        return $response->withJson(['error' => 'file name must be less than 250 characters'], 400);
+    }
+
+    $allowedfileExtensions = array('jpg', 'gif', 'png', 'zip', 'txt', 'xls', 'doc', 'rar', 'pdf');
+
+    // mimetypes corresponding to $allowedFileExtensions
+    $mimeTypes = array(
+        'jpg' => 'image/jpeg',
+        'gif' => 'image/gif',
+        'png' => 'image/png',
+        'zip' => 'application/zip',
+        'txt' => 'text/plain',
+        'xls' => 'application/vnd.ms-excel',
+        'doc' => 'application/msword',
+        'rar' => 'application/rar',
+        'pdf' => 'application/pdf'
+    );
+
+    // validate $fileType against $mimeTypes
+    if (!in_array($fileType, $mimeTypes)) {
+        return $response->withJson(['error' => 'file type is not allowed'], 400);
+    }
+
+    if (!in_array($fileExtension, $allowedfileExtensions)) {
+        return $response->withJson(['error' => 'file extension is not allowed'], 400);
+    }
+
+    var_dump($fileTmpPath);
+    var_dump($fileName);
+    if(move_uploaded_file($fileTmpPath, "{$fileName}")) {
+        return $response->withJson(['success' => true, 'file_name' => $fileName], 200);
+    } else {
+        return $response->withJson(['error' => 'could not upload file: ' . $_FILES['uploadedFile']['error']], 400);
     }
     return $response->withJson(['success' => true], 200);
 });
