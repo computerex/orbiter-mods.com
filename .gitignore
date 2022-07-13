@@ -38,3 +38,5 @@ wrangler.toml
 secrets.json
 
 update-experience.py
+
+.env
