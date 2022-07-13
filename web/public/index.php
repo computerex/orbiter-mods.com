@@ -330,8 +330,8 @@ $app->post('/upload_mod', function ($request, $response) {
     
     $user_id = $user_id['user_id'];
 
-
-    if (!isset($_FILES['uploadedFile']) || $_FILES['uploadedFile']['error'] === UPLOAD_ERR_OK) {
+    var_dump($_FILES);
+    if (!isset($_FILES['uploadedFile']) || $_FILES['uploadedFile']['error'] !== UPLOAD_ERR_OK) {
         return $response->withJson(['error' => 'No file uploaded'], 400);
     }
 
@@ -362,7 +362,7 @@ $app->post('/upload_mod', function ($request, $response) {
         return $response->withJson(['error' => 'file name must be less than 250 characters'], 400);
     }
 
-    $allowedfileExtensions = array('jpg', 'gif', 'png', 'zip', 'txt', 'xls', 'doc', 'rar', 'pdf');
+    $allowedfileExtensions = array('jpg', 'gif', 'png', 'zip', 'txt', 'xls', 'doc', 'rar', 'pdf', 'dll');
 
     // mimetypes corresponding to $allowedFileExtensions
     $mimeTypes = array(
@@ -374,7 +374,8 @@ $app->post('/upload_mod', function ($request, $response) {
         'xls' => 'application/vnd.ms-excel',
         'doc' => 'application/msword',
         'rar' => 'application/rar',
-        'pdf' => 'application/pdf'
+        'pdf' => 'application/pdf',
+        'dll' => 'application/x-msdownload'
     );
 
     // validate $fileType against $mimeTypes
@@ -386,9 +387,72 @@ $app->post('/upload_mod', function ($request, $response) {
         return $response->withJson(['error' => 'file extension is not allowed'], 400);
     }
 
+    // check that mod name, description and version are passed in
+    if (
+        !isset($_POST['mod_name']) || 
+        !isset($_POST['mod_description']) || 
+        !isset($_POST['mod_version'])) {
+        return $response->withJson(['error' => 'you must specify a valid `mod_name`, `mod_description`, and `mod_version`'], 400);
+    }
+
+    // get mod_name, mod_description, mod_version
+    $mod_name = $_POST['mod_name'];
+    $mod_description = $_POST['mod_description'];
+    $mod_version = $_POST['mod_version'];
+    $orbiter_version = !isset($_POST['orbiter_version']) ? 2016 : intval($_POST['orbiter_version']);
+    $restricted = 0;
+
+    // find number of files by $user_id where restricted = 0
+    $db = DB::getInstance();
+    $stmt = $db->prepare('SELECT COUNT(*) FROM files WHERE user_id = :user_id AND restricted = 0');
+    $stmt->bindValue(':user_id', $user_id);
+    $stmt->execute();
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    $num_files = $result['COUNT(*)'];
+
+    // check if number of unrestricted mods is less than 3
+    if ($num_files < 3) {
+        $restricted = 1;
+        // check if file size is larger than 300 MB
+        if ($fileSize > 300 * 1024 * 1024) {
+            return $response->withJson(['error' => 'new users are initially restricted to 300 MB uploads'], 400);
+        }
+    }
+    
+
+    // insert into the files table
+    $stmt = $db->prepare('INSERT INTO `files`
+        (`filename`, `name`, `description`, `version`, `user_id`, `orbiter_version`, `restricted`) 
+        VALUES (:filename, :name, :description, :version, :user_id, :orbiter_version, :restricted)');
+    $stmt->bindValue(':name', $mod_name);
+    $stmt->bindValue(':description', $mod_description);
+    $stmt->bindValue(':version', $mod_version);
+    $stmt->bindValue(':user_id', $user_id);
+    $stmt->bindValue(':orbiter_version', $orbiter_version);
+    $stmt->bindValue(':filename', $fileName);
+    $stmt->bindValue(':restricted', $restricted);
+    $stmt->execute();
+    $file_id = $db->lastInsertId();
+
+    // create mods/$user_id directory if it doesn't exist
+    $mods_dir = 'mods/' . $user_id;
+    if (!file_exists($mods_dir)) {
+        mkdir($mods_dir, 0777, true);
+    }
+
+    // create mods/$user_id/$file_id directory if it doesn't exist
+    $mod_dir = $mods_dir . '/' . $file_id;
+    if (!file_exists($mod_dir)) {
+        mkdir($mod_dir, 0777, true);
+    }
+    
+    // output file path in mod_dir
+    $file_path = $mod_dir . '/' . $fileName;
+
     var_dump($fileTmpPath);
+    var_dump($file_path);
     var_dump($fileName);
-    if(move_uploaded_file($fileTmpPath, "{$fileName}")) {
+    if(move_uploaded_file($fileTmpPath, $file_path)) {
         return $response->withJson(['success' => true, 'file_name' => $fileName], 200);
     } else {
         return $response->withJson(['error' => 'could not upload file: ' . $_FILES['uploadedFile']['error']], 400);
