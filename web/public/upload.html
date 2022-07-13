@@ -50,20 +50,28 @@
                 <small style="text-decoration:underline;"><a href="/downloads.html" title="orbiter goodies">downloads</a></small>
                 <small style="text-decoration:underline;"><a target="_blank" href="https://chat.orbiter-mods.com" title="a place to talk orbiter">chat</a></small>
             </section>
-
+            <p class="errors"></p>
             <form id="upload-form" action="upload.php" method="POST" enctype="multipart/form-data">
+                <label>mod name:</label>
                 <input type="text" name="mod_name" placeholder="name" required>
+                <br />
+                <label>mod description:</label>
                 <textarea name="mod_description" placeholder="description" required></textarea>
+                <br />
+                <label>orbiter version:</label>
                 <select name="orbiter_version">
                     <option value="2016">2016</option>
                     <option value="2010">2010</option>
                 </select>
+                <br />
+                <label>mod version:</label>
                 <input type="text" name="mod_version" placeholder="2.0.1" required>
-
+                <br />
                 <div class="file-container">
                     <input type="file" name="uploadedFile">
                     <p>Drag your files here or click in this area.</p>
                 </div>
+                <br />
                 <button id="upload-addon" type="submit">Upload</button>
               </form>
         </div>

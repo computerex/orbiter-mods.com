@@ -330,7 +330,6 @@ $app->post('/upload_mod', function ($request, $response) {
     
     $user_id = $user_id['user_id'];
 
-    var_dump($_FILES);
     if (!isset($_FILES['uploadedFile']) || $_FILES['uploadedFile']['error'] !== UPLOAD_ERR_OK) {
         return $response->withJson(['error' => 'No file uploaded'], 400);
     }
@@ -402,8 +401,20 @@ $app->post('/upload_mod', function ($request, $response) {
     $orbiter_version = !isset($_POST['orbiter_version']) ? 2016 : intval($_POST['orbiter_version']);
     $restricted = 0;
 
-    // find number of files by $user_id where restricted = 0
     $db = DB::getInstance();
+
+    // get the number of restricted files
+    $stmt = $db->prepare('SELECT COUNT(*) FROM files WHERE user_id = :user_id AND restricted = 1');
+    $stmt->bindValue(':user_id', $user_id);
+    $stmt->execute();
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    $num_restricted_files = $result['COUNT(*)'];
+
+    if ($num_restricted_files >= 3) {
+        return $response->withJson(['error' => 'you currently have mods undergoing review, please wait before uploading'], 400);
+    }
+
+    // find number of files by $user_id where restricted = 0
     $stmt = $db->prepare('SELECT COUNT(*) FROM files WHERE user_id = :user_id AND restricted = 0');
     $stmt->bindValue(':user_id', $user_id);
     $stmt->execute();
@@ -418,7 +429,6 @@ $app->post('/upload_mod', function ($request, $response) {
             return $response->withJson(['error' => 'new users are initially restricted to 300 MB uploads'], 400);
         }
     }
-    
 
     // insert into the files table
     $stmt = $db->prepare('INSERT INTO `files`
@@ -448,17 +458,56 @@ $app->post('/upload_mod', function ($request, $response) {
     
     // output file path in mod_dir
     $file_path = $mod_dir . '/' . $fileName;
-
-    var_dump($fileTmpPath);
-    var_dump($file_path);
-    var_dump($fileName);
+    
     if(move_uploaded_file($fileTmpPath, $file_path)) {
-        return $response->withJson(['success' => true, 'file_name' => $fileName], 200);
+        return $response->withJson(['success' => true, 'file_name' => $fileName, 'id' => $file_id], 200);
     } else {
         return $response->withJson(['error' => 'could not upload file: ' . $_FILES['uploadedFile']['error']], 400);
     }
     return $response->withJson(['success' => true], 200);
 });
 
+// serve the mod file given the file_id
+$app->get('/mod/{file_id}', function ($request, $response, $args) {
+    $file_id = $args['file_id'];
+
+    $db = DB::getInstance();
+    $stmt = $db->prepare(
+        'SELECT `filename`,
+            `restricted`,
+            `user_id`,
+            `version`
+        FROM `files`
+        WHERE `id` = :file_id
+        LIMIT 1'
+    );
+    $stmt->bindValue(':file_id', $file_id);
+    $stmt->execute();
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($result) {
+        $file_name = $result['filename'];
+        $restricted = $result['restricted'];
+        $user_id = $result['user_id'];
+        $file_path = 'mods/' . $user_id . '/' . $file_id . '/' . $file_name;
+        if (file_exists($file_path)) {
+            $file_size = filesize($file_path);
+            $file_type = mime_content_type($file_path);
+            // return the static file with correct headers
+            return $response->withHeader('Content-Type', $file_type)
+                ->withHeader('Content-Length', $file_size)
+                ->withHeader('Content-Disposition', 'attachment; filename="' . $file_name . '"')
+                ->withHeader('Content-Transfer-Encoding', 'binary')
+                ->withHeader('Expires', '0')
+                ->withHeader('Cache-Control', 'must-revalidate')
+                ->withHeader('Pragma', 'public')
+                ->write(file_get_contents($file_path));
+        } else {
+            return $response->withJson(['error' => 'file does not exist'], 400);
+        }
+    } else {
+        return $response->withJson(['error' => 'file not found'], 404);
+    }
+});
 
 $app->run();

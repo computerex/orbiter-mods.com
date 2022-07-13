@@ -18,6 +18,38 @@ export class UploadAddon {
                     $('#upload-addon').hide();
                 }
             });
+
+            $("form").submit(function(e) {
+                e.preventDefault();    
+                var formData = new FormData(this);
+
+                $.ajax({
+                    url: `/upload_mod?api_key=${Orb.api_key}`,
+                    type: 'POST',
+                    data: formData,
+                    success: function (data) {
+                        if (data.error) {
+                            $('.errors').text(data.error);
+                        } else if (data.success) {
+                            alert('mod uploaded');
+                        }
+                    },
+                    error: function(data) {
+                        console.log(data);
+                        console.log('foobar');
+                        if (data.responseJSON) {
+                            console.log(data.responseJSON);
+                            console.log(data.responseJSON.error);
+                            $('.errors').text(data.responseJSON.error);
+                        } else {
+                            console.log(JSON.parse(JSON.stringify(data)));
+                        }
+                    },
+                    cache: false,
+                    contentType: false,
+                    processData: false
+                });
+            });
         });
     };
 
