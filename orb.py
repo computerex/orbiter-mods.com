@@ -227,27 +227,17 @@ class Orb:
         subprocess.run(f'orb_cache/{file}')
 
     def install_zip(self, file, install_subdir=None):
-        output_dir = './'
-        if install_subdir:
-            output_dir = os.path.join('orb_cache', install_subdir)
-
+        output_dir = os.path.join('orb_cache', os.path.splitext(file)[0])        
         scn_files = []
         with zipfile.ZipFile(f'orb_cache/{file}', 'r') as zip_ref:
             zip_ref.extractall(output_dir)
-            # get list of all files in zip
-            files = zip_ref.namelist()
-            # find all files ending with .scn file extension
-            # for files in subdir the prefix isn't necessarily Scenarios/, so extract filename from orbiter Scenarios root
-            scn_files = [
-                file[file.find('Scenarios/')+10:] for file in files 
-                    if file.lower().endswith('.scn') and file.find('Scenarios/') != -1
-            ]
-            scn_files = [s for s in scn_files if s not in self.scn_blacklist]
             
+        src = output_dir
         if install_subdir:
-            # copy all files from orb_cache/install_subdir to current folder keeping directory structure in tact
-            print('copying files from ' + os.path.join('orb_cache', install_subdir, install_subdir) + ' to current folder')
-            shutil.copytree(os.path.join('orb_cache', install_subdir, install_subdir), '.', dirs_exist_ok=True)
+            src = os.path.join(output_dir, install_subdir)
+        
+        print(f'copying files from {src} to current folder')
+        shutil.copytree(src, '.', dirs_exist_ok=True)
 
         # create new directory in Scenarios/ folder named self.scn_dir
         if not os.path.exists(os.path.join('.', 'Scenarios', self.scn_dir)):
@@ -256,12 +246,24 @@ class Orb:
                 os.makedirs(os.path.join('Scenarios', self.scn_dir))
             except Exception as e:
                 pass
-        # copy all scn_files to Scenarios/self.scn_dir
-        if len(scn_files) > 0:
-            print(f'copying all .scn files to Scenarios/{self.scn_dir}')
-        for scn_file in scn_files:
-            print(f'copying {scn_file} to {os.path.join("Scenarios", self.scn_dir)}')
-            shutil.copy(os.path.join('.', 'Scenarios', scn_file), os.path.join('.', 'Scenarios', self.scn_dir))
+        
+        # recursively find all .scn files in src
+        for root, dirs, files in os.walk(src):
+            for file in files:
+                if file.endswith('.scn'):
+                    scn_files.append(os.path.join(root, file))
+
+        for scn in scn_files:
+            blacklisted = False
+            for blacklisted_scn in self.scn_blacklist:
+                if blacklisted_scn in scn:
+                    blacklisted = True
+                    break
+            if blacklisted:
+                print(f'skipping {scn} since it is blacklisted')
+                continue
+            print(f'copying {scn} to Scenarios/{self.scn_dir}')
+            shutil.copy(scn, os.path.join('Scenarios', self.scn_dir))
 
     def install_rar(self, file, install_subdir=None):
         output_dir = os.path.join('orb_cache', os.path.splitext(file)[0])
@@ -275,6 +277,13 @@ class Orb:
         # recursively copy all files from output_dir to current folder keeping directory structure in tact
         print('copying files from ' + output_dir + ' to current folder')
         shutil.copytree(output_dir, '.', dirs_exist_ok=True)
+
+        if not os.path.exists(os.path.join('.', 'Scenarios', self.scn_dir)):
+            print(f'creating new directory in Scenarios/ folder named {self.scn_dir}')
+            try:
+                os.makedirs(os.path.join('Scenarios', self.scn_dir))
+            except Exception as e:
+                pass
 
         scn_files = []
         # recursively get a list of all .scn files in output_dir
