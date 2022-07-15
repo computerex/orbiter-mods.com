@@ -2,19 +2,41 @@
 import { AddonSearch } from './AddonSearch';
 import { UploadAddon } from './UploadAddon';
 import { ExperienceManager } from './ExperienceManager';
+import { LoginRegister } from './LoginRegister';
+import { ModViewer } from './ModViewer';
+import Orb from './Orb';
 const location = window.location.pathname;
 
-switch(location) {
-    case '/':
+switch(true) {
+    case location == '/':
         const addonSearch = new AddonSearch();
         addonSearch.run();
         break;
-    case '/orb.html':
+    case /^\/orb$/i.test(location) || location == '/orb.html':
         const experienceManager = new ExperienceManager();
         experienceManager.run();
         break;
-    case '/upload.html':
+    case /^\/upload$/i.test(location) ||  location == '/upload.html':
         const uploadAddon = new UploadAddon();
         uploadAddon.run();
+        break;
+    case /^\/login$/i.test(location) || location == '/login.html':
+        Orb.checkSession((loggedIn) => {
+            if (!loggedIn) {
+                const loginRegister = new LoginRegister(null, '.login-form', (data) => {
+                    if (data.success) {
+                        window.location.href = '/';
+                    }
+                });
+                loginRegister.run();
+            } else {
+                window.location.href = '/';
+            }
+        });
+        break;
+    case /^\/view\/\d\/.*/i.test(location) || location == '/view.html':
+        console.log('rendering viewer');
+        const modViewer = new ModViewer();
+        modViewer.run();
         break;
 };

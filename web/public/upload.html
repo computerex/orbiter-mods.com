@@ -19,7 +19,7 @@
             h1 {
                 color: #14854f;
             }
-            form input[type=file] {
+            form input[type=file][name=uploadedFile] {
                 border: 4px dashed #14854f;
                 opacity: 0;
                 height: 100%;
@@ -39,6 +39,27 @@
                 font-size: 1.5em;
                 color: #14854f;
             }
+
+            .login-register-link {
+                display: none;
+            }
+
+            #upload-addon {
+                display: none;
+            }
+
+            #myProgress {
+                width: 100%;
+                background-color: #14854f;
+            }
+
+            #myBar {
+                width: 0%;
+                height: 30px;
+                background-color: cadetblue;
+
+            }
+
         </style>
     </head>
     <body>
@@ -50,7 +71,6 @@
                 <small style="text-decoration:underline;"><a href="/downloads.html" title="orbiter goodies">downloads</a></small>
                 <small style="text-decoration:underline;"><a target="_blank" href="https://chat.orbiter-mods.com" title="a place to talk orbiter">chat</a></small>
             </section>
-            <p class="errors"></p>
             <form id="upload-form" action="upload.php" method="POST" enctype="multipart/form-data">
                 <label>mod name:</label>
                 <input type="text" name="mod_name" placeholder="name" required>
@@ -67,12 +87,26 @@
                 <label>mod version:</label>
                 <input type="text" name="mod_version" placeholder="2.0.1" required>
                 <br />
+                
+                <label>picture link: (try <a target="_blank" href="https://postimages.org/">postimages.org</a>)</label>
+                <input type="text" name="mod_picture_link">
+                <br />
+
                 <div class="file-container">
                     <input type="file" name="uploadedFile">
-                    <p>Drag your files here or click in this area.</p>
+                    <p>Drag your mod archive here or click in this area.</p>
                 </div>
                 <br />
+
+                <div id="myProgress">
+                    <div id="myBar"></div>
+                  </div>
+
+                <br /> 
+                <p class="errors"></p>
+
                 <button id="upload-addon" type="submit">Upload</button>
+                <a class="login-register-link" href="/login.html">Login or register</a>
               </form>
         </div>
         <script src="/bundle.js?v=1"></script>

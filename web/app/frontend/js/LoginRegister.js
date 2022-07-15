@@ -8,15 +8,24 @@ const MODE_REGISTER = 'register';
 
 export class LoginRegister {
     
-    constructor(viewer) {
-        this.viewer = viewer;
+    constructor(viewer, container, callback) {
+        if (viewer) {
+            this.viewer = viewer;
+        }
         this.mode = MODE_LOGIN;
         this.email = '';
         this.password = '';
+        this.parent = '.right-pane';
+        if (callback) {
+            this.callback = callback;
+        }
+        if (container) {
+            this.parent = container;
+        }
     };
 
     render_mode_login() {
-        $('.right-pane').append(
+        $(this.parent).append(
             `<div class="login-register-form">
                 <div class="login-register-form-input">
                     <label for="email">email:</label>
@@ -52,7 +61,7 @@ export class LoginRegister {
     };
 
     render_mode_register() {
-        $('.right-pane').append(
+        $(this.parent).append(
             `<div class="login-register-form">
                 <div class="login-register-form-input">
                     <label for="username">username:</label>
@@ -101,10 +110,18 @@ export class LoginRegister {
             if (data.success) {
                 // login successful
                 Orb.login(data.username, email, data.api_key);
-                this.viewer.render();
+                if (this.viewer) {
+                    this.viewer.render();
+                }
+                if (this.callback) {
+                    this.callback(data);
+                }
             } else {
                 // login failed
                 $('.error').text(data.error);
+                if (this.callback) {
+                    this.callback(data);
+                }
             }
         });
     };
@@ -129,17 +146,25 @@ export class LoginRegister {
                 // check if user was created
                 if (data.success) {
                     Orb.login(username, email, data.api_key);
-                    this.viewer.render();
+                    if (this.viewer) {
+                        this.viewer.render();
+                    }
+                    if (this.callback) {
+                        this.callback(data);
+                    }
                 } else {
                     $('.error').text(data.error);
+                    if (this.callback) {
+                        this.callback(data);
+                    }
                 }
             });
         }
     };
 
     render() {
-        $('.right-pane').empty();
-        $('.right-pane').append(`<h1>Login or register</h1>`);
+        $(this.parent).empty();
+        $(this.parent).append(`<h1>Login or register</h1>`);
 
         if (this.mode === MODE_LOGIN) {
             this.render_mode_login();

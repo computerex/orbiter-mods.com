@@ -1,7 +1,7 @@
 import _ from 'underscore';
 import $ from 'jquery';
 import Orb from './Orb';
-export class UploadAddon {
+export class ModViewer {
 
     progress(percentage) {
         $('#myBar').width(percentage + '%');
@@ -31,6 +31,7 @@ export class UploadAddon {
       
 
     constructor() {
+        console.log('mod viewer');
         const self = this;
 
         $(document).ready(function(){

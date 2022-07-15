@@ -49,6 +49,9 @@ composer-up:
 composer-dump:
 	@docker run --rm -v $(shell pwd)/web/app:/app composer dump
 
+composer-require:
+	@docker run --rm -v $(shell pwd)/web/app:/app composer require $(REQUIRE)
+
 docker-start: init
 	docker-compose up -d
 
