@@ -36,6 +36,7 @@ export class LoginRegister {
                     <input id="password" type="password" placeholder="password" />
                 </div>
                 <br />
+                <div class="errors"></div>
                 <div class="login-register-form-input">
                     <button id="login">Login</button>
                 </div>
@@ -80,10 +81,10 @@ export class LoginRegister {
                     <input id="password2" type="password" placeholder="password" />
                 </div>
                 <br />
+                <div class="errors"></div>
                 <div class="login-register-form-input">
                     <button id="register">Register</button>
                 </div>
-                <div class="error"></div>
             </div>`);
 
         $('#register').on('click', () => {
@@ -118,11 +119,13 @@ export class LoginRegister {
                 }
             } else {
                 // login failed
-                $('.error').text(data.error);
+                $('.errors').text(data.error);
                 if (this.callback) {
                     this.callback(data);
                 }
             }
+        }).fail((data) => {
+            $('.errors').text(data.responseJSON.error);
         });
     };
 
@@ -153,7 +156,7 @@ export class LoginRegister {
                         this.callback(data);
                     }
                 } else {
-                    $('.error').text(data.error);
+                    $('.errors').text(data.error);
                     if (this.callback) {
                         this.callback(data);
                     }
