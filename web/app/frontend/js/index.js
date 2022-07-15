@@ -20,7 +20,7 @@ switch(true) {
         const uploadAddon = new UploadAddon();
         uploadAddon.run();
         break;
-    case /^\/login$/i.test(location) || location == '/login_register.html':
+    case /^\/login_register$/i.test(location) || location == '/login_register.html':
         Orb.checkSession((loggedIn) => {
             if (!loggedIn) {
                 const loginRegister = new LoginRegister(null, '.login-form', (data) => {
