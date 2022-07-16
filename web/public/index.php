@@ -1,10 +1,10 @@
 <?php
 
+include '../app/vendor/autoload.php';
+
 use Slim\Http\Response;
 use App\Utils\DB;
 use App\Utils\Auth;
-
-include '../app/vendor/autoload.php';
 
 error_reporting(E_ALL ^ E_DEPRECATED ^ E_WARNING);
 
@@ -490,6 +490,11 @@ $app->get('/mod/{file_id}', function ($request, $response, $args) {
         $restricted = $result['restricted'];
         $user_id = $result['user_id'];
         $file_path = 'mods/' . $user_id . '/' . $file_id . '/' . $file_name;
+
+        if (intval($restricted) == 1) {
+            return $response->withJson(['error' => 'this mod is restricted'], 400);
+        }
+
         if (file_exists($file_path)) {
             $file_size = filesize($file_path);
             $file_type = mime_content_type($file_path);
@@ -503,10 +508,11 @@ $app->get('/mod/{file_id}', function ($request, $response, $args) {
                 ->withHeader('Pragma', 'public')
                 ->write(file_get_contents($file_path));
         } else {
-            return $response->withJson(['error' => 'file does not exist'], 400);
+            // redirect user to /files/$file_path
+            return $response->withStatus(302)->withHeader('Location', '/files/' . $file_path);
         }
     } else {
-        return $response->withJson(['error' => 'file not found'], 404);
+        return $response->withJson(['error' => 'mod not found'], 404);
     }
 });
 
@@ -517,4 +523,60 @@ $app->get('/view/{mod_id}/{slug}', function ($request, $response, $args) {
         ->write(file_get_contents('view.html'));
 });
 
+$app->get('/mod/{mod_id}/info', function ($request, $response, $args) {
+    $file_id = $args['mod_id'];
+    $api_key = $request->getQueryParam('api_key');
+    
+    $authenticated = Auth::authenticate($request);
+    
+    $user_id = null;
+    if ($authenticated) {
+        $result = Auth::get_user_from_api_key($api_key);
+        if (!empty($result)) {
+            $user_id = intval($result['user_id']);
+        }
+    }
+
+    // get the files's info from the database
+    $db = DB::getInstance();
+    $stmt = $db->prepare(
+        'SELECT `files`.`name`,
+            `description`,
+            `version`,
+            `orbiter_version`,
+            `restricted`,
+            `user_id`,
+            `picture_link`,
+            `users`.`name` as `owner`
+        FROM `files`
+        JOIN `users` ON `files`.`user_id` = `users`.`id`
+        WHERE `files`.`id` = :file_id
+        LIMIT 1'
+    );
+    $stmt->bindValue(':file_id', $file_id);
+    $stmt->execute();
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (empty($result)) {
+        return $response->withJson(['error' => 'mod not found'], 404);
+    }
+
+    $file_user_id = intval($result['user_id']);
+    
+    $Parsedown = new Parsedown();
+    $Parsedown->setSafeMode(true);
+
+    $result = [
+        'name' => $result['name'],
+        'description' => $Parsedown->text($result['description']),
+        'version' => $result['version'],
+        'orbiter_version' => $result['orbiter_version'],
+        'restricted' => $result['restricted'],
+        'picture_link' => $result['picture_link'],
+        'is_owner' => ($user_id === $file_user_id) ? true : false,
+        'owner' => $result['owner']
+    ];
+    // return $result
+    return $response->withJson($result, 200);
+});
 $app->run();

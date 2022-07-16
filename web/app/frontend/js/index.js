@@ -34,7 +34,7 @@ switch(true) {
             }
         });
         break;
-    case /^\/view\/\d\/.*/i.test(location) || location == '/view.html':
+    case /^\/view\/\d/i.test(location) || location == '/view.html':
         console.log('rendering viewer');
         const modViewer = new ModViewer();
         modViewer.run();
