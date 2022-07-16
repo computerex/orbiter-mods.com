@@ -431,9 +431,12 @@ $app->post('/upload_mod', function ($request, $response) {
     }
 
     // insert into the files table
+    $Parsedown = new Parsedown();
+    $Parsedown->setSafeMode(true);
+
     $stmt = $db->prepare('INSERT INTO `files`
-        (`filename`, `name`, `description`, `version`, `user_id`, `orbiter_version`, `restricted`) 
-        VALUES (:filename, :name, :description, :version, :user_id, :orbiter_version, :restricted)');
+        (`filename`, `name`, `description`, `version`, `user_id`, `orbiter_version`, `restricted`, `description_html`)) 
+        VALUES (:filename, :name, :description, :version, :user_id, :orbiter_version, :restricted, :description_html)');
     $stmt->bindValue(':name', $mod_name);
     $stmt->bindValue(':description', $mod_description);
     $stmt->bindValue(':version', $mod_version);
@@ -441,6 +444,7 @@ $app->post('/upload_mod', function ($request, $response) {
     $stmt->bindValue(':orbiter_version', $orbiter_version);
     $stmt->bindValue(':filename', $fileName);
     $stmt->bindValue(':restricted', $restricted);
+    $stmt->bindValue(':description_html', $Parsedown->text($mod_description));
     $stmt->execute();
     $file_id = $db->lastInsertId();
 
