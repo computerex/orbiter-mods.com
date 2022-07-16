@@ -470,7 +470,7 @@ $app->post('/upload_mod', function ($request, $response) {
 // serve the mod file given the file_id
 $app->get('/mod/{file_id}', function ($request, $response, $args) {
     $file_id = $args['file_id'];
-
+    
     $db = DB::getInstance();
     $stmt = $db->prepare(
         'SELECT `filename`,
@@ -508,6 +508,13 @@ $app->get('/mod/{file_id}', function ($request, $response, $args) {
     } else {
         return $response->withJson(['error' => 'file not found'], 404);
     }
+});
+
+$app->get('/view/{mod_id}/{slug}', function ($request, $response, $args) {
+    $file_id = $args['mod_id'];
+    return $response
+        ->withHeader('Content-Type', 'text/html')
+        ->write(file_get_contents('view.html'));
 });
 
 $app->run();
