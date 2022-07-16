@@ -563,13 +563,12 @@ $app->get('/mod/{mod_id}/info', function ($request, $response, $args) {
 
     $file_user_id = intval($result['user_id']);
     
-    //$Parsedown = new Parsedown();
-    //$Parsedown->setSafeMode(true);
+    $Parsedown = new Parsedown();
+    $Parsedown->setSafeMode(true);
 
     $result = [
         'name' => $result['name'],
-        //'description' => $Parsedown->text($result['description']),
-        'description' => $result['description'],
+        'description' => $Parsedown->text($result['description']),
         'version' => $result['version'],
         'orbiter_version' => $result['orbiter_version'],
         'restricted' => $result['restricted'],
