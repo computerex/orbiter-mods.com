@@ -545,7 +545,7 @@ $app->get('/mod/{mod_id}/info', function ($request, $response, $args) {
     $db = DB::getInstance();
     $stmt = $db->prepare(
         'SELECT `files`.`name`,
-            `description`,
+            `description_html`,
             `version`,
             `orbiter_version`,
             `restricted`,
@@ -566,13 +566,10 @@ $app->get('/mod/{mod_id}/info', function ($request, $response, $args) {
     }
 
     $file_user_id = intval($result['user_id']);
-    
-    $Parsedown = new Parsedown();
-    $Parsedown->setSafeMode(true);
 
     $result = [
         'name' => $result['name'],
-        'description' => $Parsedown->text($result['description']),
+        'description' => $result['description_html'],
         'version' => $result['version'],
         'orbiter_version' => $result['orbiter_version'],
         'restricted' => $result['restricted'],
