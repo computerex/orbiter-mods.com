@@ -11,12 +11,20 @@ export class ModViewer {
     };
 
     render(mod_info) {
-        $('.root').append(`
+        if (mod_info.restricted) {
+            $('.root').append(`
             <div>
                 <h1 style="margin-bottom:-5px;">${mod_info.name}</h1>
                 <small>${mod_info.owner}</small>
             </div>`);
-
+        } else {
+            $('.root').append(`
+            <div>
+                <a href="/mod/${this.mod_id}"><h1 style="margin-bottom:-5px;">Download ${mod_info.name}</h1></a>
+                <small>${mod_info.owner}</small>
+            </div>`);
+        }
+        
         $('.root').append(mod_info.description);
 
         if (mod_info.picture_link) {

@@ -6,9 +6,9 @@ use Slim\Http\Response;
 use App\Utils\DB;
 use App\Utils\Auth;
 
-error_reporting(E_ALL ^ E_DEPRECATED ^ E_WARNING);
+error_reporting(0);
 
-$app = new \Slim\App(['settings' => ['displayErrorDetails' => true]]);
+$app = new \Slim\App(['settings' => ['displayErrorDetails' => false]]);
 
 function get_client_ip() {
     $ipaddress = '';
@@ -496,7 +496,8 @@ $app->get('/mod/{file_id}', function ($request, $response, $args) {
         $file_path = 'mods/' . $user_id . '/' . $file_id . '/' . $file_name;
 
         if (intval($restricted) == 1) {
-            return $response->withJson(['error' => 'this mod is restricted'], 400);
+            $response->getBody()->write("<h1>This mod is currently restricted!</h1>");
+            return $response;
         }
 
         if (file_exists($file_path)) {
@@ -516,7 +517,7 @@ $app->get('/mod/{file_id}', function ($request, $response, $args) {
             return $response->withStatus(302)->withHeader('Location', '/files/' . $file_path);
         }
     } else {
-        return $response->withJson(['error' => 'mod not found'], 404);
+        throw new \Slim\Exception\NotFoundException($request, $response);
     }
 });
 
