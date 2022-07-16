@@ -435,7 +435,7 @@ $app->post('/upload_mod', function ($request, $response) {
     $Parsedown->setSafeMode(true);
 
     $stmt = $db->prepare('INSERT INTO `files`
-        (`filename`, `name`, `description`, `version`, `user_id`, `orbiter_version`, `restricted`, `description_html`)) 
+        (`filename`, `name`, `description`, `version`, `user_id`, `orbiter_version`, `restricted`, `description_html`) 
         VALUES (:filename, :name, :description, :version, :user_id, :orbiter_version, :restricted, :description_html)');
     $stmt->bindValue(':name', $mod_name);
     $stmt->bindValue(':description', $mod_description);

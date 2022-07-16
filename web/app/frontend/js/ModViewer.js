@@ -11,12 +11,6 @@ export class ModViewer {
     };
 
     render(mod_info) {
-        const picture_html = 
-            `<div>
-            <div class="mod-picture">
-                <img src="${mod_info.picture_link}" />
-            </div>
-        `;
         $('.root').append(`
             <div>
                 <h1 style="margin-bottom:-5px;">${mod_info.name}</h1>
@@ -24,7 +18,13 @@ export class ModViewer {
             </div>`);
 
         $('.root').append(mod_info.description);
-        $('.root').append(picture_html);
+
+        if (mod_info.picture_link) {
+            $('.root').append( `<div>
+                <div class="mod-picture">
+                    <img src="${mod_info.picture_link}" />
+                </div>`);
+        }
     };
 
     run() {
