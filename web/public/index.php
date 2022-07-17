@@ -100,13 +100,17 @@ $app->post('/user', function ($request, $response) {
     ], 200);
 });
 
-// add endpoint /experiences to return all currently available experiences as json array
-$app->get('/fetch_experiences', function ($request, $response) {
+function get_host() {
     $host = 'https://orbiter-mods.com';
 
     if (getenv('DEBUG') == '1') {
         $host = 'http://localhost:8000';
     }
+    return $host;
+}
+
+// add endpoint /experiences to return all currently available experiences as json array
+$app->get('/fetch_experiences', function ($request, $response) {
     $pdo = DB::getInstance();
     $stmt = $pdo->prepare('SELECT * FROM experiences');
     $stmt->execute();
@@ -310,10 +314,45 @@ $app->get('/user_experiences', function ($request, $response) {
     return $response->withJson(['success' => true, 'ids' => array_column($result, 'id')], 200);
 });
 
-// create endpoint to return number of addons in addons.json
-$app->get('/mods_count', function ($request, $response) {
-    $addons = json_decode(file_get_contents('addons.json'), true);
-    return $response->withJson(['success' => true, 'count' => count($addons)], 200);
+function get_mods_index() {
+    $mods = json_decode(file_get_contents('of.json'), true);
+    // get all unrestricted files from the files table
+    $db = DB::getInstance();
+    $stmt = $db->prepare('SELECT id, name FROM files WHERE restricted = 0');
+    $stmt->execute();
+    $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $host =  get_host();
+
+    foreach ($result as $file) {
+        $name = $file['name'];
+        $url = $host . "/view/" . $file['id'] . "/" . strToLower(preg_replace('%[^a-z0-9_-]%six','-', $name));
+        $links = $mods[$name] ?: [];
+        $links_filtered = [];
+        // remove all links starting with $host
+        foreach ($links as $key => $link) {
+            if (strpos($link, $host) === 0) {
+                continue;
+            }
+            $links_filtered []= $link;
+        }
+        $links_filtered []= $url;
+        $mods[$name] = $links_filtered;
+    }
+    return $mods;
+}
+
+// create endpoint to return number of mods in mods.json
+$app->get('/mods_hash', function ($request, $response) {
+    $mods = get_mods_index();
+    // hash the mods array to get a unique hash for the mods index
+    $hash = md5(json_encode($mods));
+    return $response->withJson(['success' => true, 'hash' => $hash], 200);
+});
+
+// create endpoint to return number of mods in mods.json
+$app->get('/mods.json', function ($request, $response) {
+    $mods = get_mods_index();
+    return $response->withJson($mods, 200);
 });
 
 function did_user_upload() {

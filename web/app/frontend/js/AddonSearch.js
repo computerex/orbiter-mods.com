@@ -10,7 +10,7 @@ export class AddonSearch {
     };
 
     get_index(callback, cache_bust=false) {
-        let url = '/addons.json';
+        let url = '/mods.json';
         if (cache_bust) {
             url += '?cache_bust=' + Math.random();
         }
@@ -24,26 +24,20 @@ export class AddonSearch {
 
     constructor() {
         this.addons = {};
-        $.get('/mods_count?cache_bust=' + Math.random(), (data) => {
-            const index_count = data.count;
+        $.get('/mods_hash?cache_bust=' + Math.random(), (data) => {
+            const index_hash = data.hash;
             // set this.addons from local storage
-            if (localStorage.getItem('addons')) {
+            if (localStorage.getItem('addons') && localStorage.getItem('addons_hash') === index_hash) {
                 this.addons = JSON.parse(localStorage.getItem('addons'));
-                // if number of addons in index is same as in local storage, don't bother refreshing the index
-                if (index_count === Object.keys(this.addons).length) {
-                    this.init_search();
-                    return;
-                }
+                this.init_search();
+                return;
             }
             this.get_index(() => {
-                localStorage.setItem('addons', JSON.stringify(this.addons));
-                if (index_count !== Object.keys(this.addons).length) {
-                    this.get_index(() => {
                         // save this.addons into local store
                         localStorage.setItem('addons', JSON.stringify(this.addons));
-                    }, true)
-                }
-            });
+                        localStorage.setItem('addons_hash', index_hash);
+                    }, true
+            );
         });
         
 
@@ -69,7 +63,12 @@ export class AddonSearch {
             const urls = this.addons[result];
             for (let inx = 0; inx < urls.length; inx++) {
                 const url = urls[inx];
-                $('#results').append(`<div><img style="padding-right:10px;" src="/images/of.ico" /><a target="_blank" href="${url}">${result}</a></div>`);
+                let favico = '/favicon.ico';
+                // if url host is orbiter-forum.com change favicon to of.ico
+                if (url.indexOf('orbiter-forum.com') > -1) {
+                    favico = '/images/of.ico';
+                }
+                $('#results').append(`<div><img style="padding-right:10px;width:26px;" src="${favico}" /><a target="_blank" href="${url}">${result}</a></div>`);
             }
         });
     };
@@ -81,7 +80,7 @@ export class AddonSearch {
             return;
         }
         const results = _.filter(Object.keys(this.addons), function(item) {
-            return item.fuzzy(search, 0.7);
+            return item.fuzzy(search, 0.8);
         });
         this.render(results);
     };
