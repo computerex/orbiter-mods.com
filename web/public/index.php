@@ -8,7 +8,7 @@ use App\Utils\Auth;
 
 error_reporting(0);
 
-$app = new \Slim\App(['settings' => ['displayErrorDetails' => false]]);
+$app = new \Slim\App(['settings' => ['displayErrorDetails' => true]]);
 
 function get_client_ip() {
     $ipaddress = '';
@@ -316,24 +316,11 @@ $app->get('/mods_count', function ($request, $response) {
     return $response->withJson(['success' => true, 'count' => count($addons)], 200);
 });
 
-// create php file upload handler
-$app->post('/upload_mod', function ($request, $response) {
-    $api_key = $request->getQueryParam('api_key');
-    if (!Auth::authenticate($request)) {
-        return $response->withJson(['error' => 'Unauthorized'], 401);
-    }
-    
-    $user_id = Auth::get_user_from_api_key($api_key);
-    if (empty($user_id)) {
-        return $response->withJson(['error' => 'Unauthorized'], 401);
-    }
-    
-    $user_id = $user_id['user_id'];
+function did_user_upload() {
+    return isset($_FILES['uploadedFile']) && $_FILES['uploadedFile']['error'] === UPLOAD_ERR_OK;
+}
 
-    if (!isset($_FILES['uploadedFile']) || $_FILES['uploadedFile']['error'] !== UPLOAD_ERR_OK) {
-        return $response->withJson(['error' => 'No file uploaded'], 400);
-    }
-
+function validate_file($response) {
     $fileTmpPath = $_FILES['uploadedFile']['tmp_name'];
     $fileName = $_FILES['uploadedFile']['name'];
     $fileSize = $_FILES['uploadedFile']['size'];
@@ -385,6 +372,58 @@ $app->post('/upload_mod', function ($request, $response) {
     if (!in_array($fileExtension, $allowedfileExtensions)) {
         return $response->withJson(['error' => 'file extension is not allowed'], 400);
     }
+    return null;
+}
+
+// create php file upload handler
+$app->post('/upload_mod', function ($request, $response) {
+    $api_key = $request->getQueryParam('api_key');
+    if (!Auth::authenticate($request)) {
+        return $response->withJson(['error' => 'Unauthorized'], 401);
+    }
+    
+    $user_id = Auth::get_user_from_api_key($api_key);
+    if (empty($user_id)) {
+        return $response->withJson(['error' => 'Unauthorized'], 401);
+    }
+    
+    $user_id = $user_id['user_id'];
+    $updating_mod = false;
+    $did_user_upload = did_user_upload();
+    $restricted = 0;
+    $mod_info = null;
+    $db = DB::getInstance();
+
+    // check if mod_id is passed in request
+    if (isset($_POST['mod_id'])) {
+        $mod_id = $_POST['mod_id'];
+        // get the file with matching mod_id
+        $stmt = $db->prepare('SELECT * FROM files WHERE id = :mod_id');
+        $stmt->bindValue(':mod_id', $mod_id);
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (empty($result)) {
+            return $response->withJson(['error' => 'no file found with that mod_id'], 400);
+        }
+        // check if the file's user_id matches the user_id of the user who is trying to update the file
+        if ($result['user_id'] != $user_id) {
+            return $response->withJson(['error' => 'you are not authorized to update this file'], 400);
+        }
+        $restricted = intval($result['restricted']);
+        $updating_mod = true;
+        $mod_info = $result;
+    }
+
+    if ($did_user_upload) {
+        $result  = validate_file($response);
+        if ($result) {
+            return $result;
+        }
+    }
+
+    if (!$did_user_upload && !$updating_mod) {
+        return $response->withJson(['error' => 'no file uploaded'], 400);
+    }
 
     // check that mod name, description and version are passed in
     if (
@@ -399,75 +438,99 @@ $app->post('/upload_mod', function ($request, $response) {
     $mod_description = $_POST['mod_description'];
     $mod_version = $_POST['mod_version'];
     $orbiter_version = !isset($_POST['orbiter_version']) ? 2016 : intval($_POST['orbiter_version']);
-    $restricted = 0;
+    $picture_link = !isset($_POST['picture_link']) ? '' : $_POST['picture_link'];
 
-    $db = DB::getInstance();
+    if ($did_user_upload) {
+        // get the number of restricted files
+        $stmt = $db->prepare('SELECT COUNT(*) FROM files WHERE user_id = :user_id AND restricted = 1');
+        $stmt->bindValue(':user_id', $user_id);
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        $num_restricted_files = $result['COUNT(*)'];
 
-    // get the number of restricted files
-    $stmt = $db->prepare('SELECT COUNT(*) FROM files WHERE user_id = :user_id AND restricted = 1');
-    $stmt->bindValue(':user_id', $user_id);
-    $stmt->execute();
-    $result = $stmt->fetch(PDO::FETCH_ASSOC);
-    $num_restricted_files = $result['COUNT(*)'];
+        if ($num_restricted_files >= 3) {
+            return $response->withJson(['error' => 'you currently have mods undergoing review, please wait before uploading'], 400);
+        }
 
-    if ($num_restricted_files >= 3) {
-        return $response->withJson(['error' => 'you currently have mods undergoing review, please wait before uploading'], 400);
-    }
+        // find number of files by $user_id where restricted = 0
+        $stmt = $db->prepare('SELECT COUNT(*) FROM files WHERE user_id = :user_id AND restricted = 0');
+        $stmt->bindValue(':user_id', $user_id);
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        $num_files = $result['COUNT(*)'];
 
-    // find number of files by $user_id where restricted = 0
-    $stmt = $db->prepare('SELECT COUNT(*) FROM files WHERE user_id = :user_id AND restricted = 0');
-    $stmt->bindValue(':user_id', $user_id);
-    $stmt->execute();
-    $result = $stmt->fetch(PDO::FETCH_ASSOC);
-    $num_files = $result['COUNT(*)'];
-
-    // check if number of unrestricted mods is less than 3
-    if ($num_files < 3) {
-        $restricted = 1;
-        // check if file size is larger than 300 MB
-        if ($fileSize > 300 * 1024 * 1024) {
-            return $response->withJson(['error' => 'new users are initially restricted to 300 MB uploads'], 400);
+        // check if number of unrestricted mods is less than 3
+        if (($num_files < 3 && !$updating_mod) || $restricted === 1) {
+            $restricted = 1;
+            // check if file size is larger than 300 MB
+            if ($_FILES['uploadedFile']['size'] > 300 * 1024 * 1024) {
+                return $response->withJson(['error' => 'new users are initially restricted to 300 MB uploads'], 400);
+            }
         }
     }
 
-    // insert into the files table
     $Parsedown = new Parsedown();
     $Parsedown->setSafeMode(true);
 
-    $stmt = $db->prepare('INSERT INTO `files`
-        (`filename`, `name`, `description`, `version`, `user_id`, `orbiter_version`, `restricted`, `description_html`) 
-        VALUES (:filename, :name, :description, :version, :user_id, :orbiter_version, :restricted, :description_html)');
-    $stmt->bindValue(':name', $mod_name);
-    $stmt->bindValue(':description', $mod_description);
-    $stmt->bindValue(':version', $mod_version);
-    $stmt->bindValue(':user_id', $user_id);
-    $stmt->bindValue(':orbiter_version', $orbiter_version);
-    $stmt->bindValue(':filename', $fileName);
-    $stmt->bindValue(':restricted', $restricted);
-    $stmt->bindValue(':description_html', $Parsedown->text($mod_description));
-    $stmt->execute();
-    $file_id = $db->lastInsertId();
-
-    // create mods/$user_id directory if it doesn't exist
-    $mods_dir = 'mods/' . $user_id;
-    if (!file_exists($mods_dir)) {
-        mkdir($mods_dir, 0777, true);
-    }
-
-    // create mods/$user_id/$file_id directory if it doesn't exist
-    $mod_dir = $mods_dir . '/' . $file_id;
-    if (!file_exists($mod_dir)) {
-        mkdir($mod_dir, 0777, true);
-    }
-    
-    // output file path in mod_dir
-    $file_path = $mod_dir . '/' . $fileName;
-    
-    if(move_uploaded_file($fileTmpPath, $file_path)) {
-        return $response->withJson(['success' => true, 'file_name' => $fileName, 'id' => $file_id], 200);
+    if (!$updating_mod) {
+        $stmt = $db->prepare('INSERT INTO `files`
+        (`filename`, `name`, `description`, `version`, `user_id`, `orbiter_version`, `restricted`, `description_html`, `picture_link`) 
+        VALUES (:filename, :name, :description, :version, :user_id, :orbiter_version, :restricted, :description_html, :picture_link)');
+        $stmt->bindValue(':name', $mod_name);
+        $stmt->bindValue(':description', $mod_description);
+        $stmt->bindValue(':version', $mod_version);
+        $stmt->bindValue(':user_id', $user_id);
+        $stmt->bindValue(':orbiter_version', $orbiter_version);
+        $stmt->bindValue(':filename', $_FILES['uploadedFile']['name']);
+        $stmt->bindValue(':restricted', $restricted);
+        $stmt->bindValue(':description_html', $Parsedown->text($mod_description));
+        $stmt->bindValue(':picture_link', $picture_link);
+        $stmt->execute();
+        $mod_id = $db->lastInsertId();
     } else {
-        return $response->withJson(['error' => 'could not upload file: ' . $_FILES['uploadedFile']['error']], 400);
+        // update files
+        $stmt = $db->prepare('UPDATE files SET name = :name, 
+        description = :description, version = :version, orbiter_version = :orbiter_version, 
+        restricted = :restricted, description_html = :description_html, picture_link = :picture_link, `filename` = :filename WHERE id = :mod_id');
+        $stmt->bindValue(':name', $mod_name);
+        $stmt->bindValue(':description', $mod_description);
+        $stmt->bindValue(':version', $mod_version);
+        $stmt->bindValue(':orbiter_version', $orbiter_version);
+        $stmt->bindValue(':restricted', $restricted);
+        $stmt->bindValue(':mod_id', $mod_id);
+        $stmt->bindValue(':description_html', $Parsedown->text($mod_description));
+        $stmt->bindValue(':picture_link', $picture_link);
+        $stmt->bindValue(':filename', $did_user_upload ? $_FILES['uploadedFile']['name'] : $mod_info['filename']);
+        $stmt->execute();
+
     }
+    
+    if ($did_user_upload) {
+        $fileTmpPath = $_FILES['uploadedFile']['tmp_name'];
+        $fileName = $_FILES['uploadedFile']['name'];
+
+        // create mods/$user_id directory if it doesn't exist
+        $mods_dir = 'mods/' . $user_id;
+        if (!file_exists($mods_dir)) {
+            mkdir($mods_dir, 0777, true);
+        }
+
+        // create mods/$user_id/$file_id directory if it doesn't exist
+        $mod_dir = $mods_dir . '/' . $mod_id;
+        if (!file_exists($mod_dir)) {
+            mkdir($mod_dir, 0777, true);
+        }
+        
+        // output file path in mod_dir
+        $file_path = $mod_dir . '/' . $fileName;
+        
+        if(move_uploaded_file($fileTmpPath, $file_path)) {
+            return $response->withJson(['success' => true, 'file_name' => $fileName, 'id' => $mod_id], 200);
+        } else {
+            return $response->withJson(['error' => 'could not upload file: ' . $_FILES['uploadedFile']['error']], 400);
+        }
+    }
+    
     return $response->withJson(['success' => true], 200);
 });
 
@@ -531,10 +594,10 @@ $app->get('/view/{mod_id}/{slug}', function ($request, $response, $args) {
 $app->get('/mod/{mod_id}/info', function ($request, $response, $args) {
     $file_id = $args['mod_id'];
     $api_key = $request->getQueryParam('api_key');
-    
+    $markdown_desc = $request->getQueryParam('markdown_desc');
     $authenticated = Auth::authenticate($request);
-    
     $user_id = null;
+
     if ($authenticated) {
         $result = Auth::get_user_from_api_key($api_key);
         if (!empty($result)) {
@@ -547,6 +610,7 @@ $app->get('/mod/{mod_id}/info', function ($request, $response, $args) {
     $stmt = $db->prepare(
         'SELECT `files`.`name`,
             `description_html`,
+            `description`,
             `version`,
             `orbiter_version`,
             `restricted`,
@@ -570,7 +634,7 @@ $app->get('/mod/{mod_id}/info', function ($request, $response, $args) {
 
     $result = [
         'name' => $result['name'],
-        'description' => $result['description_html'],
+        'description' => $markdown_desc == 1 ? $result['description'] : $result['description_html'],
         'version' => $result['version'],
         'orbiter_version' => $result['orbiter_version'],
         'restricted' => $result['restricted'],

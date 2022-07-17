@@ -56,5 +56,21 @@ export default Orb = {
             }
             callback([]);
         });
+    },
+
+    get_mod(mod_id, callbackPass, callbackFail, markdown_desc=false) {
+        let url = `/mod/${mod_id}/info?api_key=${Orb.api_key}`;
+        if (markdown_desc) {
+            url += '&markdown_desc=1';
+        }
+        $.get(url, (data) => {
+            if (callbackPass) {
+                callbackPass(data);
+            }
+        }).fail((data)=> {
+            if (callbackFail) {
+                callbackFail(data);
+            }
+        });
     }
 };

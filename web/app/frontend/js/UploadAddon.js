@@ -32,7 +32,11 @@ export class UploadAddon {
 
     constructor() {
         const self = this;
-
+        // get mod if from query string /upload.html?mod_id=:mod_id
+        console.log(window.location.href);
+        const mod_id = window.location.href.split('=')[1];
+        this.mod_id = mod_id;
+        console.log(mod_id);
         $(document).ready(function(){
             $('form input[type=file]').change(function () {
                 console.log(this.files);
@@ -50,10 +54,30 @@ export class UploadAddon {
               $('.file-container p').text(msg);
             });
             Orb.checkSession((loggedIn) => {
+                if (!loggedIn && self.mod_id) {
+                    window.location.href = '/login_register.html';
+                    return;
+                }
                 if (loggedIn) {
                     $('#upload-addon').show();
                     $('.login-register-link').hide();
                     $('form').attr('action', `/upload_mod?api_key=${Orb.api_key}`);
+                    Orb.get_mod(self.mod_id, (mod_info) => {
+                        console.log(mod_info);
+                        self.mod_info = mod_info;
+                        if (self.mod_info.is_owner) {
+                            console.log('you are owner');
+                            $('[name=mod_name]').val(mod_info.name);
+                            $('[name=mod_description]').val(mod_info.description);
+                            $('[name=orbiter_version]').val(mod_info.orbiter_version);
+                            $('[name=mod_version]').val(mod_info.version);
+                            $('[name=mod_picture_link]').val(mod_info.picture_link);
+                        } else {
+                           window.location.href = '/upload';
+                        }
+                    }, (error) => {
+                        console.log(error);
+                    }, true);
                 } else {
                     $('#upload-addon').hide();
                     $('.login-register-link').show();
@@ -63,6 +87,7 @@ export class UploadAddon {
             $("form").submit(function(e) {
                 e.preventDefault();    
                 var formData = new FormData(this);
+                formData.append('mod_id', self.mod_id);
                 self.progress(0);
                 $.ajax({
                     url: `/upload_mod?api_key=${Orb.api_key}`,
