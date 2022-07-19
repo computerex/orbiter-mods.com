@@ -111,7 +111,9 @@ export class UploadAddon {
                             $('.errors').text(data.error);
                         } else if (data.success) {
                             alert('mod uploaded, you will be redirected automatically.');
-                            window.location.href = '/view/' + data.id + '/' + $('[name=mod_name]').val();
+                            if (typeof self.mod_id !== 'undefined') {
+                                window.location.href = '/view/' + self.mod_id + '/' + $('[name=mod_name]').val();
+                            }
                             $('.errors').text('mod uploaded');
                         }
                     },
