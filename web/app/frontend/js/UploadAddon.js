@@ -33,13 +33,10 @@ export class UploadAddon {
     constructor() {
         const self = this;
         // get mod if from query string /upload.html?mod_id=:mod_id
-        console.log(window.location.href);
         const mod_id = window.location.href.split('=')[1];
         this.mod_id = mod_id;
-        console.log(mod_id);
         $(document).ready(function(){
             $('form input[type=file]').change(function () {
-                console.log(this.files);
                 let msg = this.files.length + " file(s) selected";
                 if (this.files.length > 0) {
                     const file = this.files[0];
@@ -63,20 +60,19 @@ export class UploadAddon {
                     $('.login-register-link').hide();
                     $('form').attr('action', `/upload_mod?api_key=${Orb.api_key}`);
                     Orb.get_mod(self.mod_id, (mod_info) => {
-                        console.log(mod_info);
                         self.mod_info = mod_info;
                         if (self.mod_info.is_owner) {
-                            console.log('you are owner');
                             $('[name=mod_name]').val(mod_info.name);
                             $('[name=mod_description]').val(mod_info.description);
                             $('[name=orbiter_version]').val(mod_info.orbiter_version);
                             $('[name=mod_version]').val(mod_info.version);
                             $('[name=mod_picture_link]').val(mod_info.picture_link);
+                            $('#upload-addon').text('Update');
                         } else {
                            window.location.href = '/upload';
                         }
                     }, (error) => {
-                        console.log(error);
+                        alert(error.responseJSON.error);
                     }, true);
                 } else {
                     $('#upload-addon').hide();
@@ -100,11 +96,7 @@ export class UploadAddon {
                             if (evt.lengthComputable) {
                                 var percentComplete = evt.loaded / evt.total;
                                 percentComplete = parseInt(percentComplete * 100);
-                                console.log(percentComplete);
                                 self.progress(percentComplete);
-                                if (percentComplete === 100) {
-                                    console.log('file done uploading');
-                                }
                             }
                         }, false);
                     

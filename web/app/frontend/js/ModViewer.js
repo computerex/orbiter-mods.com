@@ -3,11 +3,9 @@ import $ from 'jquery';
 import Orb from './Orb';
 export class ModViewer {
     constructor() {
-        console.log('mod viewer');
         // get mod id from url of format /view/:mod_id/:slug
         const mod_id = window.location.pathname.split('/')[2];
         this.mod_id = mod_id;
-        console.log(mod_id);
     };
 
     render(mod_info) {
@@ -43,9 +41,8 @@ export class ModViewer {
             }
             $.get(url, (data) => {
                 this.render(data);
-                console.log(data);
             }).fail((data)=> {
-                console.log(data.responseJSON.error);
+                alert(data.responseJSON.error);
             });
         });
     };

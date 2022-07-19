@@ -52,7 +52,7 @@ export default Orb = {
                 this.user_experiences = data.ids;
                 callback(data.ids);
             } else {
-                console.log(data.error);
+                alert(data.error);
             }
             callback([]);
         });
