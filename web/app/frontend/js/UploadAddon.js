@@ -111,7 +111,8 @@ export class UploadAddon {
                             $('.errors').text(data.error);
                         } else if (data.success) {
                             alert('mod uploaded, you will be redirected automatically.');
-                            if (typeof self.mod_id !== 'undefined') {
+                            const id = typeof data.id !== 'undefined' ? data.id : self.mod_id;
+                            if (typeof id !== 'undefined') {
                                 window.location.href = '/view/' + self.mod_id + '/' + $('[name=mod_name]').val();
                             }
                             $('.errors').text('mod uploaded');
