@@ -59,21 +59,23 @@ export class UploadAddon {
                     $('#upload-addon').show();
                     $('.login-register-link').hide();
                     $('form').attr('action', `/upload_mod?api_key=${Orb.api_key}`);
-                    Orb.get_mod(self.mod_id, (mod_info) => {
-                        self.mod_info = mod_info;
-                        if (self.mod_info.is_owner) {
-                            $('[name=mod_name]').val(mod_info.name);
-                            $('[name=mod_description]').val(mod_info.description);
-                            $('[name=orbiter_version]').val(mod_info.orbiter_version);
-                            $('[name=mod_version]').val(mod_info.version);
-                            $('[name=mod_picture_link]').val(mod_info.picture_link);
-                            $('#upload-addon').text('Update');
-                        } else {
-                           window.location.href = '/upload';
-                        }
-                    }, (error) => {
-                        alert(error.responseJSON.error);
-                    }, true);
+                    if (typeof self.mod_id !== 'undefined') {
+                        Orb.get_mod(self.mod_id, (mod_info) => {
+                            self.mod_info = mod_info;
+                            if (self.mod_info.is_owner) {
+                                $('[name=mod_name]').val(mod_info.name);
+                                $('[name=mod_description]').val(mod_info.description);
+                                $('[name=orbiter_version]').val(mod_info.orbiter_version);
+                                $('[name=mod_version]').val(mod_info.version);
+                                $('[name=mod_picture_link]').val(mod_info.picture_link);
+                                $('#upload-addon').text('Update');
+                            } else {
+                               window.location.href = '/upload';
+                            }
+                        }, (error) => {
+                            alert(error.responseJSON.error);
+                        }, true);
+                    }
                 } else {
                     $('#upload-addon').hide();
                     $('.login-register-link').show();
