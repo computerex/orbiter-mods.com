@@ -477,7 +477,7 @@ $app->post('/upload_mod', function ($request, $response) {
     $mod_description = $_POST['mod_description'];
     $mod_version = $_POST['mod_version'];
     $orbiter_version = !isset($_POST['orbiter_version']) ? 2016 : intval($_POST['orbiter_version']);
-    $picture_link = !isset($_POST['picture_link']) ? '' : $_POST['picture_link'];
+    $picture_link = !isset($_POST['mod_picture_link']) ? '' : $_POST['mod_picture_link'];
 
     if ($did_user_upload) {
         // get the number of restricted files
