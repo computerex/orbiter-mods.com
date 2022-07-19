@@ -9,6 +9,8 @@ export class ModViewer {
     };
 
     render(mod_info) {
+        // set page title to mod_info.name
+        document.title = mod_info.name;
         if (mod_info.restricted) {
             $('.root').append(`
                 <h1 style="display:inline-block;">${mod_info.name}</h1>
