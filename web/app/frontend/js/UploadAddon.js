@@ -85,7 +85,9 @@ export class UploadAddon {
             $("form").submit(function(e) {
                 e.preventDefault();    
                 var formData = new FormData(this);
-                formData.append('mod_id', self.mod_id);
+                if (typeof self.mod_id !== 'undefined') {
+                    formData.append('mod_id', self.mod_id);
+                }
                 self.progress(0);
                 $.ajax({
                     url: `/upload_mod?api_key=${Orb.api_key}`,
@@ -108,7 +110,8 @@ export class UploadAddon {
                         if (data.error) {
                             $('.errors').text(data.error);
                         } else if (data.success) {
-                            alert('mod uploaded');
+                            alert('mod uploaded, you will be redirected automatically.');
+                            window.location.href = '/view/' + data.id + '/' + $('[name=mod_name]').val();
                             $('.errors').text('mod uploaded');
                         }
                     },
