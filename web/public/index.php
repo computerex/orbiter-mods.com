@@ -316,6 +316,7 @@ $app->get('/user_experiences', function ($request, $response) {
 
 function get_mods_index() {
     $mods = json_decode(file_get_contents('of.json'), true);
+    // add orbiter-mods files to the index
     // get all unrestricted files from the files table
     $db = DB::getInstance();
     $stmt = $db->prepare('SELECT id, name FROM files WHERE restricted = 0');
@@ -326,9 +327,9 @@ function get_mods_index() {
     foreach ($result as $file) {
         $name = $file['name'];
         $url = $host . "/view/" . $file['id'] . "/" . strToLower(preg_replace('%[^a-z0-9_-]%six','-', $name));
-        $links = $mods[$name] ?: [];
+        $links = !empty($mods[$name]) ? $mods[$name]['urls'] : [];
         $links_filtered = [];
-        // remove all links starting with $host
+        // remove all links starting with $host, so we don't dupe
         foreach ($links as $key => $link) {
             if (strpos($link, $host) === 0) {
                 continue;
@@ -336,7 +337,7 @@ function get_mods_index() {
             $links_filtered []= $link;
         }
         $links_filtered []= $url;
-        $mods[$name] = $links_filtered;
+        $mods[$name]['urls'] = $links_filtered;
     }
     return $mods;
 }

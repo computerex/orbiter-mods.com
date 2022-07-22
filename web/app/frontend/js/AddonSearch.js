@@ -24,6 +24,11 @@ export class AddonSearch {
 
     constructor() {
         this.addons = {};
+
+        $('.categories input[type=checkbox]').on('change', (e) => {
+            this.do_search_lazy();
+        });
+
         $.get('/mods_hash?cache_bust=' + Math.random(), (data) => {
             const index_hash = data.hash;
             // set this.addons from local storage
@@ -57,10 +62,25 @@ export class AddonSearch {
         });
     };
 
+    get_enabled_categories() {
+        const categories_enabled = [];
+        $('.categories input[type=checkbox]').each((i, el) => {
+            if (el.checked) {
+                categories_enabled.push(el.value);
+            }
+        });
+        return categories_enabled;
+    };
+
     render(results) {
         $('#results').empty();
+        const categories_enabled = this.get_enabled_categories();
         results.forEach((result) => {
-            const urls = this.addons[result];
+            const urls = this.addons[result]['urls'];
+            const category = this.addons[result]['category'] || '';
+            if (categories_enabled.length > 0 && categories_enabled.indexOf(category) === -1) {
+                return;
+            }
             for (let inx = 0; inx < urls.length; inx++) {
                 const url = urls[inx];
                 let favico = '/favicon.ico';
@@ -68,7 +88,7 @@ export class AddonSearch {
                 if (url.indexOf('orbiter-forum.com') > -1) {
                     favico = '/images/of.ico';
                 }
-                $('#results').append(`<div><img style="padding-right:10px;width:26px;" src="${favico}" /><a target="_blank" href="${url}">${result}</a></div>`);
+                $('#results').append(`<div><img style="padding-right:10px;width:26px;" src="${favico}" /><a target="_blank" href="${url}">${result} - ${category}</a></div>`);
             }
         });
     };
@@ -76,11 +96,20 @@ export class AddonSearch {
     do_search() {
         const search = $('#search').val();
         if (search.length === 0) {
-            this.render([]);
+            const enabled_categories = this.get_enabled_categories();
+            let results = [];
+            if (enabled_categories.length > 0) {
+                // find all mods with a category that's in enabled_categories
+                results = Object.keys(this.addons).filter((key) => {
+                    const category = this.addons[key]['category'] || '';
+                    return enabled_categories.indexOf(category) > -1;
+                });
+            }
+            this.render(results);
             return;
         }
         const results = _.filter(Object.keys(this.addons), function(item) {
-            return item.fuzzy(search, 0.8);
+            return item.fuzzy(search, 0.9);
         });
         this.render(results);
     };
