@@ -61,12 +61,23 @@ export class ExperienceViewer {
         });
 
         if (experienceId && experienceId != 0) {
-            $(`.experience[data-experience-id=${experienceId}]`).trigger('click');
-            $(`.experience[data-experience-id=${experienceId}]`).addClass('selected');
+            this.click_experience(experienceId);   
         } else {
-            $(`.experience[data-experience-id=0]`).trigger('click');
+            // get experience id through from 'id' url query string
+            let experienceId = parseInt(window.location.search.split('=')[1] || 0);
+            // get all the ids from this.experiences
+            const ids = this.experiences.map(experience => parseInt(experience.id));
+            if (ids.includes(experienceId)) {
+                this.click_experience(experienceId);
+            } else {
+                this.click_experience(0);
+            }
         }
+    };
 
+    click_experience(experienceId) {
+        $(`.experience[data-experience-id=${experienceId}]`).trigger('click');
+        $(`.experience[data-experience-id=${experienceId}]`).addClass('selected');
     };
 
     run(experienceId) {

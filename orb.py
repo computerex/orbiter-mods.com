@@ -195,7 +195,8 @@ def reset_orbiter():
         return
     # verify current orbiter install hash using ./Orbiter2016.json as reference hash_file
     files_to_revert = verify_orbiter_hash('./Orbiter2016.json')
-    download_orbiter_2016_if_needed()
+    orb = Orb()
+    download_orbiter_2016_if_needed(orb)
     for file_to_revert in files_to_revert:
         print(f'reverting {file_to_revert}')
         os.remove(file_to_revert)
