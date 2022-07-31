@@ -26,6 +26,7 @@ export class ExperienceViewer {
         }
         $('.experience').removeClass('selected');
         $(`.experience[data-experience-id=${experienceId}]`).addClass('selected');
+        $(`.experience[data-experience-id=${experienceId}]`)[0].scrollIntoView();
         this.uploader.run(experienceId, this.experiences);
     };
 
