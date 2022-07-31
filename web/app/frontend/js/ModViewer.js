@@ -14,11 +14,11 @@ export class ModViewer {
         if (mod_info.restricted) {
             $('.root').append(`
                 <h1 style="display:inline-block;">${mod_info.name}</h1>
-                <small>by ${mod_info.owner}</small>`);
+                <small>added by ${mod_info.owner}</small>`);
         } else {
             $('.root').append(`
                 <a href="/mod/${this.mod_id}"><h1 style="display:inline-block;">Download ${mod_info.name}</h1></a>
-                <small>by ${mod_info.owner}</small>`);
+                <small>added by ${mod_info.owner}</small>`);
         }
 
         if (mod_info.is_owner) {
