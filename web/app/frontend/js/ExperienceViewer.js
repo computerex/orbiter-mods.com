@@ -79,7 +79,7 @@ export class ExperienceViewer {
         $(`.experience[data-experience-id=${experienceId}]`).trigger('click');
         $(`.experience[data-experience-id=${experienceId}]`).addClass('selected');
         // set url id query string to experienceId
-        window.location.search = '?id=' + experienceId;
+        // window.location.search = '?id=' + experienceId;
     };
 
     run(experienceId) {
