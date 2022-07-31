@@ -21,6 +21,7 @@ export class ExperienceViewer {
     selectExperience(experienceId) {
         $('.right-pane').empty();
         
+        window.history.replaceState(null, null, `?id=${experienceId}`);
         if (experienceId == 0) {
         }
         $('.experience').removeClass('selected');
@@ -78,8 +79,6 @@ export class ExperienceViewer {
     click_experience(experienceId) {
         $(`.experience[data-experience-id=${experienceId}]`).trigger('click');
         $(`.experience[data-experience-id=${experienceId}]`).addClass('selected');
-        // set url id query string to experienceId
-        // window.location.search = '?id=' + experienceId;
     };
 
     run(experienceId) {
