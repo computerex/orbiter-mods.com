@@ -269,8 +269,9 @@ class Orb:
     def install_rar(self, file, install_subdir=None):
         output_dir = os.path.join('orb_cache', os.path.splitext(file)[0])
 
+        print(f'trying to extract {file} to {output_dir}')
         # extract the rar in orb_cache. We need to do this for automatic scenario copying
-        subprocess.run(f'{os.path.join("orb_cache", "unarr.exe")} {os.path.join("orb_cache", file)} {output_dir}')
+        subprocess.run(f'{os.path.join("orb_cache", "unarr.exe")} "{os.path.join("orb_cache", file)}" "{output_dir}"')
 
         if install_subdir:
             output_dir = os.path.join(output_dir, install_subdir)
