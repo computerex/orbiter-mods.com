@@ -422,7 +422,8 @@ class Orb:
             zip_file_name = r.headers['Content-Disposition'].split('filename=')[1]
         else:
             zip_file_name = file_name
-
+        # remove all quotes from zip file name
+        zip_file_name = zip_file_name.replace('"', '')
         with open(f'orb_cache/{zip_file_name}', 'wb') as f:
             total_length = int(r.headers.get('content-length'))
             for chunk in progress.bar(r.iter_content(chunk_size=1024), expected_size=(total_length/1024) + 1): 
