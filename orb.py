@@ -186,6 +186,21 @@ def download_orbiter_2016_if_needed(orb):
             print('copying files from Orbiter2016 to current folder')
             shutil.copytree(os.path.join('orb_cache', 'Orbiter2016'), '.', dirs_exist_ok=True)
 
+def del_orbiter():
+    test = input('Are you sure you want to delete the orbiter install? (y/n): ')
+    if test.lower() != 'y':
+        print('aborting orbiter install delete')
+        time.sleep(3)
+        return
+    # delete everything in current directory except for orb_cache, orb.exe, Orbiter2016.json
+    for file in os.listdir('.'):
+        if file == 'orb_cache' or file == 'orb.exe' or file == 'Orbiter2016.json':
+            continue
+        if os.path.isdir(file):
+            shutil.rmtree(file)
+        else:
+            os.remove(file)
+
 def reset_orbiter():
     # ask user to confirm as doing this action will destroy the current orbiter install
     test = input('Are you sure you want to reset the orbiter install? (y/n): ')
@@ -211,7 +226,10 @@ class Orb:
     def set_scn_blacklist(self, scn_blacklist):
         self.scn_blacklist += scn_blacklist
         self.scn_blacklist = list(set(self.scn_blacklist))
-        
+    
+    def delete_orbiter(self):
+        del_orbiter()
+
     def install_exe(self, file):
         # check if file is in current folder
         if not os.path.exists(file):
