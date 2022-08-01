@@ -112,7 +112,7 @@ function get_host() {
 // add endpoint /experiences to return all currently available experiences as json array
 $app->get('/fetch_experiences', function ($request, $response) {
     $pdo = DB::getInstance();
-    $stmt = $pdo->prepare('SELECT * FROM experiences');
+    $stmt = $pdo->prepare('SELECT * FROM experiences order by featured desc');
     $stmt->execute();
     $experiences = $stmt->fetchAll(PDO::FETCH_ASSOC);
     $stmt = null;
