@@ -60,6 +60,33 @@
             #results {
                 margin-top:10px;
             }
+
+            h1, h2, h3, h4, h5, h6 {
+                color: #14854f;
+            }
+
+            .orb {
+                background: white;
+                border: 1px solid grey;
+                font-size: 2em;
+                padding:20px;
+                border-radius: 2px;
+            }
+            
+            .orb-download {
+                margin-top: 20px;
+                text-align: center;
+            }
+
+            .orb:hover {
+                background: green;
+                color: white;
+            }
+
+            .orb-download:hover {
+                background: green;
+                color: white;
+            }
             
         </style>
         <meta name="referrer" content="no-referrer" />
@@ -121,18 +148,15 @@
             <section id="results">
             </section>
 
-            <h4 style="margin-top:20px">What is orb installer?</h4>
-
-            <p>
-                Tired of CTD's and tracking down zip files all over the internet? We are too, and that's
-                why we are making orb, so we can spend less time installing mods, and more time playing with them.
-                Orb is the CKAN of Orbiter.
-            </p>
-            <p>
-                We are close to an initial release,
-                follow its progress <a target="_blank" href="https://chat.orbiter-mods.com/topic/2/orbiter-mods-com-work-discussion">here.</a>
-            </p>
-
+            <section class="orb-download">
+                <a href="https://orbiter-mods.com/view/21/orb-v1">
+                    <div class="orb">
+                        Download Orb
+                    </div>
+                </a>
+                <small>one mod to install them all</small>
+            </section>
+            
             <section class="yt-container">
                 <iframe class="video" width="560" height="315" src="https://www.youtube.com/embed/VmaLM1mEsZ8" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
             </section>
