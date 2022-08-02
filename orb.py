@@ -194,7 +194,7 @@ def del_orbiter():
         return
     # delete everything in current directory except for orb_cache, orb.exe, Orbiter2016.json
     for file in os.listdir('.'):
-        if file == 'orb_cache' or file == 'orb.exe' or file == 'Orbiter2016.json':
+        if file == 'orb_cache' or file == 'orb' or file == 'Orbiter2016.json' or file == 'orb.bat':
             continue
         if os.path.isdir(file):
             shutil.rmtree(file)
@@ -343,9 +343,8 @@ class Orb:
                 return
 
     def edit_cfg_file_add_line(self, cfg, new_line):
-        # check if config file exists
         if not os.path.exists(cfg):
-            print(f'{cfg} does not exist')
+            print(f'{cfg} does not exist!')
             # create config file and add the start/end tags
             with open(cfg, 'w') as f:
                 f.write(f'{new_line}\n')
