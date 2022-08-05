@@ -29,6 +29,10 @@ export class AddonSearch {
             this.do_search_lazy();
         });
 
+        $('#orbiter-mods-only').on('change', (e) => {
+            this.do_search_lazy();
+        });
+
         $.get('/mods_hash?cache_bust=' + Math.random(), (data) => {
             const index_hash = data.hash;
             // set this.addons from local storage
@@ -75,6 +79,8 @@ export class AddonSearch {
     render(results) {
         $('#results').empty();
         const categories_enabled = this.get_enabled_categories();
+        const orbiter_mods_only = $('#orbiter-mods-only').is(':checked');
+
         results.forEach((result) => {
             const urls = this.addons[result]['urls'];
             const category = this.addons[result]['category'] || '';
@@ -84,6 +90,9 @@ export class AddonSearch {
             for (let inx = 0; inx < urls.length; inx++) {
                 const url = urls[inx];
                 let favico = '/favicon.ico';
+                if (orbiter_mods_only && url.indexOf('orbiter-forum.com') !== -1) {
+                    continue;
+                }
                 // if url host is orbiter-forum.com change favicon to of.ico
                 if (url.indexOf('orbiter-forum.com') > -1) {
                     favico = '/images/of.ico';
