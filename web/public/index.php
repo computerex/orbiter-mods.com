@@ -415,6 +415,45 @@ function validate_file($response) {
     return null;
 }
 
+$app->get('/stations', function($request, $response) {
+    // return all stations in the Stations table
+    $db = DB::getInstance();
+    $stmt = $db->prepare('SELECT * FROM stations');
+    $stmt->execute();
+    $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    return $response->withJson($result, 200);
+});
+
+$app->post('/station', function ($request, $response) {
+    // deserialize post body
+    $body = $request->getParsedBody();
+    $links = $body['station_links'];
+    $orbit_def = $body['orbit_def'];
+    $station_id = $body['station_id'];
+
+    // check if station with given $station_id exists in the Stations table
+    $db = DB::getInstance();
+    $stmt = $db->prepare('SELECT id FROM stations WHERE id = :id');
+    $stmt->bindValue(':id', $station_id);
+    $stmt->execute();
+    $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    if (count($result) == 0) {
+        // insert $links in station_links column and $orbit_def in orbit_def column in station table
+        $stmt = $db->prepare('INSERT INTO stations (station_links, orbit_def) VALUES (:station_links, :orbit_def)');
+        $stmt->bindValue(':station_links', $links);
+        $stmt->bindValue(':orbit_def', $orbit_def);
+        $stmt->execute();
+    } else {
+        // update $links in station_links column and $orbit_def in orbit_def column in station table
+        $stmt = $db->prepare('UPDATE stations SET station_links = :station_links, orbit_def = :orbit_def WHERE id = :id');
+        $stmt->bindValue(':station_links', $links);
+        $stmt->bindValue(':orbit_def', $orbit_def);
+        $stmt->bindValue(':id', $station_id);
+        $stmt->execute();
+    }
+    $stmt = null;
+});
+
 // create php file upload handler
 $app->post('/upload_mod', function ($request, $response) {
     $api_key = $request->getQueryParam('api_key');
