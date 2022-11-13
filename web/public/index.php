@@ -396,6 +396,7 @@ function validate_file($response) {
         'gif' => 'image/gif',
         'png' => 'image/png',
         'zip' => 'application/zip',
+        'zip2' => 'application/x-zip-compressed',
         'txt' => 'text/plain',
         'xls' => 'application/vnd.ms-excel',
         'doc' => 'application/msword',

@@ -25,7 +25,7 @@ cl = boto3.client(
     endpoint_url=endpoint,
     config=Config(
         s3={'addressing_style': 'path'},
-        retries=dict( max_attempts=3 ),
+        retries=dict( max_attempts=30 ),
     ),
 )
  
