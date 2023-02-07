@@ -666,9 +666,38 @@ $app->get('/mod/{file_id}', function ($request, $response, $args) {
 
 $app->get('/view/{mod_id}/{slug}', function ($request, $response, $args) {
     $file_id = $args['mod_id'];
+    // get the mod title, description, and picture url from the database for given mod_id
+    $db = DB::getInstance();
+    $stmt = $db->prepare(
+        'SELECT `name`,
+            `description`,
+            `picture_link`
+        FROM `files`
+        WHERE `id` = :file_id
+        LIMIT 1'
+    );
+    $stmt->bindValue(':file_id', $file_id);
+    $stmt->execute();
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    if (!empty($result)) {
+        $mod_name = $result['name'];
+        $mod_description = $result['description'];
+        $picture_link = $result['picture_link'];
+
+        $html = file_get_contents('view.html');
+        // replace OG_TITLE_TAG with the mod's title
+        $html = str_replace('OG_TITLE_TAG', $mod_name, $html);
+        // replace OG_DESCRIPTION_TAG with the mod's description
+        $html = str_replace('OG_DESC_TAG', $mod_description, $html);
+        // replace OG_IMAGE_TAG with the mod's picture url
+        if (!empty($picture_link)) {
+            $html = str_replace('https://i.postimg.cc/W4mBPDdm/image.png', $picture_link, $html);
+        }
+    }
+    
     return $response
         ->withHeader('Content-Type', 'text/html')
-        ->write(file_get_contents('view.html'));
+        ->write($html);
 });
 
 $app->get('/mod/{mod_id}/info', function ($request, $response, $args) {
