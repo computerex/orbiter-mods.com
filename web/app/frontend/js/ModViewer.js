@@ -15,7 +15,12 @@ export class ModViewer {
         $('head').append(`<meta property="og:description" content="${mod_info.description}">`);
         // add title meta tag
         $('head').append(`<meta property="og:title" content="${mod_info.name}">`);
-        
+
+        // add twitter meta tags
+        $('head').append(`<meta name="twitter:card" content="summary">`);
+        $('head').append(`<meta name="twitter:title" content="${mod_info.name}">`);
+        $('head').append(`<meta name="twitter:description" content="${mod_info.description}">`);
+
         if (mod_info.restricted) {
             $('.root').append(`
                 <h1 style="display:inline-block;">${mod_info.name}</h1>
