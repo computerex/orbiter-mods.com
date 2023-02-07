@@ -86,105 +86,6 @@ def get_download_folder_path():
         return os.path.join(os.environ['USERPROFILE'], 'Downloads')
     else:
         return os.path.join(os.environ['HOME'], 'Downloads')
-  
-def should_generate_hash(path):
-    # check if path is a dir or file
-    if path.is_dir():
-        return False
-    # check if path is a .py file
-    if path.suffix == '.py':
-        return False
-    # skip orb.exe
-    if path.name == 'orb.exe':
-        return False
-    # skip orb
-    if path.name == 'orb':
-        return False
-    if path.name == 'Orbiter2016.json':
-        return False
-    if path.name == 'Orbiter.cfg':
-        return False
-    if path.name == 'Orbiter_NG.cfg':
-        return False
-
-    full_path = str(path)
-    # skip orb_cache
-    if full_path.startswith('./orb_cache') or full_path.startswith('orb_cache'):
-        return False
-    return True
-
-def generate_file_hash(full_path):
-    with open(full_path, 'rb') as f:
-        content = f.read()
-        # generate md5 hash for content string
-        return hashlib.md5(content).hexdigest()
-
-def generate_orbiter_hash(output_hash_file):
-    files = {}
-    for path in Path('./').rglob('*.*'):
-        try:
-            if not should_generate_hash(path):
-                continue
-            # get full path name
-            full_path = str(path)
-            files[full_path] = generate_file_hash(full_path)
-            print(full_path)
-        except Exception as e:
-            print(e)
-    with open(output_hash_file, 'w') as f:
-        json.dump(files, f)
-
-def verify_orbiter_hash(hash_file):
-    with open(hash_file, 'r') as f:
-        files = json.load(f)
-    files_to_revert = []
-    for path in Path('./').rglob('*.*'):
-        try:
-            if not should_generate_hash(path):
-                continue
-            # get full path name
-            full_path = str(path)
-            if full_path not in files:
-                print(f'{full_path} is not in the hash file')
-                continue
-            if files[full_path] != generate_file_hash(full_path):
-                print(f'{full_path} has changed')
-                files_to_revert.append(full_path)
-        except Exception as e:
-            print(e)
-    return files_to_revert
-
-def download_orbiter_2016_if_needed(orb):
-    # check if orbiter 2016 is already downloaded and unzipped in orb_cache
-    if os.path.exists('./orb_cache/Orbiter2016'):
-        pass
-    else:
-        # check if Orbiter2016.zip is in orb_cache
-        if is_file_cached('Orbiter2016.zip'):
-            print('Orbiter2016.zip is already in cache')
-        else:
-            orbiter_url = 'https://orbiter-mods.com/files/Orbiter2016.zip'
-            if DEBUG == 1:
-                orbiter_url = 'http://localhost:8000/Orbiter2016.zip'
-
-            # ask user if they want to continue to download Orbiter2016
-            print('Orbiter2016 is not in cache. would you like to download it?')
-            if input('(y/n) ') != 'y':
-                print('aborting orbiter2016 download')
-                return        
-            orb.download_zip(orbiter_url, 'Orbiter2016.zip')
-        # unzip Orbiter2016.zip to orb_cache/Orbiter2016
-        print('unzipping Orbiter2016.zip - this will only take a bit and will speed things up in the future!')
-        with zipfile.ZipFile(f'orb_cache/Orbiter2016.zip', 'r') as zip_ref:
-            zip_ref.extractall('./orb_cache/Orbiter2016')
-    # check if orbiter.exe is in the current folder
-    if not os.path.exists('orbiter.exe'):
-        # ask user if they'd like to install a fresh copy of orbiter 2016
-        print('orbiter.exe is not in the current folder. would you like to install a fresh copy of orbiter 2016?')
-        if input('(y/n): ') == 'y':
-            # copy all files from orb_cache/Orbiter2016 to current folder keeping directory structure in tact
-            print('copying files from Orbiter2016 to current folder')
-            shutil.copytree(os.path.join('orb_cache', 'Orbiter2016'), '.', dirs_exist_ok=True)
 
 def del_orbiter():
     test = input('Are you sure you want to delete the orbiter install? (y/n): ')
@@ -200,23 +101,6 @@ def del_orbiter():
             shutil.rmtree(file)
         else:
             os.remove(file)
-
-def reset_orbiter():
-    # ask user to confirm as doing this action will destroy the current orbiter install
-    test = input('Are you sure you want to reset the orbiter install? (y/n): ')
-    if test.lower() != 'y':
-        print('aborting orbiter install reset')
-        time.sleep(3)
-        return
-    # verify current orbiter install hash using ./Orbiter2016.json as reference hash_file
-    files_to_revert = verify_orbiter_hash('./Orbiter2016.json')
-    orb = Orb()
-    download_orbiter_2016_if_needed(orb)
-    for file_to_revert in files_to_revert:
-        print(f'reverting {file_to_revert}')
-        os.remove(file_to_revert)
-        # copy removed file from orb_cache/Orbiter2016 to ./
-        shutil.copy(f'orb_cache/Orbiter2016/{file_to_revert}', file_to_revert)
 
 class Orb:
     def __init__(self, scn_dir=None):
@@ -475,9 +359,10 @@ class Orb:
         self.experience_list = experiences
 
     def install_orbiter_mods_experience(self, experience_id):
-        xp = [x for x in self.experience_list if 'id' in x and x['id'] == experience_id]
+        xp = [x for x in self.experience_list if 'id' in x and int(x['id']) == int(experience_id)]
         if len(xp) == 0:
             print(f'experience {experience_id} not found')
+            print([e for e in self.experience_list if e['name'] == 'NASSP 8 beta'])
             return
         execute_script(self.experience_list, xp[0])
 
@@ -500,7 +385,6 @@ def execute_script(all_experiences, experience):
     experience_name = experience['name']
     orb = Orb()
     orb.set_scn_dir(experience_name)
-    orb.set_experience_list(all_experiences)
 
     # fetch experience_script_url and save it in orb_cache
     experience_script_file_name = experience_name + '.py'
@@ -511,15 +395,6 @@ def execute_script(all_experiences, experience):
     # load experience_script_file_name
     mod = load_experience_module(f'orb_cache/{experience_script_file_name}')
 
-    if mod.requires_fresh_install():
-        print('This experience requires a fresh install')
-        test = input('continue? (y/n): ')
-        if test.lower() != 'y':
-            print('ok, bye!')
-            time.sleep(3)
-            sys.exit(1)
-        print('reseting orbiter')
-        reset_orbiter()
     try:        
         mod.main(orb)
     except Exception as e:
@@ -546,8 +421,6 @@ def main():
 
     orb = Orb()
 
-    download_orbiter_2016_if_needed(orb)
-
     experiences = fetch_experiences()
 
     # find all *.py files in orb_cache dir
@@ -561,6 +434,13 @@ def main():
                 'links': "source unknown",
                 'experience_script': open(f'orb_cache/{experience_file}').read()
             })
+
+    orb.set_experience_list(experiences)
+    
+    if '--experience-id' in sys.argv:
+        experience_id = sys.argv[sys.argv.index('--experience-id') + 1]
+        orb.install_orbiter_mods_experience(experience_id)
+        return
 
     if len(experiences) == 0:
         print('no experiences found, terminating')
