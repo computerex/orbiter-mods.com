@@ -11,9 +11,11 @@ export class ModViewer {
     render(mod_info) {
         // set page title to mod_info.name
         document.title = mod_info.name;
-        document.querySelector('meta[name="description"]').setAttribute("content", mod_info.description);
-        // set og:title
-        //document.querySelector('meta[property="og:title"]').setAttribute("content", mod_info.name);
+        // add og:description meta tag
+        $('head').append(`<meta property="og:description" content="${mod_info.description}">`);
+        // add title meta tag
+        $('head').append(`<meta property="og:title" content="${mod_info.name}">`);
+        
         if (mod_info.restricted) {
             $('.root').append(`
                 <h1 style="display:inline-block;">${mod_info.name}</h1>
