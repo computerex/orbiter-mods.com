@@ -364,7 +364,7 @@ class Orb:
             print(f'experience {experience_id} not found')
             print([e for e in self.experience_list if e['name'] == 'NASSP 8 beta'])
             return
-        execute_script(self.experience_list, xp[0])
+        execute_script(self, self.experience_list, xp[0])
 
 # fetch experiences from https://orbiter-mods.com/fetch_experiences
 def fetch_experiences():
@@ -380,10 +380,18 @@ def fetch_experiences():
         pass
     return []
 
-def execute_script(all_experiences, experience):
+def launch_with_elevation(experience_id):
+    args = sys.argv
+    # remove --experience-id from args
+    args = [x for x in args if not x.startswith('--experience-id')]
+    args.append(f'--experience-id {experience_id}')
+    print(" ".join(args))
+    ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, " ".join(args), None, 1)
+
+def execute_script(orb, all_experiences, experience):
     experience_script = experience['experience_script']
     experience_name = experience['name']
-    orb = Orb()
+    experience_id = experience['id']
     orb.set_scn_dir(experience_name)
 
     # fetch experience_script_url and save it in orb_cache
@@ -397,6 +405,12 @@ def execute_script(all_experiences, experience):
 
     try:        
         mod.main(orb)
+    except OSError as e:
+        # check for win error 740 requires elevation
+        if e.winerror == 740 or e.errno == 740:
+            # run self as admin and pass experience_id as argument
+            print('running as admin')
+            launch_with_elevation(experience_id)
     except Exception as e:
         print(f'Please contact the author of this experience script: {str(e)}')
         traceback.print_exc()
@@ -460,7 +474,7 @@ def main():
         sys.exit(1)
 
     experience = experiences[mod_index]
-    execute_script(experiences, experience)
+    execute_script(orb, experiences, experience)
 
     print('ok, bye!')
     time.sleep(3)
