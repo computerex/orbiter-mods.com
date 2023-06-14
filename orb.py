@@ -95,7 +95,7 @@ def del_orbiter():
         return
     # delete everything in current directory except for orb_cache, orb.exe, Orbiter2016.json
     for file in os.listdir('.'):
-        if file == 'orb_cache' or file == 'orb' or file == 'Orbiter2016.json' or file == 'orb.bat':
+        if file == 'orb_cache' or file == 'orb' or file == 'Orbiter2016.json' or file == 'orb.bat' or file.lower().startswith('orb_install_'):
             continue
         if os.path.isdir(file):
             shutil.rmtree(file)
