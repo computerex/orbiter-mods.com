@@ -364,7 +364,7 @@ class Orb:
             print(f'experience {experience_id} not found')
             print([e for e in self.experience_list if e['name'] == 'NASSP 8 beta'])
             return
-        execute_script(self, self.experience_list, xp[0])
+        execute_script(self.experience_list, xp[0])
 
 # fetch experiences from https://orbiter-mods.com/fetch_experiences
 def fetch_experiences():
@@ -388,10 +388,12 @@ def launch_with_elevation(experience_id):
     print(" ".join(args))
     ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, " ".join(args), None, 1)
 
-def execute_script(orb, all_experiences, experience):
+def execute_script(all_experiences, experience):
     experience_script = experience['experience_script']
     experience_name = experience['name']
     experience_id = experience['id']
+    orb = Orb()
+    orb.set_experience_list(all_experiences)
     orb.set_scn_dir(experience_name)
 
     # fetch experience_script_url and save it in orb_cache
@@ -456,6 +458,17 @@ def main():
         orb.install_orbiter_mods_experience(experience_id)
         return
 
+    if '--experiences' in sys.argv:
+        # get all args after --experiences
+        experience_ids = sys.argv[sys.argv.index('--experiences') + 1:]
+        # remove --experiences from sys.args
+        sys.argv = [x for x in sys.argv if x != '--experiences']
+        for experience_id in experience_ids:
+            orb.install_orbiter_mods_experience(experience_id)
+        print('ok, bye!')
+        time.sleep(3)
+        return
+
     if len(experiences) == 0:
         print('no experiences found, terminating')
         time.sleep(3)
@@ -474,7 +487,7 @@ def main():
         sys.exit(1)
 
     experience = experiences[mod_index]
-    execute_script(orb, experiences, experience)
+    execute_script(experiences, experience)
 
     print('ok, bye!')
     time.sleep(3)
