@@ -29,10 +29,6 @@ export class AddonSearch {
             this.do_search_lazy();
         });
 
-        $('#orbiter-mods-only').on('change', (e) => {
-            this.do_search_lazy();
-        });
-
         $.get('/mods_hash?cache_bust=' + Math.random(), (data) => {
             const index_hash = data.hash;
             // set this.addons from local storage
@@ -69,6 +65,9 @@ export class AddonSearch {
     get_enabled_categories() {
         const categories_enabled = [];
         $('.categories input[type=checkbox]').each((i, el) => {
+            if (el.value === 'orbiter-mods-only') {
+                return;
+            }
             if (el.checked) {
                 categories_enabled.push(el.value);
             }
@@ -78,21 +77,19 @@ export class AddonSearch {
 
     render(results) {
         $('#results').empty();
-        const categories_enabled = this.get_enabled_categories();
+        if (!results) {
+            results = [];
+        }
         const orbiter_mods_only = $('#orbiter-mods-only').is(':checked');
-
         results.forEach((result) => {
             const urls = this.addons[result]['urls'];
             const category = this.addons[result]['category'] || '';
-            if (categories_enabled.length > 0 && categories_enabled.indexOf(category) === -1) {
-                return;
-            }
             for (let inx = 0; inx < urls.length; inx++) {
                 const url = urls[inx];
-                let favico = '/favicon.ico';
-                if (orbiter_mods_only && url.indexOf('orbiter-forum.com') !== -1) {
+                if (orbiter_mods_only && !url.match(/orbiter-mods.com/)) {
                     continue;
                 }
+                let favico = '/favicon.ico';
                 // if url host is orbiter-forum.com change favicon to of.ico
                 if (url.indexOf('orbiter-forum.com') > -1) {
                     favico = '/images/of.ico';
@@ -104,22 +101,32 @@ export class AddonSearch {
 
     do_search() {
         const search = $('#search').val();
-        if (search.length === 0) {
-            const enabled_categories = this.get_enabled_categories();
-            let results = [];
-            if (enabled_categories.length > 0) {
-                // find all mods with a category that's in enabled_categories
-                results = Object.keys(this.addons).filter((key) => {
-                    const category = this.addons[key]['category'] || '';
-                    return enabled_categories.indexOf(category) > -1;
-                });
-            }
-            this.render(results);
+        const enabled_categories = this.get_enabled_categories();
+
+        if (search.length === 0 && enabled_categories.length === 0) {
+            this.render();
             return;
         }
-        const results = _.filter(Object.keys(this.addons), function(item) {
-            return item.fuzzy(search, 0.9);
-        });
+
+        var results = Object.keys(this.addons);
+
+        if (search.length > 0) {
+            results = _.filter(results, function(item) {
+                return item.fuzzy(search, 0.9);
+            });
+        }
+
+        
+        if (enabled_categories.length > 0) {
+            // find all mods with a category that's in enabled_categories
+            results = results.filter((key) => {
+                if (!this.addons[key]) {
+                    return false;
+                }
+                const category = this.addons[key]['category'] || '';
+                return enabled_categories.indexOf(category) > -1;
+            });
+        }
         this.render(results);
     };
 
