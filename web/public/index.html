@@ -196,10 +196,6 @@
         transition: color 0.3s ease;
     }
     
-    a:hover{
-        color: var(--accent-color);
-    }
-
     .categories {
         display: flex;
         flex-wrap: wrap;
@@ -268,6 +264,31 @@
     .edition .orb:hover {
         background-color: var(--accent-color);
     }
+
+    .orb-button {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: var(--primary-color);
+            color: white;
+            font-size: 1.2em;
+            font-weight: bold;
+            border-radius: 25px;
+            text-decoration: none;
+            margin: 0 10px;
+            transition: background-color 0.3s ease;
+        }
+
+        .orb-button:hover {
+            background-color: var(--accent-color);
+        }
+
+        .orb-button img{
+            width: 20px;
+            height: auto;
+            margin-right: 10px;
+        }
     </style>
     <meta name="referrer" content="no-referrer" />
 </head>
@@ -369,8 +390,19 @@
 
         <section class="orb-download">
             <h2>Download Orb - The Automated Mod Installer</h2>
-            <p>Orb is an automated modlist installer for Orbiter Space Flight Simulator. It allows users to easily install hundreds of the most popular Orbiter mods with just a few clicks.</p> <br />
-            <a href="https://orbiter-mods.com/view/21/orb-v1" class="orb">Download Orb</a>
+            <p>Orb is an automated modlist installer for Orbiter Space Flight Simulator. It allows users to easily install hundreds of the most popular Orbiter mods with just a few clicks. Now available for Linux!</p>
+            <br />
+            <div style="display: flex; justify-content: center;">
+                <a href="/view/21/orb-v1" class="orb-button">
+                    <img src="/windows-icon.png" alt="download for windows">
+                    Download for Windows
+                </a>
+                <a href="/view/62/orbiter-linux-bundle" class="orb-button">
+                    <img src="/linux-logo.png" alt="download for linux">
+                    Download for Linux
+                </a>
+            </div>
+            <small style="font-style: italic;">The Linux installation bundle includes WINE+orb for a seamless experience!</small>
         </section>
 
         <div class="yt-container">
