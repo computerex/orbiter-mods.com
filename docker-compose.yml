@@ -42,6 +42,17 @@ services:
         restart: always
         depends_on:
             - mysqldb
+    zinclabs:
+        image: "elestio/zinc:latest"
+        restart: always
+        volumes:
+            - './zincdata:/data'
+        environment:
+            - ZINC_DATA_PATH=/data
+            - ZINC_FIRST_ADMIN_USER=foo
+            - ZINC_FIRST_ADMIN_PASSWORD=bar
+        ports:
+            - "4080:4080"
     mysqldb:
         image: mysql:${MYSQL_VERSION}
         container_name: ${MYSQL_HOST}
