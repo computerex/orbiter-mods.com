@@ -29,11 +29,71 @@ function get_client_ip() {
     return $ipaddress;
 }
 
+function perform_zinc_search($index, $terms) {
+    // Define the URL and request body
+    $url = "http://host.docker.internal:4080/api/$index/_search";
+    $headers = array(
+        'Content-Type: application/json'
+    );
+
+    $request_body = array(
+        "search_type" => "match",
+        "query" => array(
+            "term" => $terms,
+            "field" => "text",
+            "fuzziness" => "auto"
+        ),
+        "max_results" => 20
+    );
+
+    // Send the POST request
+    $curl = curl_init($url);
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($curl, CURLOPT_POST, true);
+    curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($request_body));
+    curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+    curl_setopt($curl, CURLOPT_USERPWD, 'foo:bar'); // Basic authentication
+
+    $response = curl_exec($curl);
+    $http_status = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+    curl_close($curl);
+
+    // Check the response status code
+    if ($http_status == 200) {
+        $data = json_decode($response, true);
+        // Process the response data as needed
+        return $data;
+    } else {
+        echo "Request failed with status code: $http_status\n";
+        return null;
+    }
+}
+
 $app->get('/ip', function($request, Response $response) {
     $ip = get_client_ip();
     $response->getBody()->write($ip);
     return $response;
 });
+
+$app->get('/search', function($request, Response $response) {
+    $phrase = $request->getQueryParam('phrase');
+    $results = perform_zinc_search('of', $phrase)['hits']['hits'];
+    
+    // sort results by score, best first
+    usort($results, function($a, $b) {
+        return $b['_score'] - $a['_score'];
+    });
+
+    
+    // get the _source
+    $results = array_map(function($result) {
+        // remove @timestamp
+        unset($result['_source']['@timestamp']);
+        return $result['_source'];
+    }, $results);
+    return $response->withJson($results);
+});
+
 
 $app->get('/', function ($request, Response $response) {
     // serve static index html file
