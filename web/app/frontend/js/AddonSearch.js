@@ -30,19 +30,20 @@ export class AddonSearch {
             this.do_search_lazy();
         });
 
-        $('input[type=radio][name=search]').on('change', (e) => {
+        $('input[type=radio][name=search]').on('click', (e) => {
             this.render();
-            // empty #search
+            // Empty #search
             $('#search').val('');
             const id = e.target.id;
-            // If the "Mods" radio button is selected
+        
+            // If the "Mods" radio button is clicked
             if (id === 'mods') {
                 this.search_threads = false;
-                // set #search placeholder to "Search mods"
+                // Set #search placeholder to "Search mods"
                 $('#search').attr('placeholder', 'Search mods');
             }
-        
-            // If the "Messages" radio button is selected
+            
+            // If the "Messages" radio button is clicked
             else if (id === 'messages') {
                 this.search_threads = true;
                 $('#search').attr('placeholder', 'press enter to search messages');
@@ -86,7 +87,6 @@ export class AddonSearch {
         $('#search').on('keypress', (e) => {
             if (e.which === 13) {
                 const phrase = $('#search').val();
-                console.log('searching for ' + phrase);
                 this.search_of_index(phrase);
             }
         });
@@ -159,7 +159,6 @@ export class AddonSearch {
         // GET request /search?phrase=phrase
         $.get('/search?phrase=' + url_phrase, (data) => {
             // render results
-            console.log(data);
             this.render(data);
         });
     };
