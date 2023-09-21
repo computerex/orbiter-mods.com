@@ -301,13 +301,14 @@
 
         .switch label{
             font-size: 16px;
-            padding: 10px 20px;
+            padding: 4px 10px;
             background-color: #14854f;
             color: white;
             cursor: pointer;
             border-radius: 25px;
             transition: 0.3s ease;
             margin: 0 10px;
+            user-select: none;
         }
 
         .switch input[type="radio"]:checked + label{
@@ -356,7 +357,7 @@
         </section>
 
         <section>
-            <small><span style="float:right" id="index_count">loading...</span></small>
+            <small><span id="index_count">loading...</span></small>
             <div class="switch">
                 <p>Select to search: </p>
                 <input type="radio" id="mods" name="search" value="mods" checked>
