@@ -289,6 +289,54 @@
             height: auto;
             margin-right: 10px;
         }
+
+        .switch p{
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        .switch input[type="radio"]{
+            display: none;
+        }
+
+        .switch label{
+            font-size: 16px;
+            padding: 10px 20px;
+            background-color: #14854f;
+            color: white;
+            cursor: pointer;
+            border-radius: 25px;
+            transition: 0.3s ease;
+            margin: 0 10px;
+        }
+
+        .switch input[type="radio"]:checked + label{
+            background-color: #f7a606;
+        }
+
+        #results div {
+            border-radius: 4px; 
+            border: 1px solid #ccc; 
+            padding: 15px;
+            margin: 10px 0; 
+            background-color: #f5f5f5;
+            transition: background-color 0.3s ease;
+        }
+
+        #results div:hover {
+            background-color: #fff;
+        }
+
+        #results div a {
+            text-decoration: none; 
+            font-weight: bold; 
+            color: var(--primary-color);
+        }
+
+        #results div a:hover {
+            color: var(--accent-color);
+        }
+
     </style>
     <meta name="referrer" content="no-referrer" />
 </head>
@@ -309,6 +357,13 @@
 
         <section>
             <small><span style="float:right" id="index_count">loading...</span></small>
+            <div class="switch">
+                <p>Select to search: </p>
+                <input type="radio" id="mods" name="search" value="mods" checked>
+                <label for="mods">Mods</label>
+                <input type="radio" id="messages" name="search" value="messages">
+                <label for="messages">Messages</label>
+              </div>
             <input type="text" id="search" placeholder="Search for mods"></input>
 
             <div class="categories">

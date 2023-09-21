@@ -24,10 +24,32 @@ export class AddonSearch {
 
     constructor() {
         this.addons = {};
+        this.search_threads = false;
 
         $('.categories input[type=checkbox]').on('change', (e) => {
             this.do_search_lazy();
         });
+
+        $('input[type=radio][name=search]').on('change', (e) => {
+            this.render();
+            // empty #search
+            $('#search').val('');
+            const id = e.target.id;
+            // If the "Mods" radio button is selected
+            if (id === 'mods') {
+                this.search_threads = false;
+                // set #search placeholder to "Search mods"
+                $('#search').attr('placeholder', 'Search mods');
+            }
+        
+            // If the "Messages" radio button is selected
+            else if (id === 'messages') {
+                this.search_threads = true;
+                $('#search').attr('placeholder', 'press enter to search messages');
+            }
+        });
+
+        
 
         $.get('/mods_hash?cache_bust=' + Math.random(), (data) => {
             const index_hash = data.hash;
@@ -60,6 +82,14 @@ export class AddonSearch {
         $('#search').on('keyup', () => {
             this.do_search_lazy();
         });
+        // enter key on #search
+        $('#search').on('keypress', (e) => {
+            if (e.which === 13) {
+                const phrase = $('#search').val();
+                console.log('searching for ' + phrase);
+                this.search_of_index(phrase);
+            }
+        });
     };
 
     get_enabled_categories() {
@@ -80,26 +110,65 @@ export class AddonSearch {
         if (!results) {
             results = [];
         }
-        const orbiter_mods_only = $('#orbiter-mods-only').is(':checked');
-        results.forEach((result) => {
-            const urls = this.addons[result]['urls'];
-            const category = this.addons[result]['category'] || '';
-            for (let inx = 0; inx < urls.length; inx++) {
-                const url = urls[inx];
-                if (orbiter_mods_only && !url.match(/orbiter-mods.com/)) {
-                    continue;
+        if (this.search_threads) {
+            results.forEach((result) => {
+                const author = result['author'];
+                const date = new Date(result['date']);
+    
+                // Format date as DD-MM-YYYY
+                const formattedDate = date.getDate() + '-' + (date.getMonth()+1) + '-' + date.getFullYear();
+
+                const id = result['id'];
+                const post_id = result['post_id'];
+                var text = result['text'];
+
+                // truncate text and add ellipsis
+                if (text.length > 200) {
+                    text = text.substring(0, 200) + '...';
                 }
-                let favico = '/favicon.ico';
-                // if url host is orbiter-forum.com change favicon to of.ico
-                if (url.indexOf('orbiter-forum.com') > -1) {
-                    favico = '/images/of.ico';
+
+                const thread_id = result['thread_id'];
+                const url = `https://www.orbiter-forum.com/threads/${thread_id}/${post_id}`;
+
+                $('#results').append(`<div onClick="window.open('${url}', '_blank')" style="cursor: pointer;"><a style="color: #14854f;" target="_blank" href="${url}">${text}</a><p style="font-size:0.8em; color:#666;">Posted on ${formattedDate}</p></div>`);
+            });   
+        } else {
+            const orbiter_mods_only = $('#orbiter-mods-only').is(':checked');
+            results.forEach((result) => {
+                const urls = this.addons[result]['urls'];
+                const category = this.addons[result]['category'] || '';
+                for (let inx = 0; inx < urls.length; inx++) {
+                    const url = urls[inx];
+                    if (orbiter_mods_only && !url.match(/orbiter-mods.com/)) {
+                        continue;
+                    }
+                    let favico = '/favicon.ico';
+                    // if url host is orbiter-forum.com change favicon to of.ico
+                    if (url.indexOf('orbiter-forum.com') > -1) {
+                        favico = '/images/of.ico';
+                    }
+                    $('#results').append(`<div><img style="padding-right:10px;width:26px;" src="${favico}" /><a target="_blank" href="${url}">${result} - ${category}</a></div>`);
                 }
-                $('#results').append(`<div><img style="padding-right:10px;width:26px;" src="${favico}" /><a target="_blank" href="${url}">${result} - ${category}</a></div>`);
-            }
+            });
+        }
+    };
+
+    search_of_index(phrase) {
+        // urlencode phrase
+        const url_phrase = encodeURIComponent(phrase);
+        // GET request /search?phrase=phrase
+        $.get('/search?phrase=' + url_phrase, (data) => {
+            // render results
+            console.log(data);
+            this.render(data);
         });
     };
 
     do_search() {
+        if (this.search_threads) {
+            return;
+        }
+
         const search = $('#search').val();
         const enabled_categories = this.get_enabled_categories();
 
