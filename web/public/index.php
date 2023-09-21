@@ -37,13 +37,18 @@ function perform_zinc_search($index, $terms) {
     );
 
     $request_body = array(
-        "search_type" => "match",
-        "query" => array(
-            "term" => $terms,
-            "field" => "text",
-            "fuzziness" => "auto"
-        ),
-        "max_results" => 20
+	    "search_type" => "match",
+	    "query" => array(
+		"term" => $terms,
+		"field" => "text",
+		"fuzziness" => "auto"
+	    ),
+	    "sort" => [  // Implement a sort order, useful for relevant results
+		"_score" => "desc", // Sorting by relevance score from the search
+		"date" => "desc"
+	    ],
+	    "max_results" => 20,
+	    "min_score" => 0.5 // Set a minimum score threshold to filter out poorly matching results
     );
 
     // Send the POST request
