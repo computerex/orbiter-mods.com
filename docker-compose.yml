@@ -26,6 +26,8 @@ services:
             - "./migs:/migs"
         env_file:
             - ".env"
+        extra_hosts:
+            - "host.docker.internal:172.17.0.1"
     composer:
         image: "composer"
         volumes:

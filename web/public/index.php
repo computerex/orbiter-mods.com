@@ -31,7 +31,7 @@ function get_client_ip() {
 
 function perform_zinc_search($index, $terms) {
     // Define the URL and request body
-    $url = "http://host.docker.internal:4080/api/$index/_search";
+    $url = "http://zinclabs:4080/api/$index/_search";
     $headers = array(
         'Content-Type: application/json'
     );
