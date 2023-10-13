@@ -70,3 +70,12 @@ services:
             - "8989:3306"
         volumes:
             - "./data/db/mysql:/var/lib/mysql"
+    chat:
+        build:
+            context: ../the-probe
+            dockerfile: Dockerfile
+        restart: always
+        ports:
+            - "4000:4000"
+        volumes:
+            - "../the-probe:/app"
