@@ -99,7 +99,7 @@ $app->get('/search', function($request, Response $response) {
     return $response->withJson($results);
 });
 
-$app->get('/chat', function($request, Response $response) {
+$app->post('/chat', function($request, Response $response) {
 
     // Get the request body from the incoming request
     $requestBody = $request->getBody();
