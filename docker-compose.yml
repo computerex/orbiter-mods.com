@@ -75,6 +75,8 @@ services:
             context: ../the-probe
             dockerfile: Dockerfile
         restart: always
+        environment:
+            - TOKENIZERS_PARALLELISM=false
         ports:
             - "4000:4000"
         volumes:
