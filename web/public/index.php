@@ -100,7 +100,7 @@ $app->get('/search', function($request, Response $response) {
 });
 
 $app->post('/chat', function($request, Response $response) {
-    $ip = $_SERVER['REMOTE_ADDR'];
+    $ip = get_client_ip();
     $ip_dir = '/ips/';
     $absolute_rate_limit_file = '/ips/rate_limit.txt';
 
