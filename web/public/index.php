@@ -100,10 +100,46 @@ $app->get('/search', function($request, Response $response) {
 });
 
 $app->post('/chat', function($request, Response $response) {
+    $ip = $_SERVER['REMOTE_ADDR'];
+    $ip_dir = '../ips/';
+    $absolute_rate_limit_file = '../rate_limit.txt';
 
-    // Get the request body from the incoming request
+    if(!file_exists($ip_dir . $ip)) {
+        mkdir($ip_dir . $ip);
+    }
+
+    $ip_file = $ip_dir . $ip . '/timestamp.txt';
+    $current_time = microtime(true);
+
+    if(file_exists($ip_file)) {
+        $last_time = file_get_contents($ip_file);
+
+        if($current_time - $last_time < 5) {
+            return $response->withStatus(429)
+                            ->withHeader('Content-Type', 'text/html')
+                            ->write('Rate limit exceeded, please slow down');
+        }
+    }
+
+    if (file_exists($absolute_rate_limit_file)) {
+        $last_limit_data = file_get_contents($absolute_rate_limit_file);
+        $data = explode(":", $last_limit_data);
+        if(count($data) == 2 && floatval($data[0]) == floor($current_time)) {
+            // If the count exceeds 5 in the current second, reject the request
+            if(intval($data[1]) >= 5) {
+                return $response->withStatus(429)->withHeader('Content-Type', 'text/html')->write('Rate limit exceeded, please slow down');
+            }
+            // Otherwise increment the count
+            file_put_contents($absolute_rate_limit_file, floor($current_time).":".(intval($data[1])+1));
+        } else {
+            // If the current second is different, set count to 1
+            file_put_contents($absolute_rate_limit_file, floor($current_time).":1");
+        }
+    } else {
+        file_put_contents($absolute_rate_limit_file, floor($current_time).":1");
+    }
+
     $requestBody = $request->getBody();
-
     $curl = curl_init();
 
     curl_setopt_array($curl, array(
@@ -124,6 +160,8 @@ $app->post('/chat', function($request, Response $response) {
     $response = curl_exec($curl);
 
     curl_close($curl);
+    // After successful call:
+    file_put_contents($ip_file, microtime(true));
     return $response;
 });
 
