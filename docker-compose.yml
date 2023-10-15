@@ -23,6 +23,7 @@ services:
         volumes:
             - "./etc/php/php.ini:/usr/local/etc/php/conf.d/php.ini"
             - "./web:/var/www/html"
+            - "./web/ips:/ips"
             - "./migs:/migs"
         env_file:
             - ".env"

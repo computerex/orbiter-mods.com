@@ -101,8 +101,8 @@ $app->get('/search', function($request, Response $response) {
 
 $app->post('/chat', function($request, Response $response) {
     $ip = $_SERVER['REMOTE_ADDR'];
-    $ip_dir = '../ips/';
-    $absolute_rate_limit_file = '../rate_limit.txt';
+    $ip_dir = '/ips/';
+    $absolute_rate_limit_file = '/ips/rate_limit.txt';
 
     if(!file_exists($ip_dir . $ip)) {
         mkdir($ip_dir . $ip);
