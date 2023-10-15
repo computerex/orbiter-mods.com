@@ -23,7 +23,6 @@ export class Chat {
     postMessage() {
         // Send the user's message to the server using jQuery AJAX
         const requestData = JSON.stringify(this.messages);
-        console.log(requestData);
         $.ajax({
             type: "POST",
             url: "/chat",
