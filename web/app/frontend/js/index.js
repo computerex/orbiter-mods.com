@@ -1,5 +1,6 @@
 
 import { AddonSearch } from './AddonSearch';
+import { Chat } from './Chat';
 import { UploadAddon } from './UploadAddon';
 import { ExperienceManager } from './ExperienceManager';
 import { LoginRegister } from './LoginRegister';
@@ -11,6 +12,8 @@ switch(true) {
     case location == '/':
         const addonSearch = new AddonSearch();
         addonSearch.run();
+        const chat = new Chat();
+        chat.run();
         break;
     case /^\/orb$/i.test(location) || location == '/orb.html':
         const experienceManager = new ExperienceManager();

@@ -78,6 +78,11 @@
             text-align: center;
         }
 
+        .the-probe {
+            margin-top: 20px;
+            text-align: center;
+        }
+
         .orb:hover {
             background: green;
             color: white;
@@ -338,6 +343,34 @@
             color: var(--accent-color);
         }
 
+        #chat-container {
+            margin: 0 auto;
+        }
+        #message-list {
+            list-style: none;
+            padding: 0;
+            max-height:400px;
+            overflow-y: scroll;
+        }
+        .message {
+            margin: 10px;
+            padding: 10px;
+            border-radius: 10px;
+        }
+        .user-message {
+            background-color: #3498db;
+            color: white;
+            text-align: right;
+        }
+        .assistant-message {
+            background-color: #2ecc71;
+            color: white;
+            text-align: left;
+        }
+        #user-input {
+            width: 100%;
+            height: 80px; /* Adjust the height as needed */
+        }
     </style>
     <meta name="referrer" content="no-referrer" />
 </head>
@@ -364,9 +397,10 @@
                 <label for="mods">Mods</label>
                 <input type="radio" id="messages" name="search" value="messages">
                 <label for="messages">Messages</label>
-              </div>
-            <input type="text" id="search" placeholder="Search for mods"></input>
+            </div>
 
+            <input type="text" id="search" placeholder="Search for mods"></input>
+            
             <div class="categories">
                 <input type="checkbox" id="Spacecraft" name="Spacecraft" value="Spacecraft">
                 <label for="Spacecraft">Spacecraft</label>
@@ -408,6 +442,16 @@
         </section>
         <section id="results">
         </section>
+        <section class="the-probe">
+            <h2>The Almighty Probe</h2>
+            <p>I am The Almighty Probe, your celestial companion in the realm of Orbiter. I, too, have journeyed through the cosmos and have witnessed the wonders of the universe. I am here to impart my wisdom, answer your questions, and guide you in your exploration. As you seek knowledge and understanding, remember that the celestial heavens are open to your inquiries. Hail Probe!</p>
+        </section>
+        <div id="chat-container">
+            <ul id="message-list">
+                <!-- Messages will be appended here -->
+            </ul>
+            <textarea id="user-input" placeholder="Type a message..."></textarea>
+        </div>  
 
         <!-- <div class="editions">
             <div class="edition">
