@@ -1,3 +1,3 @@
-C:\Users\lenovo\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\Scripts\pyinstaller.exe --distpath \\wsl$\Ubuntu\home\mohd\projects\orbiter-mods.com\dist --specpath \\wsl$\Ubuntu\home\mohd\projects\orbiter-mods.com\ --paths=C:\Users\lenovo\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages --hidden-import tkinter --noconfirm \\wsl$\Ubuntu\home\mohd\projects\orbiter-mods.com\orb.py
-copy \\wsl$\Ubuntu\home\mohd\projects\orbiter-mods.com\orb.py E:\Orbiter2016
-xcopy \\wsl$\Ubuntu\home\mohd\projects\orbiter-mods.com\dist\orb E:\Orbiter2016\ /E/H
+C:\Users\mohd\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\Scripts\pyinstaller.exe --distpath C:\projects\orbiter-mods.com\dist --specpath C:\projects\orbiter-mods.com\ --paths=C:\Users\mohd\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages --hidden-import tkinter --noconfirm .\orb.py
+copy C:\projects\orbiter-mods.com\orb.py C:\projects\orbiter-mods.com-test
+xcopy C:\projects\orbiter-mods.com\dist\orb C:\projects\orbiter-mods.com-test\orb /E/H
