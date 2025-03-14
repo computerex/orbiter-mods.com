@@ -121,37 +121,106 @@ export class AddonSearch {
                 const id = result['id'];
                 const post_id = result['post_id'];
                 var text = result['text'];
-
-                // truncate text and add ellipsis
-                if (text.length > 200) {
-                    text = text.substring(0, 200) + '...';
-                }
-
                 const thread_id = result['thread_id'];
                 const url = `https://www.orbiter-forum.com/threads/${thread_id}/${post_id}`;
 
-                $('#results').append(`<div onClick="window.open('${url}', '_blank')" style="cursor: pointer;"><a style="color: #14854f;" target="_blank" href="${url}">${text}</a><p style="font-size:0.8em; color:#666;">Posted on ${formattedDate}</p></div>`);
+                // Create message result with new styling
+                const messageHtml = `
+                    <div class="message-result" onclick="window.open('${url}', '_blank')" style="cursor: pointer;">
+                        <div class="message-content">
+                            ${this.formatMessageContent(text)}
+                        </div>
+                        <div class="message-meta">
+                            <div class="message-date">
+                                <span>📅 Posted on ${formattedDate}</span>
+                            </div>
+                            <div class="message-forum">
+                                <span>💬 Orbiter Forum</span>
+                            </div>
+                        </div>
+                    </div>`;
+
+                $('#results').append(messageHtml);
             });   
         } else {
             const orbiter_mods_only = $('#orbiter-mods-only').is(':checked');
             results.forEach((result) => {
-                const urls = this.addons[result]['urls'];
-                const category = this.addons[result]['category'] || '';
-                for (let inx = 0; inx < urls.length; inx++) {
-                    const url = urls[inx];
+                const addon = this.addons[result];
+                if (!addon) return;  // Skip if addon not found
+                
+                const urls = addon['urls'] || [];
+                const category = addon['category'] || '';
+                
+                urls.forEach(url => {
                     if (orbiter_mods_only && !url.match(/orbiter-mods.com/)) {
-                        continue;
+                        return;
                     }
                     let favico = '/favicon.ico';
-                    // if url host is orbiter-forum.com change favicon to of.ico
                     if (url.indexOf('orbiter-forum.com') > -1) {
                         favico = '/images/of.ico';
                     }
-                    $('#results').append(`<div><img style="padding-right:10px;width:26px;" src="${favico}" /><a target="_blank" href="${url}">${result} - ${category}</a></div>`);
-                }
+                    $('#results').append(`<div class="result-card">
+                        <div class="mod-icon">
+                            <img src="${favico}" alt="site icon" style="width: 24px; height: 24px;">
+                        </div>
+                        <div class="result-content">
+                            <div>
+                                <a href="${url}" class="mod-title" target="_blank">${result}</a>
+                                <span class="mod-category category-${category.toLowerCase()}">
+                                    ${this.getCategorySymbol(category)} ${category}
+                                </span>
+                            </div>
+                            <div class="result-meta">
+                                <div class="result-stats">
+                                    <div class="stat-item">
+                                        <span>🔗 ${new URL(url).hostname}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>`);
+                });
             });
         }
     };
+
+    // Helper function to get category symbol
+    getCategorySymbol(category) {
+        const symbolMap = {
+            'Spacecraft': '🚀',
+            'Aircraft': '✈️',
+            'Scenarios': '▶️',
+            'Utilities': '🔧',
+            'Resources': '📦',
+            'Sounds': '🔊',
+            'Scenery': '🏔️',
+            'Launchers': '🛸',
+            'Repaints': '🎨',
+            'Tutorials': '📚',
+            'Miscellaneous': '⭐'
+        };
+        return symbolMap[category] || '📄';
+    }
+
+    // Helper function to format message content with quotes
+    formatMessageContent(text) {
+        if (text.includes('said:') || text.includes('wrote:')) {
+            const parts = text.split(/(?:said:|wrote:)/);
+            if (parts.length > 1) {
+                const author = parts[0].trim();
+                const quote = parts[1].trim();
+                const response = parts[2] ? parts[2].trim() : '';
+
+                return `
+                    <div class="message-quote">
+                        <div class="message-quote-author">${author} wrote:</div>
+                        <p>${quote}</p>
+                    </div>
+                    ${response ? `<p>${response}</p>` : ''}`;
+            }
+        }
+        return `<p>${text}</p>`;
+    }
 
     search_of_index(phrase) {
         // urlencode phrase

@@ -1,498 +1,839 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Mods/addons for Orbiter Space Flight Simulator. A community to chat about Orbiter, and home of the orb installer.">
-    <meta name="keywords" content="Orbiter, Space Flight Simulator, Mods, orb, orb installer, addons, add-ons">
-    <meta name="robots" content="index, follow">
-    <meta name="revisit-after" content="1 day">
-    <meta name="distribution" content="global">
-    <meta name="rating" content="general">
-    <meta name="language" content="en">
+    
+    <!-- Primary Meta Tags -->
+    <title>Orbiter-Mods.com - Mods & Addons for Orbiter Space Flight Simulator</title>
+    <meta name="title" content="Orbiter-Mods.com - Mods & Addons for Orbiter Space Flight Simulator">
+    <meta name="description" content="Download mods, addons, and tools for Orbiter Space Flight Simulator. Features the Orb installer for easy mod management. Join the Orbiter community!">
+    <meta name="keywords" content="Orbiter, Space Flight Simulator, Mods, orb, orb installer, addons, add-ons, spacecraft, space simulation, space games">
+    <meta name="author" content="Orbiter-Mods.com">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://orbiter-mods.com/">
+    <meta property="og:title" content="Orbiter-Mods.com - Mods & Addons for Orbiter Space Flight Simulator">
+    <meta property="og:description" content="Download mods, addons, and tools for Orbiter Space Flight Simulator. Features the Orb installer for easy mod management. Join the Orbiter community!">
 
-    <title>Mods/Addons for Orbiter Space Flight Simulator</title>
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary">
+    <meta property="twitter:url" content="https://orbiter-mods.com/">
+    <meta property="twitter:title" content="Orbiter-Mods.com - Mods & Addons for Orbiter Space Flight Simulator">
+    <meta property="twitter:description" content="Download mods, addons, and tools for Orbiter Space Flight Simulator. Features the Orb installer for easy mod management. Join the Orbiter community!">
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://orbiter-mods.com/">
+
+    <!-- Robots meta -->
+    <meta name="robots" content="index, follow">
+    <meta name="googlebot" content="index, follow">
+    <meta name="revisit-after" content="7 days">
+
+    <!-- Additional meta tags -->
+    <meta name="application-name" content="Orbiter-Mods.com">
+    <meta name="theme-color" content="#2563eb">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="Orbiter-Mods">
+    
+    <!-- Existing links -->
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link rel="stylesheet" href="/css/chota.min.css">
     <script src="/js/font-awesome.js"></script>
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "url": "https://orbiter-mods.com/",
+      "name": "Orbiter-Mods.com",
+      "description": "Download mods, addons, and tools for Orbiter Space Flight Simulator. Features the Orb installer for easy mod management.",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://orbiter-mods.com/?search={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Orb Installer",
+      "applicationCategory": "Utility",
+      "operatingSystem": ["Windows", "Linux"],
+      "description": "Automated mod installer for Orbiter Space Flight Simulator",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      }
+    }
+    </script>
+
+    <!-- Existing styles -->
     <style>
-        .col {
-            position: relative;
-        }
-        .download-icon {
-            position: absolute;
-            right: 45px;
-            bottom: 3px;
-            color: white;
-        }
-
-        .download-count {
-            position: absolute;
-            right: 15px;
-            bottom: 0px;
-            color: white;
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #3b82f6;
+            --accent-color: #f59e0b;
+            --background-color: #f8fafc;
+            --text-color: #1e293b;
+            --card-bg: #ffffff;
+            --border-color: #e2e8f0;
         }
 
-        .mod-title {
-            position: absolute;
-            left: 0px;
-            top: 0px;
-            color: white;
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-size: 16px;
+            line-height: 1.6;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
         }
 
-        .yt-container {
+        .container {
+            max-width: 1200px !important;
+            padding: 2rem;
+            margin: 0 auto;
             width: 100%;
-            display: flex;
-            justify-content: center;
-            margin-top: 30px;
-        }
-        .video {
-            width: 80%;
-            max-width: 800px;
-            height: 0;
-            padding-bottom: 56.25%;
-        }
-        .categories {
-            margin-top:10px;
+            box-sizing: border-box;
         }
 
-        #results {
-            margin-top:10px;
-        }
-
-        h1, h2, h3, h4, h5, h6 {
-            color: #14854f;
-        }
-
-        .orb {
+        /* Header Styles */
+        .site-header {
             background: white;
-            border: 1px solid grey;
-            font-size: 2em;
-            padding:20px;
-            border-radius: 2px;
+            padding: 1.5rem 0;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
         }
 
-        .orb-download {
-            margin-top: 20px;
-            text-align: center;
-        }
-
-        .the-probe {
-            margin-top: 20px;
-            text-align: center;
-        }
-
-        .orb:hover {
-            background: green;
-            color: white;
-        }
-
-        .editions {
+        .site-header .container {
             display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 20px;
-            margin-top: 30px;
-        }
-
-        .edition {
-  flex: 1 1 300px;
-  max-width: 300px;
-  background: white;
-  border: 1px solid grey;
-  padding: 20px;
-  border-radius: 2px;
-  text-align: center;
-  transition: background 0.3s ease, color 0.3s ease;
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.edition-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.edition-title {
-  font-size: 1.2em;
-  margin-bottom: 10px;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  height: 60px;
-}
-
-.edition-description {
-  flex-grow: 1;
-  margin-top: 10px;
-}
-
-.edition-image {
-  max-height: 200px;
-  width: auto;
-  object-fit: contain;
-}
-
-
-        .orb {
-            margin-top: auto;
-        }
-
-        :root{
-        --primary-color: #14854f;
-        --secondary-color: #4c7a98;
-        --accent-color: #f7a606;
-        --background-color: #f5f5f5;
-        --text-color: #333333;
-    }
-    
-    body{
-        background-color: var(--background-color);
-        color: var(--text-color);
-    }
-    
-    h1, h2, h3, h4, h5, h6 {
-        color: var(--primary-color);
-    }
-
-    body{
-        font-family: Arial, sans-serif;
-        font-size: 16px;
-        line-height: 1.5;
-    }
-    
-    h1{
-        font-size: 3.5rem;
-        font-weight: bold;
-        margin-bottom: 1rem;
-    }
-    
-    h2{
-        font-size: 2.5rem;
-        font-weight: bold;
-        margin-top: 2rem;
-        margin-bottom: 1rem;
-    }
-    
-    h3{
-        font-size: 2rem;
-        font-weight: bold;
-        margin-top: 1.5rem;
-        margin-bottom: 0.5rem;
-    }
-    
-    p{
-        margin-bottom: 1rem;
-    }
-    
-    small{
-        font-size: 1.3rem;
-    }
-    
-    a{
-        color: var(--primary-color);
-        text-decoration: none;
-        transition: color 0.3s ease;
-    }
-    
-    .categories {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        margin-top: 10px;
-    }
-
-    .categories input[type="checkbox"] {
-    display: none; /* Hide the default checkboxes */
-    }
-
-    .categories label {
-        display: inline-flex;
-        align-items: center;
-        padding: 5px 10px;
-        border-radius: 5px;
-        background-color: #e0e0e0;
-        color: #333333;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-    }
-
-    .categories label:hover {
-        background-color: #d0d0d0;
-    }
-
-    .categories input[type="checkbox"]:checked + label {
-        background-color: #14854f;
-        color: white;
-    }
-
-    .categories label,
-    .editions {
-        user-select: none; /* Disable text selection on the labels */
-    }
-
-    .orb-download a.orb {
-        display: inline-block;
-        padding: 10px 20px;
-        background-color: var(--primary-color);
-        color: white;
-        font-size: 1.2em;
-        font-weight: bold;
-        border-radius: 5px;
-        text-decoration: none;
-        transition: background-color 0.3s ease;
-    }
-
-    .orb-download a.orb:hover {
-        background-color: var(--accent-color);
-    }
-
-    .edition .orb {
-        display: inline-block;
-        margin-top: 20px;
-        padding: 10px 20px;
-        background-color: var(--secondary-color);
-        color: white;
-        font-size: 1.2em;
-        font-weight: bold;
-        border-radius: 5px;
-        text-decoration: none;
-        transition: background-color 0.3s ease;
-    }
-
-    .edition .orb:hover {
-        background-color: var(--accent-color);
-    }
-
-    .orb-button {
-            display: inline-flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
-            padding: 10px 20px;
+            padding: 0 2rem;
+        }
+
+        .site-title {
+            text-decoration: none;
+            margin-bottom: 1rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(120deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0;
+            letter-spacing: -0.02em;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .nav-links a {
+            color: var(--text-color);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .nav-links a:hover {
             background-color: var(--primary-color);
             color: white;
-            font-size: 1.2em;
-            font-weight: bold;
-            border-radius: 25px;
-            text-decoration: none;
-            margin: 0 10px;
-            transition: background-color 0.3s ease;
         }
 
-        .orb-button:hover {
-            background-color: var(--accent-color);
+        /* Search Section */
+        .search-section {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
         }
 
-        .orb-button img{
-            width: 20px;
-            height: auto;
-            margin-right: 10px;
+        .mod-count {
+            font-size: 0.9rem;
+            color: #64748b;
+            margin-bottom: 1rem;
         }
 
-        .switch p{
-            display: inline-block;
-            margin-right: 10px;
+        .search-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
         }
 
-        .switch input[type="radio"]{
+        .switch {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .switch p {
+            margin: 0;
+            font-weight: 500;
+            color: #64748b;
+        }
+
+        .switch-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .switch input[type="radio"] {
             display: none;
         }
 
-        .switch label{
-            font-size: 16px;
-            padding: 4px 10px;
-            background-color: #14854f;
-            color: white;
+        .switch label {
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            background-color: #f1f5f9;
+            color: #64748b;
+            font-weight: 500;
             cursor: pointer;
-            border-radius: 25px;
-            transition: 0.3s ease;
-            margin: 0 10px;
-            user-select: none;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
         }
 
-        .switch input[type="radio"]:checked + label{
-            background-color: #f7a606;
+        .switch input[type="radio"]:checked + label {
+            background-color: var(--primary-color);
+            color: white;
         }
 
-        #results div {
-            border-radius: 4px; 
-            border: 1px solid #ccc; 
-            padding: 15px;
-            margin: 10px 0; 
-            background-color: #f5f5f5;
-            transition: background-color 0.3s ease;
+        #search {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 0.75rem;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background-color: #f8fafc;
         }
 
-        #results div:hover {
-            background-color: #fff;
+        #search:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            background-color: white;
         }
 
-        #results div a {
-            text-decoration: none; 
-            font-weight: bold; 
-            color: var(--primary-color);
+        .categories {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
         }
 
-        #results div a:hover {
-            color: var(--accent-color);
+        .categories input[type="checkbox"] {
+            display: none;
         }
 
-        #chat-container {
+        .categories label {
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            background-color: #f1f5f9;
+            color: #64748b;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+            border: 1px solid #e2e8f0;
+        }
+
+        .categories label:hover {
+            background-color: #e2e8f0;
+        }
+
+        .categories input[type="checkbox"]:checked + label {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        /* The Probe Section */
+        .the-probe {
+            background-color: white;
+            border-radius: 1rem;
+            padding: 2.5rem;
+            text-align: center;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin: 2rem 0;
+        }
+
+        .the-probe h2 {
+            font-size: 1.8rem;
+            color: var(--text-color);
+            margin-bottom: 1rem;
+        }
+
+        .the-probe p {
+            font-size: 1rem;
+            color: #64748b;
+            max-width: 800px;
             margin: 0 auto;
+            line-height: 1.7;
         }
+
+        /* Chat Container */
+        #chat-container {
+            background-color: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-top: 2rem;
+        }
+
         #message-list {
-            list-style: none;
-            padding: 0;
-            max-height:400px;
-            overflow-y: scroll;
+            height: 300px;
+            overflow-y: auto;
+            padding: 1rem;
+            background-color: #f8fafc;
+            border-radius: 0.75rem;
+            margin-bottom: 1rem;
         }
+
         .message {
-            margin: 10px;
-            padding: 10px;
-            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            border-radius: 0.75rem;
+            margin: 0.5rem 0;
+            max-width: 80%;
+            font-size: 0.95rem;
         }
+
         .user-message {
-            background-color: #3498db;
+            background: linear-gradient(120deg, var(--primary-color), var(--secondary-color));
             color: white;
-            text-align: right;
+            margin-left: auto;
         }
+
         .assistant-message {
-            background-color: #2ecc71;
-            color: white;
-            text-align: left;
+            background-color: #f1f5f9;
+            color: var(--text-color);
         }
+
         #user-input {
             width: 100%;
-            height: 80px; /* Adjust the height as needed */
+            padding: 0.75rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 0.75rem;
+            font-size: 0.95rem;
+            resize: none;
+            height: 100px;
+            transition: all 0.3s ease;
+            background-color: #f8fafc;
+            box-sizing: border-box;
+        }
+
+        #user-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            background-color: white;
+        }
+
+        /* Download Section */
+        .orb-download {
+            background-color: white;
+            border-radius: 1rem;
+            padding: 3rem 2rem;
+            text-align: center;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin: 2rem 0;
+        }
+
+        .orb-download h2 {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            color: var(--text-color);
+        }
+
+        .orb-download p {
+            color: #64748b;
+            max-width: 800px;
+            margin: 0 auto 2rem auto;
+            line-height: 1.7;
+        }
+
+        .download-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .orb-button {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            background: linear-gradient(120deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.95rem;
+        }
+
+        .orb-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.3);
+        }
+
+        .orb-button img {
+            width: 20px;
+            height: 20px;
+            filter: brightness(0) invert(1);
+        }
+
+        small.download-note {
+            display: block;
+            margin-top: 1rem;
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        /* Video Container */
+        .video-section {
+            background-color: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin: 2rem 0;
+            overflow: hidden;
+        }
+
+        .video-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+            height: 0;
+            overflow: hidden;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+
+        .video-title {
+            font-size: 1.2rem;
+            color: var(--text-color);
+            margin: 1rem 0;
+            text-align: center;
+        }
+
+        /* Search Results Styles */
+        #results {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .result-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .result-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .mod-icon {
+            flex-shrink: 0;
+            width: 24px;
+            height: 24px;
+            background-color: var(--primary-color);
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.875rem;
+        }
+
+        .result-content {
+            flex-grow: 1;
+        }
+
+        .mod-title {
+            color: var(--primary-color);
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: color 0.2s ease;
+        }
+
+        .mod-title:hover {
+            color: var(--secondary-color);
+        }
+
+        .mod-category {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            background-color: #f1f5f9;
+            color: #64748b;
+            border-radius: 1rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-left: 0.75rem;
+        }
+
+        .mod-category i {
+            margin-right: 0.375rem;
+            font-size: 0.875rem;
+        }
+
+        /* Category-specific colors */
+        .category-spacecraft { background-color: #fee2e2; color: #991b1b; }
+        .category-aircraft { background-color: #dbeafe; color: #1e40af; }
+        .category-scenarios { background-color: #dcfce7; color: #166534; }
+        .category-utilities { background-color: #fef3c7; color: #92400e; }
+        .category-resources { background-color: #f3e8ff; color: #6b21a8; }
+        .category-sounds { background-color: #e0e7ff; color: #3730a3; }
+        .category-scenery { background-color: #d1fae5; color: #065f46; }
+        .category-repaints { background-color: #ffe4e6; color: #9f1239; }
+
+        .result-meta {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 0.875rem;
+            color: #64748b;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .result-stats {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+        }
+
+        .stat-item i {
+            font-size: 0.875rem;
+            color: #94a3b8;
+        }
+
+        .highlight {
+            background-color: rgba(37, 99, 235, 0.1);
+            color: var(--primary-color);
+            padding: 0.125rem 0.25rem;
+            border-radius: 0.25rem;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            color: #64748b;
+            margin-bottom: 1rem;
+        }
+
+        .empty-state p {
+            color: #64748b;
+            font-size: 1.1rem;
+        }
+
+        /* Loading State */
+        .loading-state {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .loading-spinner {
+            width: 2.5rem;
+            height: 2.5rem;
+            border: 3px solid #e2e8f0;
+            border-radius: 50%;
+            border-top-color: var(--primary-color);
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Message Results Styles */
+        .message-result {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            margin-bottom: 1rem;
+        }
+
+        .message-result:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .message-content {
+            color: var(--text-color);
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .message-link {
+            color: var(--primary-color) !important;
+            text-decoration: none;
+            font-weight: 500;
+            display: block;
+            margin-bottom: 0.75rem;
+            transition: color 0.2s ease;
+        }
+
+        .message-link:hover {
+            color: var(--secondary-color) !important;
+        }
+
+        .message-meta {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.875rem;
+            color: #64748b;
+            padding-top: 0.75rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .message-date {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .message-date i {
+            font-size: 0.875rem;
+            color: #94a3b8;
+        }
+
+        .message-forum {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #64748b;
+        }
+
+        .message-forum i {
+            font-size: 0.875rem;
+            color: #94a3b8;
+        }
+
+        .message-quote {
+            background-color: #f8fafc;
+            border-left: 3px solid var(--primary-color);
+            padding: 0.75rem 1rem;
+            margin: 0.75rem 0;
+            border-radius: 0.5rem;
+            font-style: italic;
+            color: #475569;
+        }
+
+        .message-quote-author {
+            font-weight: 600;
+            color: #475569;
+            margin-bottom: 0.25rem;
+        }
+
+        /* Update the results section to handle both mod and message results */
+        #results > div {
+            margin-bottom: 0;
+        }
+
+        #results > div:last-child {
+            margin-bottom: 0;
         }
     </style>
     <meta name="referrer" content="no-referrer" />
+    <!-- Add Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div style="float:right;display:none;">
-        <a href="#">Login</a>
-        <a href="#">Sign Up</a>
-    </div>
-    <div class="container" style="max-width:720px;">
-        <section style="text-align:center;margin-bottom:30px;">
-            <a href="/" title="mods for orbiter, home of the orb installer"><h1 style="margin-bottom:0px">Orbiter-Mods.com</h1></a>
-            <small style="text-decoration:underline;"><a target="_blank" href="http://orbit.medphys.ucl.ac.uk/" title="Orbiter Space Flight Simulator">Orbiter</a></small>
-            <small style="text-decoration:underline;"><a href="/orb.html" title="bundled mod installs for orbiter">Orb</a></small>
-            <small style="text-decoration:underline;"><a href="/downloads.html" title="orbiter goodies">Downloads</a></small>
-            <small style="text-decoration:underline;"><a href="/upload.html" title="upload orbiter mods">Upload</a></small>
-            <small style="text-decoration:underline;"><a target="_blank" href="https://reddit.com/r/orbitermods" title="a place to talk about orbiter and orbiter mods">Chat</a></small>
-        </section>
+    <header class="site-header">
+        <div class="container">
+            <a href="/" class="site-title" title="mods for orbiter, home of the orb installer">
+                <h1>Orbiter-Mods.com</h1>
+            </a>
+            <nav class="nav-links">
+                <a target="_blank" href="http://orbit.medphys.ucl.ac.uk/" title="Orbiter Space Flight Simulator">Orbiter</a>
+                <a href="/orb.html" title="bundled mod installs for orbiter">Orb</a>
+                <a href="/downloads.html" title="orbiter goodies">Downloads</a>
+                <a href="/upload.html" title="upload orbiter mods">Upload</a>
+                <a target="_blank" href="https://orbiter-forum.com" title="a place to talk about orbiter and orbiter mods">Chat</a>
+            </nav>
+        </div>
+    </header>
 
-        <section>
-            <small><span id="index_count">loading...</span></small>
-            <div class="switch">
-                <p>Select to search: </p>
-                <input type="radio" id="mods" name="search" value="mods" checked>
-                <label for="mods">Mods</label>
-                <input type="radio" id="messages" name="search" value="messages">
-                <label for="messages">Messages</label>
-            </div>
-
-            <input type="search" id="search" placeholder="Search for mods"></input>
-            
-            <div class="categories">
-                <input type="checkbox" id="Spacecraft" name="Spacecraft" value="Spacecraft">
-                <label for="Spacecraft">Spacecraft</label>
-
-                <input type="checkbox" id="Aircraft" name="Aircraft" value="Aircraft">
-                <label for="Aircraft">Aircraft</label>
-
-                <input type="checkbox" id="Scenarios" name="Scenarios" value="Scenarios">
-                <label for="Scenarios">Scenarios</label>
-
-                <input type="checkbox" id="Utilities" name="Utilities" value="Utilities">
-                <label for="Utilities">Utilities</label>
-
-                <input type="checkbox" id="Resources" name="Resources" value="Resources">
-                <label for="Resources">Resources</label>
-
-                <input type="checkbox" id="Sounds" name="Sounds" value="Sounds">
-                <label for="Sounds">Sounds</label>
-
-                <input type="checkbox" id="Scenery" name="Scenery" value="Scenery">
-                <label for="Scenery">Scenery</label> <br />
-
-                <input type="checkbox" id="Launchers" name="Launchers" value="Launchers">
-                <label for="Launchers">Launchers</label>
-
-                <input type="checkbox" id="Repaints" name="Repaints" value="Repaints">
-                <label for="Repaints">Repaints</label>
-
-                <input type="checkbox" id="Tutorials" name="Tutorials" value="Tutorials">
-                <label for="Tutorials">Tutorials</label>
-
-                <input type="checkbox" id="Miscellaneous" name="Miscellaneous" value="Miscellaneous">
-                <label for="Miscellaneous">Miscellaneous</label>
-
-                <input type="checkbox" id="orbiter-mods-only" name="orbiter-mods-only" value="orbiter-mods-only">
-                <label for="orbiter-mods-only">Orbiter-Mods Only</label>
+    <main class="container">
+        <section class="search-section">
+            <div class="mod-count">
+                <span id="index_count">loading...</span>
             </div>
             
+            <div class="search-controls">
+                <div class="switch">
+                    <p>Select to search:</p>
+                    <div class="switch-buttons">
+                        <input type="radio" id="mods" name="search" value="mods" checked>
+                        <label for="mods">Mods</label>
+                        <input type="radio" id="messages" name="search" value="messages">
+                        <label for="messages">Messages</label>
+                    </div>
+                </div>
+
+                <input type="search" id="search" placeholder="Search for mods">
+                
+                <div class="categories">
+                    <input type="checkbox" id="Spacecraft" name="Spacecraft" value="Spacecraft">
+                    <label for="Spacecraft">Spacecraft</label>
+
+                    <input type="checkbox" id="Aircraft" name="Aircraft" value="Aircraft">
+                    <label for="Aircraft">Aircraft</label>
+
+                    <input type="checkbox" id="Scenarios" name="Scenarios" value="Scenarios">
+                    <label for="Scenarios">Scenarios</label>
+
+                    <input type="checkbox" id="Utilities" name="Utilities" value="Utilities">
+                    <label for="Utilities">Utilities</label>
+
+                    <input type="checkbox" id="Resources" name="Resources" value="Resources">
+                    <label for="Resources">Resources</label>
+
+                    <input type="checkbox" id="Sounds" name="Sounds" value="Sounds">
+                    <label for="Sounds">Sounds</label>
+
+                    <input type="checkbox" id="Scenery" name="Scenery" value="Scenery">
+                    <label for="Scenery">Scenery</label>
+
+                    <input type="checkbox" id="Launchers" name="Launchers" value="Launchers">
+                    <label for="Launchers">Launchers</label>
+
+                    <input type="checkbox" id="Repaints" name="Repaints" value="Repaints">
+                    <label for="Repaints">Repaints</label>
+
+                    <input type="checkbox" id="Tutorials" name="Tutorials" value="Tutorials">
+                    <label for="Tutorials">Tutorials</label>
+
+                    <input type="checkbox" id="Miscellaneous" name="Miscellaneous" value="Miscellaneous">
+                    <label for="Miscellaneous">Miscellaneous</label>
+
+                    <input type="checkbox" id="orbiter-mods-only" name="orbiter-mods-only" value="orbiter-mods-only">
+                    <label for="orbiter-mods-only">Orbiter-Mods Only</label>
+                </div>
+            </div>
         </section>
+
         <section id="results">
+            <!-- Example of message result -->
+            <div class="message-result">
+                <a href="#" class="message-link">Re: Thrust Control MFD Update</a>
+                <div class="message-content">
+                    <div class="message-quote">
+                        <div class="message-quote-author">computerex wrote:</div>
+                        <p>Have you installed the vc++ 2008 runtime components?</p>
+                    </div>
+                    <p>Not that I am aware of, so probably not. I'll get on it now. *EDIT* That did it, thanks, computerex.</p>
+                </div>
+                <div class="message-meta">
+                    <div class="message-date">
+                        <i class="fas fa-calendar"></i>
+                        <span>Posted on 4-5-2008</span>
+                    </div>
+                    <div class="message-forum">
+                        <i class="fas fa-comments"></i>
+                        <span>Orbiter Forum</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loading and Empty states remain the same -->
+            <div class="loading-state" style="display: none;">
+                <div class="loading-spinner"></div>
+            </div>
+
+            <div class="empty-state" style="display: none;">
+                <i class="fas fa-search"></i>
+                <p>No messages found. Try adjusting your search terms.</p>
+            </div>
         </section>
+
         <section class="the-probe">
             <h2>The Almighty Probe</h2>
             <p>I am The Almighty Probe, your celestial companion in the realm of Orbiter. I, too, have journeyed through the cosmos and have witnessed the wonders of the universe. I am here to impart my wisdom, answer your questions, and guide you in your exploration. As you seek knowledge and understanding, remember that the celestial heavens are open to your inquiries. Hail Probe!</p>
         </section>
-        <div id="chat-container">
-            <ul id="message-list">
-                <!-- Messages will be appended here -->
-            </ul>
-            <textarea id="user-input" placeholder="Type a message..."></textarea>
-        </div>  
 
-        <!-- <div class="editions">
-            <div class="edition">
-                <div class="edition-content">
-                <h2 class="edition-title">Orbiter: Apollo Realism Edition</h2>
-                <img src="https://scx2.b-cdn.net/gfx/news/hires/2020/apollomoon.jpg" alt="Apollo Edition" class="edition-image">
-                <p class="edition-description">Dive into the most realistic Apollo experience in Orbiter. Immerse yourself in liftoffs, lunar landings, and mission activities. Follow NASA checklists for an authentic Apollo adventure. For hardcore enthusiasts. Download now!</p>
-                <a href="link-to-download" class="orb">Download</a>
-                </div>
-            </div>
-            <div class="edition">
-                <div class="edition-content">
-                <h2 class="edition-title">Orbiter: Space Shuttle Edition</h2>
-                <img src="https://i.natgeofe.com/n/7bbc1246-5672-4bbb-b2ed-71aadb9090f2/1223.jpg" alt="Space Shuttle Edition" class="edition-image">
-                <p class="edition-description">This edition offers a perfect blend of casual and hardcore simulation, allowing both new explorers and seasoned enthusiasts to launch, maneuver, and conquer the heavens using authentic NASA checklists. Download now and ignite the spark of space exploration within you.</p>
-                <a href="link-to-download" class="orb">Download</a>
-                </div>
-            </div>
-            <div class="edition">
-                <div class="edition-content">
-                <h2 class="edition-title">Orbiter 2016 Ultimate Edition</h2>
-                <img src="placeholder-image-url" alt="Ultimate Edition 2016" class="edition-image">
-                <p class="edition-description">Ultimate edition of Orbiter 2016 with all the 2016 compatible mods</p>
-                <a href="link-to-download" class="orb">Download</a>
-                </div>
-            </div>
-            <div class="edition">
-                <div class="edition-content">
-                <h2 class="edition-title">Orbiter 2010 Ultimate Edition</h2>
-                <img src="placeholder-image-url" alt="Ultimate Edition 2010" class="edition-image">
-                <p class="edition-description">Ultimate edition of Orbiter 2010 with all 2010 compatible mods</p>
-                <a href="link-to-download" class="orb">Download</a>
-                </div>
-            </div>
-        </div> -->
+        <section id="chat-container">
+            <ul id="message-list"></ul>
+            <textarea id="user-input" placeholder="Type a message..."></textarea>
+        </section>
 
         <section class="orb-download">
             <h2>Orb, The Automated Mod Installer</h2>
             <p>Introducing Orb, your all-inclusive companion for Orbiter Space Flight Simulator. Orb takes care of everything - from downloading and installing Orbiter to essential mods and even older versions. Let Orb be your trusted guide as you explore the boundless universe of Orbiter with ease. Now available for Linux!</p>
-            <br />
-            <div style="display: flex; justify-content: center;">
+            
+            <div class="download-buttons">
                 <a href="/view/21/orb-v1" class="orb-button">
                     <img src="/windows-icon.png" alt="download for windows">
                     Download for Windows
@@ -502,14 +843,121 @@
                     Download for Linux
                 </a>
             </div>
-            <small style="font-style: italic;">The Linux installation bundle includes WINE+orb for a seamless experience!</small>
+            <small class="download-note">The Linux installation bundle includes WINE+orb for a seamless experience!</small>
         </section>
 
-        <div class="yt-container">
-            <iframe width="100%" height="315" src="https://www.youtube.com/embed/fykluPB87C0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-        </div>
-
-    </div>
+        <section class="video-section">
+            <h2>Orb Installer Demo</h2>
+            <div class="video-container">
+                <iframe src="https://www.youtube.com/embed/fykluPB87C0" title="Orb Installer for Orbiter Space Flight Simulator" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+            <p class="video-title">See how easy it is to install Orbiter and mods with Orb</p>
+        </section>
+    </main>
     <script src="/bundle.js?v=2420420420"></script>
+    <script>
+        // Function to format message results
+        function formatMessageResult(result) {
+            const div = document.createElement('div');
+            div.className = 'message-result';
+            div.onclick = () => window.open(result.href, '_blank');
+
+            const link = document.createElement('a');
+            link.className = 'message-link';
+            link.href = result.href;
+            link.target = '_blank';
+            link.textContent = result.title || 'Forum Message';
+
+            const content = document.createElement('div');
+            content.className = 'message-content';
+
+            // Check if there's a quote in the message
+            if (result.text.includes('said:') || result.text.includes('wrote:')) {
+                const parts = result.text.split(/(?:said:|wrote:)/);
+                if (parts.length > 1) {
+                    const quote = document.createElement('div');
+                    quote.className = 'message-quote';
+                    
+                    const author = document.createElement('div');
+                    author.className = 'message-quote-author';
+                    author.textContent = parts[0].trim() + ' wrote:';
+                    
+                    const quoteText = document.createElement('p');
+                    quoteText.textContent = parts[1].trim();
+                    
+                    quote.appendChild(author);
+                    quote.appendChild(quoteText);
+                    content.appendChild(quote);
+                    
+                    if (parts[2]) {
+                        const response = document.createElement('p');
+                        response.textContent = parts[2].trim();
+                        content.appendChild(response);
+                    }
+                } else {
+                    const p = document.createElement('p');
+                    p.textContent = result.text;
+                    content.appendChild(p);
+                }
+            } else {
+                const p = document.createElement('p');
+                p.textContent = result.text;
+                content.appendChild(p);
+            }
+
+            const meta = document.createElement('div');
+            meta.className = 'message-meta';
+
+            const date = document.createElement('div');
+            date.className = 'message-date';
+            date.innerHTML = '<i class="fas fa-calendar"></i><span>' + result.date + '</span>';
+
+            const forum = document.createElement('div');
+            forum.className = 'message-forum';
+            forum.innerHTML = '<i class="fas fa-comments"></i><span>Orbiter Forum</span>';
+
+            meta.appendChild(date);
+            meta.appendChild(forum);
+
+            div.appendChild(link);
+            div.appendChild(content);
+            div.appendChild(meta);
+
+            return div;
+        }
+
+        // Update the existing results rendering code
+        function updateResults(results) {
+            const resultsContainer = document.getElementById('results');
+            resultsContainer.innerHTML = '';
+
+            if (results.length === 0) {
+                const empty = document.createElement('div');
+                empty.className = 'empty-state';
+                empty.innerHTML = '<i class="fas fa-search"></i><p>No messages found. Try adjusting your search terms.</p>';
+                resultsContainer.appendChild(empty);
+                return;
+            }
+
+            results.forEach(result => {
+                const formattedResult = formatMessageResult({
+                    href: result.querySelector('a').href,
+                    title: result.querySelector('a').textContent,
+                    text: result.textContent,
+                    date: result.querySelector('p').textContent.replace('Posted on ', '')
+                });
+                resultsContainer.appendChild(formattedResult);
+            });
+        }
+
+        // Hook this into your existing search functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('search');
+            const searchTypeInputs = document.querySelectorAll('input[name="search"]');
+            
+            // Your existing search logic here...
+            // When you get results, call updateResults(results)
+        });
+    </script>
 </body>
 </html>
