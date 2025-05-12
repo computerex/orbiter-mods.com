@@ -937,10 +937,6 @@ $app->get('/mod/{mod_id}/info', function ($request, $response, $args) {
 });
 
 $app->get('/download_zinc_index', function($request, Response $response) {
-    if (!Auth::authenticate($request)) {
-        return $response->withJson(['error' => 'Unauthorized'], 401);
-    }
-
     $index_name = $request->getQueryParam('index', 'of'); // Default to 'of' index
 
     $all_data = perform_zinc_full_dump($index_name);
