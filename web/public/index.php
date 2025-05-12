@@ -74,6 +74,57 @@ function perform_zinc_search($index, $terms) {
     }
 }
 
+function perform_zinc_full_dump($index) {
+    $url = "http://zinclabs:4080/api/$index/_search";
+    $headers = array(
+        'Content-Type: application/json'
+    );
+    $all_hits = [];
+    $from = 0;
+    $batch_size = 1000; // Number of documents to fetch per request
+
+    do {
+        $request_body = array(
+            "search_type" => "matchall",
+            "query" => new stdClass(), // Empty query object for matchall
+            "from" => $from,
+            "max_results" => $batch_size,
+            "_source" => [] // Return all fields
+        );
+
+        $curl = curl_init($url);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_POST, true);
+        curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($request_body));
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($curl, CURLOPT_USERPWD, 'foo:bar'); // Basic authentication
+
+        $response_body = curl_exec($curl);
+        $http_status = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        curl_close($curl);
+
+        if ($http_status == 200) {
+            $data = json_decode($response_body, true);
+            if (isset($data['hits']['hits']) && count($data['hits']['hits']) > 0) {
+                foreach ($data['hits']['hits'] as $hit) {
+                    $all_hits[] = $hit['_source']; // Store only the _source field
+                }
+                $from += count($data['hits']['hits']);
+                if (count($data['hits']['hits']) < $batch_size) {
+                    break; // Last page
+                }
+            } else {
+                break; // No more hits or error in response structure
+            }
+        } else {
+            // Optionally log error or handle it: "Request failed with status code: $http_status\n";
+            return null; // Indicate failure
+        }
+    } while (true);
+
+    return $all_hits;
+}
+
 $app->get('/ip', function($request, Response $response) {
     $ip = get_client_ip();
     $response->getBody()->write($ip);
@@ -884,4 +935,28 @@ $app->get('/mod/{mod_id}/info', function ($request, $response, $args) {
     // return $result
     return $response->withJson($result, 200);
 });
+
+$app->get('/download_zinc_index', function($request, Response $response) {
+    if (!Auth::authenticate($request)) {
+        return $response->withJson(['error' => 'Unauthorized'], 401);
+    }
+
+    $index_name = $request->getQueryParam('index', 'of'); // Default to 'of' index
+
+    $all_data = perform_zinc_full_dump($index_name);
+
+    if ($all_data === null) {
+        return $response->withJson(['error' => 'Failed to retrieve data from Zinc index'], 500);
+    }
+
+    $filename = $index_name . "_export_" . date("Y-m-d_H-i-s") . ".json";
+
+    $response = $response->withHeader('Content-Type', 'application/json')
+                         ->withHeader('Content-Disposition', 'attachment; filename="' . $filename . '"')
+                         ->withBody(new \Slim\Http\Stream(fopen('php://temp', 'r+')));
+    $response->getBody()->write(json_encode($all_data, JSON_PRETTY_PRINT));
+    
+    return $response;
+});
+
 $app->run();
