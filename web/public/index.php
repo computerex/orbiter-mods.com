@@ -76,91 +76,62 @@ function perform_zinc_search($index, $terms) {
 
 function perform_zinc_full_dump($index) {
     $start_date = "1992-01-01T00:00:00Z";
-    $end_date = (date('Y') + 1) . "-01-01T00:00:00Z";
-    $size = 500;
-    $scroll_duration = "1m";
+    $end_date = "2035-01-01T00:00:00Z";
+    $page_size = 500;
+    $all_hits = [];
+    $from = 0;
 
-    $initial_url = "http://zinclabs:4080/$index/_search?scroll=$scroll_duration&size=$size";
-    $headers = ['Content-Type: application/json'];
-
-    $request_body = [
-        "query" => [
-            "range" => [
-                "date" => [
-                    "gte" => $start_date,
-                    "lte" => $end_date
-                ]
-            ]
-        ],
-        "sort" => ["date" => "desc"]
+    $url = "http://zinclabs:4080/api/$index/_search";
+    $headers = [
+        "Content-Type: application/json"
     ];
 
-    $curl = curl_init($initial_url);
-    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($curl, CURLOPT_POST, true);
-    curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($request_body));
-    curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-    curl_setopt($curl, CURLOPT_USERPWD, 'foo:bar');
-
-    $response = curl_exec($curl);
-    $http_status = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-    curl_close($curl);
-
-    if ($http_status != 200) {
-        return null;
-    }
-
-    $data = json_decode($response, true);
-    $scroll_id = $data['_scroll_id'] ?? null;
-    $all_hits = $data['hits']['hits'] ?? [];
-
-    if (!$scroll_id) {
-        return [
-            "hits" => [
-                "total" => ["value" => count($all_hits)],
-                "hits" => $all_hits
-            ]
-        ];
-    }
-    
-    $scroll_url = "http://zinclabs:4080/$index/_search/scroll";
-
     while (true) {
-        $scroll_request_body = [
-            "scroll" => $scroll_duration,
-            "scroll_id" => $scroll_id
+        $request_body = [
+            "search_type" => "querystring",
+            "query" => [
+                "term" => "date:[$start_date TO $end_date]"
+            ],
+            "sort_fields" => ["-date"],
+            "from" => $from,
+            "max_results" => $page_size,
+            "_source" => []
         ];
 
-        $curl = curl_init($scroll_url);
+        $curl = curl_init($url);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($curl, CURLOPT_POST, true);
-        curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($scroll_request_body));
+        curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($request_body));
         curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($curl, CURLOPT_USERPWD, 'foo:bar');
+        curl_setopt($curl, CURLOPT_USERPWD, "foo:bar");
 
         $response = curl_exec($curl);
         $http_status = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         curl_close($curl);
 
         if ($http_status != 200) {
-            break; 
+            if ($from == 0) { // if first request fails
+                return null;
+            }
+            break;
         }
 
         $data = json_decode($response, true);
-        $hits = $data['hits']['hits'] ?? [];
-        
+        $hits = $data["hits"]["hits"] ?? [];
+
         if (empty($hits)) {
             break;
         }
-        
-        $all_hits = array_merge($all_hits, $hits);
-        $scroll_id = $data['_scroll_id'] ?? null;
 
-        if (!$scroll_id) {
+        $all_hits = array_merge($all_hits, $hits);
+        
+        if (count($hits) < $page_size) {
             break;
         }
+
+        $from += count($hits);
     }
-    
+
     return [
         "hits" => [
             "total" => ["value" => count($all_hits)],
