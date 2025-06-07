@@ -81,11 +81,17 @@ function perform_zinc_full_dump($index) {
     );
     $all_hits = [];
     $from = 0;
-    $batch_size = 500000;
+    $batch_size = 1000;
 
     do {
         $request_body = array(
-            "search_type" => "matchall",
+            "search_type" => "match",
+            "query" => [
+                "term" => "",
+                "field" => "_all",
+                "start_time" => "2000-01-01T00:00:00.000Z",
+                "end_time" => "2100-01-01T00:00:00.000Z",
+            ],
             "sort_fields" => ["-@timestamp", "_id"],
             "from" => $from,
             "max_results" => $batch_size,
