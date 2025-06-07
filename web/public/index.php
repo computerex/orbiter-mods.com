@@ -81,7 +81,7 @@ function perform_zinc_full_dump($index) {
     );
     $all_hits = [];
     $from = 0;
-    $batch_size = 1000;
+    $batch_size = 500000;
 
     do {
         $request_body = array(
