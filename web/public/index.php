@@ -85,8 +85,12 @@ function perform_zinc_full_dump($index) {
 
     do {
         $request_body = array(
-            "search_type" => "matchall",
-            "query" => new stdClass(), // Empty query object for matchall
+            "query" => [
+                "match_all" => new stdClass()
+            ],
+            "sort" => [
+                "_id" => "asc"
+            ],
             "from" => $from,
             "max_results" => $batch_size,
             "_source" => [] // Return all fields
