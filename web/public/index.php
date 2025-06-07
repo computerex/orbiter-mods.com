@@ -89,9 +89,11 @@ function perform_zinc_full_dump($index) {
 
     while (true) {
         $request_body = [
-            "search_type" => "querystring",
+            "search_type" => "daterange",
             "query" => [
-                "query" => "date:[$start_date TO $end_date]"
+                "start_time" => $start_date,
+                "end_time" => $end_date,
+                "field" => "date"
             ],
             "from" => $from,
             "max_results" => $size,
