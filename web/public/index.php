@@ -86,8 +86,7 @@ function perform_zinc_full_dump($index) {
     do {
         $request_body = array(
             "search_type" => "matchall",
-            "query" => new stdClass(),
-            "sort_fields" => ["-date", "_id"],
+            "sort_fields" => ["-@timestamp", "_id"],
             "from" => $from,
             "max_results" => $batch_size,
             "_source" => []
