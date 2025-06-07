@@ -80,7 +80,7 @@ function perform_zinc_full_dump($index) {
     $size = 500;
     $scroll_duration = "1m";
 
-    $initial_url = "http://zinclabs:4080/es/$index/_search?scroll=$scroll_duration&size=$size";
+    $initial_url = "http://zinclabs:4080/$index/_search?scroll=$scroll_duration&size=$size";
     $headers = ['Content-Type: application/json'];
 
     $request_body = [
@@ -123,7 +123,7 @@ function perform_zinc_full_dump($index) {
         ];
     }
     
-    $scroll_url = "http://zinclabs:4080/es/_search/scroll";
+    $scroll_url = "http://zinclabs:4080/$index/_search/scroll";
 
     while (true) {
         $scroll_request_body = [
