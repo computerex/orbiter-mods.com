@@ -81,19 +81,16 @@ function perform_zinc_full_dump($index) {
     );
     $all_hits = [];
     $from = 0;
-    $batch_size = 1000; // Number of documents to fetch per request
+    $batch_size = 1000;
 
     do {
         $request_body = array(
-            "query" => [
-                "match_all" => new stdClass()
-            ],
-            "sort" => [
-                "_id" => "asc"
-            ],
+            "search_type" => "matchall",
+            "query" => new stdClass(),
+            "sort_fields" => ["-date", "_id"],
             "from" => $from,
             "max_results" => $batch_size,
-            "_source" => [] // Return all fields
+            "_source" => []
         );
 
         $curl = curl_init($url);
@@ -101,7 +98,7 @@ function perform_zinc_full_dump($index) {
         curl_setopt($curl, CURLOPT_POST, true);
         curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($request_body));
         curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($curl, CURLOPT_USERPWD, 'foo:bar'); // Basic authentication
+        curl_setopt($curl, CURLOPT_USERPWD, 'foo:bar');
 
         $response_body = curl_exec($curl);
         $http_status = curl_getinfo($curl, CURLINFO_HTTP_CODE);
@@ -110,21 +107,21 @@ function perform_zinc_full_dump($index) {
         if ($http_status == 200) {
             $data = json_decode($response_body, true);
             $hits = $data['hits']['hits'] ?? [];
-            if (!empty($hits)) {
+            if (count($hits) > 0) {
                 foreach ($hits as $hit) {
-                    $all_hits[] = $hit['_source']; // Store only the _source field
+                    $all_hits[] = $hit['_source'];
                 }
+                
                 $from += count($hits);
 
                 if (count($hits) < $batch_size) {
-                    break; // Last page
+                    break;
                 }
             } else {
-                break; // No more hits or error in response structure
+                break;
             }
         } else {
-            // Optionally log error or handle it: "Request failed with status code: $http_status\n";
-            return null; // Indicate failure
+            return null;
         }
     } while (true);
 
