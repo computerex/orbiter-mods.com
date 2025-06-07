@@ -79,24 +79,25 @@ function perform_zinc_full_dump($index) {
     $headers = array(
         'Content-Type: application/json'
     );
+
     $all_hits = [];
     $from = 0;
-    $batch_size = 1000;
+    $size = 500;
 
-    do {
-        $request_body = array(
-            "search_type" => "match",
+    $start_date = "1992-01-01T00:00:00Z";
+    $end_date = (date('Y') + 1) . "-01-01T00:00:00Z";
+
+    while (true) {
+        $request_body = [
+            "search_type" => "querystring",
             "query" => [
-                "term" => "",
-                "field" => "_all",
-                "start_time" => "2000-01-01T00:00:00.000Z",
-                "end_time" => "2100-01-01T00:00:00.000Z",
+                "query" => "date:[$start_date TO $end_date]"
             ],
-            "sort_fields" => ["-@timestamp", "_id"],
             "from" => $from,
-            "max_results" => $batch_size,
+            "max_results" => $size,
+            "sort_fields" => ["-date"],
             "_source" => []
-        );
+        ];
 
         $curl = curl_init($url);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
@@ -105,32 +106,35 @@ function perform_zinc_full_dump($index) {
         curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
         curl_setopt($curl, CURLOPT_USERPWD, 'foo:bar');
 
-        $response_body = curl_exec($curl);
+        $response = curl_exec($curl);
         $http_status = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         curl_close($curl);
 
-        if ($http_status == 200) {
-            $data = json_decode($response_body, true);
-            $hits = $data['hits']['hits'] ?? [];
-            if (count($hits) > 0) {
-                foreach ($hits as $hit) {
-                    $all_hits[] = $hit['_source'];
-                }
-                
-                $from += count($hits);
-
-                if (count($hits) < $batch_size) {
-                    break;
-                }
-            } else {
-                break;
-            }
-        } else {
-            return null;
+        if ($http_status != 200) {
+            return null; // Error
         }
-    } while (true);
 
-    return $all_hits;
+        $data = json_decode($response, true);
+        $hits = $data['hits']['hits'] ?? [];
+        
+        if (empty($hits)) {
+            break; // No more results
+        }
+        
+        $all_hits = array_merge($all_hits, $hits);
+        $from += count($hits);
+
+        if ($from >= $data['hits']['total']['value']) {
+            break;
+        }
+    }
+
+    return [
+        "hits" => [
+            "total" => ["value" => count($all_hits)],
+            "hits" => $all_hits
+        ]
+    ];
 }
 
 $app->get('/ip', function($request, Response $response) {
