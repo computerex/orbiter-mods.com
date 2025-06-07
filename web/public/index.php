@@ -81,26 +81,21 @@ function perform_zinc_full_dump($index) {
     $all_hits = [];
     $from = 0;
 
-    $url = "http://zinclabs:4080/$index/_search";
+    $url = "http://zinclabs:4080/api/$index/_search";
     $headers = [
         "Content-Type: application/json"
     ];
 
     while (true) {
         $request_body = [
+            "search_type" => "daterange",
             "query" => [
-                "range" => [
-                    "date" => [
-                        "gte" => $start_date,
-                        "lte" => $end_date,
-                    ],
-                ],
+                "start_time" => $start_date,
+                "end_time" => $end_date,
             ],
-            "sort" => [
-                "date" => "desc"
-            ],
+            "sort_fields" => ["-date"],
             "from" => $from,
-            "size" => $page_size,
+            "max_results" => $page_size,
             "_source" => []
         ];
 
@@ -116,6 +111,8 @@ function perform_zinc_full_dump($index) {
         curl_close($curl);
 
         if ($http_status != 200) {
+            // For debugging, let's see the response
+            // error_log("ZincSearch request failed with status $http_status: $response");
             if ($from == 0) { // if first request fails
                 return null;
             }
