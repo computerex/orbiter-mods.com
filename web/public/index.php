@@ -81,20 +81,26 @@ function perform_zinc_full_dump($index) {
     $all_hits = [];
     $from = 0;
 
-    $url = "http://zinclabs:4080/api/$index/_search";
+    $url = "http://zinclabs:4080/$index/_search";
     $headers = [
         "Content-Type: application/json"
     ];
 
     while (true) {
         $request_body = [
-            "search_type" => "querystring",
             "query" => [
-                "term" => "date:[$start_date TO $end_date]"
+                "range" => [
+                    "date" => [
+                        "gte" => $start_date,
+                        "lte" => $end_date,
+                    ],
+                ],
             ],
-            "sort_fields" => ["-date"],
+            "sort" => [
+                "date" => "desc"
+            ],
             "from" => $from,
-            "max_results" => $page_size,
+            "size" => $page_size,
             "_source" => []
         ];
 
