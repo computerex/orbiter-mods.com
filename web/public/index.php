@@ -75,69 +75,69 @@ function perform_zinc_search($index, $terms) {
 }
 
 function perform_zinc_full_dump($index) {
-    $start_year = 1992;
-    $end_year = 2035;
+    $current_date = new DateTime('1992-01-01');
+    $end_of_range = new DateTime('2036-01-01');
     $all_hits = [];
 
-    for ($year = $start_year; $year <= $end_year; $year++) {
-        for ($month = 1; $month <= 12; $month++) {
-            $from = 0;
-            $page_size = 500;
+    while ($current_date < $end_of_range) {
+        $from = 0;
+        $page_size = 500;
 
-            $start_date = sprintf("%d-%02d-01T00:00:00Z", $year, $month);
-            $next_month_date = new DateTime("$year-$month-01");
-            $next_month_date->modify('+1 month');
-            $end_date = $next_month_date->format('Y-m-d\TH:i:s\Z');
+        $start_date = $current_date->format('Y-m-d\T00:00:00\Z');
+        
+        $end_of_day = clone $current_date;
+        $end_of_day->modify('+1 day');
+        $end_date = $end_of_day->format('Y-m-d\T00:00:00\Z');
 
-            while (true) {
-                $url = "http://zinclabs:4080/api/$index/_search";
-                $headers = [
-                    "Content-Type: application/json"
-                ];
-                $request_body = [
-                    "search_type" => "daterange",
-                    "query" => [
-                        "start_time" => $start_date,
-                        "end_time" => $end_date,
-                    ],
-                    "sort_fields" => ["-date"],
-                    "from" => $from,
-                    "max_results" => $page_size,
-                    "_source" => []
-                ];
+        while (true) {
+            $url = "http://zinclabs:4080/api/$index/_search";
+            $headers = [
+                "Content-Type: application/json"
+            ];
+            $request_body = [
+                "search_type" => "daterange",
+                "query" => [
+                    "start_time" => $start_date,
+                    "end_time" => $end_date,
+                ],
+                "sort_fields" => ["-date"],
+                "from" => $from,
+                "max_results" => $page_size,
+                "_source" => []
+            ];
 
-                $curl = curl_init($url);
-                curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-                curl_setopt($curl, CURLOPT_POST, true);
-                curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($request_body));
-                curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-                curl_setopt($curl, CURLOPT_USERPWD, "foo:bar");
+            $curl = curl_init($url);
+            curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($curl, CURLOPT_POST, true);
+            curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($request_body));
+            curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+            curl_setopt($curl, CURLOPT_USERPWD, "foo:bar");
 
-                $response = curl_exec($curl);
-                $http_status = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-                curl_close($curl);
+            $response = curl_exec($curl);
+            $http_status = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+            curl_close($curl);
 
-                if ($http_status != 200) {
-                    // a month with no records may error, that's fine
-                    break;
-                }
-
-                $data = json_decode($response, true);
-                $hits = $data["hits"]["hits"] ?? [];
-
-                if (empty($hits)) {
-                    break;
-                }
-
-                $all_hits = array_merge($all_hits, $hits);
-
-                if (count($hits) < $page_size) {
-                    break;
-                }
-
-                $from += count($hits);
+            if ($http_status != 200) {
+                // a day with no records may error, that's fine
+                break;
             }
+
+            $data = json_decode($response, true);
+            $hits = $data["hits"]["hits"] ?? [];
+
+            if (empty($hits)) {
+                break;
+            }
+
+            $all_hits = array_merge($all_hits, $hits);
+
+            if (count($hits) < $page_size) {
+                break;
+            }
+
+            $from += count($hits);
         }
+        $current_date->modify('+1 day');
     }
 
     return [
