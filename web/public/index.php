@@ -80,8 +80,8 @@ function perform_zinc_full_dump($index) {
         'Content-Type: application/json'
     );
     $all_hits = [];
+    $from = 0;
     $batch_size = 1000; // Number of documents to fetch per request
-    $last_hit_sort = null;
 
     do {
         $request_body = array(
@@ -89,15 +89,12 @@ function perform_zinc_full_dump($index) {
                 "match_all" => new stdClass()
             ],
             "sort" => [
-                ["_id" => "asc"]
+                "_id" => "asc"
             ],
+            "from" => $from,
             "max_results" => $batch_size,
             "_source" => [] // Return all fields
         );
-
-        if ($last_hit_sort !== null) {
-            $request_body['search_after'] = $last_hit_sort;
-        }
 
         $curl = curl_init($url);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
@@ -117,8 +114,7 @@ function perform_zinc_full_dump($index) {
                 foreach ($hits as $hit) {
                     $all_hits[] = $hit['_source']; // Store only the _source field
                 }
-                // Get the sort value of the last document
-                $last_hit_sort = end($hits)['sort'];
+                $from += count($hits);
 
                 if (count($hits) < $batch_size) {
                     break; // Last page
