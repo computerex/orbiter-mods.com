@@ -106,8 +106,8 @@
             overflow-x: hidden;
         }
 
-        a { color: var(--accent) !important; text-decoration: none !important; transition: color 0.2s; }
-        a:hover { color: var(--accent-hover) !important; opacity: 1 !important; }
+        a { color: var(--accent); text-decoration: none !important; transition: color 0.2s; }
+        a:hover { opacity: 1 !important; }
 
         /* ── Navigation ── */
         .site-nav {
@@ -239,13 +239,13 @@
             flex-wrap: wrap;
         }
 
-        .btn-primary {
+        .btn-primary, .btn-primary:hover, .btn-primary:visited {
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
             padding: 1rem 2.5rem;
             background: var(--accent);
-            color: white;
+            color: white !important;
             border-radius: 100px;
             font-size: 1.1rem;
             font-weight: 600;
@@ -258,16 +258,16 @@
         .btn-primary:hover {
             background: var(--accent-hover);
             transform: scale(1.02);
-            color: white;
+            color: white !important;
         }
 
-        .btn-secondary {
+        .btn-secondary, .btn-secondary:visited {
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
             padding: 1rem 2.5rem;
             background: rgba(255, 255, 255, 0.08);
-            color: var(--text-primary);
+            color: var(--text-primary) !important;
             border: 1px solid var(--border);
             border-radius: 100px;
             font-size: 1.1rem;
@@ -280,7 +280,7 @@
         .btn-secondary:hover {
             background: rgba(255, 255, 255, 0.12);
             border-color: var(--border-hover);
-            color: white;
+            color: white !important;
         }
 
         /* ── Sections ── */
@@ -777,24 +777,24 @@
             margin-bottom: 1rem;
         }
 
-        .orb-button {
+        .orb-button, .orb-button:visited, .orb-button:hover {
             display: inline-flex;
             align-items: center;
             gap: 0.6rem;
             padding: 1rem 2.5rem;
             background: var(--accent);
-            color: white;
+            color: white !important;
             border-radius: 100px;
             font-size: 1.1rem;
             font-weight: 600;
-            text-decoration: none;
+            text-decoration: none !important;
             transition: all 0.3s ease;
         }
 
         .orb-button:hover {
             background: var(--accent-hover);
             transform: scale(1.02);
-            color: white;
+            color: white !important;
         }
 
         .orb-button img {
