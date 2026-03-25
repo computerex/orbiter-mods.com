@@ -1,49 +1,244 @@
-<html>
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="robots" content="index, follow">
-        <meta name="revisit-after" content="1 day">
-        <meta name="distribution" content="global">
-        <meta name="rating" content="general">
-        <meta name="language" content="en">
-        
-        <!-- og meta tags -->
-        <meta property="og:title" content="OG_TITLE_TAG">
-        <meta property="og:description" content="OG_DESC_TAG">
-        <meta property="og:image" content="https://i.postimg.cc/W4mBPDdm/image.png">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="index, follow">
+    <meta name="revisit-after" content="7 days">
+    <meta name="theme-color" content="#2563eb">
 
-        <!-- twitter meta tags -->
-        <meta name="twitter:card" content="summary_large_image">
-        <meta name="twitter:title" content="OG_TITLE_TAG">
-        <meta name="twitter:description" content="OG_DESC_TAG">
-        <meta name="twitter:image" content="https://i.postimg.cc/W4mBPDdm/image.png">
+    <!-- og meta tags -->
+    <meta property="og:title" content="OG_TITLE_TAG">
+    <meta property="og:description" content="OG_DESC_TAG">
+    <meta property="og:image" content="https://i.postimg.cc/W4mBPDdm/image.png">
 
-        <link rel="icon" type="image/x-icon" href="/favicon.ico">
-        <link rel="stylesheet" href="/css/chota.min.css">
-        <script src="/js/font-awesome.js"></script>
-        <style>
-            h1, h2, h3, h4, h5, h6 {
-                color: #14854f;
+    <!-- twitter meta tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="OG_TITLE_TAG">
+    <meta name="twitter:description" content="OG_DESC_TAG">
+    <meta name="twitter:image" content="https://i.postimg.cc/W4mBPDdm/image.png">
+
+    <title>Orbiter-Mods.com</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/css/chota.min.css">
+    <script src="/js/font-awesome.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #3b82f6;
+            --background-color: #f8fafc;
+            --text-color: #1e293b;
+            --card-bg: #ffffff;
+            --border-color: #e2e8f0;
+            --muted-color: #64748b;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-size: 16px;
+            line-height: 1.6;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Header */
+        .site-header {
+            background: white;
+            padding: 1.5rem 0;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .site-header .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .site-title {
+            text-decoration: none;
+            margin-bottom: 1rem;
+        }
+
+        .site-title h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(120deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0;
+            letter-spacing: -0.02em;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .nav-links a {
+            color: var(--text-color);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .nav-links a:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        /* Main content */
+        .main-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 2rem 3rem 2rem;
+        }
+
+        .root {
+            background: white;
+            border-radius: 1rem;
+            padding: 2.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border-color);
+        }
+
+        /* Mod title styles */
+        .root h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-color);
+            margin: 0;
+            display: inline-block;
+            -webkit-text-fill-color: unset;
+            background: none;
+            -webkit-background-clip: unset;
+        }
+
+        .root h1 a,
+        .root a h1 {
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .root h1 a:hover,
+        .root a h1:hover,
+        .root a:hover h1 {
+            color: var(--secondary-color);
+        }
+
+        .root > small {
+            display: inline-block;
+            margin-left: 0.75rem;
+            color: var(--muted-color);
+            font-size: 0.9rem;
+        }
+
+        .root > a[href*="upload"] {
+            display: inline-block;
+            margin-left: 0.75rem;
+            color: var(--primary-color);
+            font-size: 0.9rem;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .root > a[href*="upload"]:hover {
+            text-decoration: underline;
+        }
+
+        /* Description content */
+        .root p, .root div {
+            color: var(--text-color);
+            line-height: 1.7;
+            margin-top: 1rem;
+        }
+
+        .root h2, .root h3, .root h4, .root h5, .root h6 {
+            color: var(--text-color);
+            margin-top: 1.5rem;
+            font-weight: 600;
+        }
+
+        .root a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .root a:hover {
+            text-decoration: underline;
+        }
+
+        /* Mod picture */
+        .root .mod-picture {
+            margin-top: 1.5rem;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .root .mod-picture img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-container { padding: 0 1rem 2rem 1rem; }
+            .root { padding: 1.5rem; }
+            .site-title h1 { font-size: 1.8rem; }
+
+            .root h1 {
+                font-size: 1.4rem;
             }
-        </style>
-    </head>
-    <body>
-        <div class="container" style="max-width:90%;">
-            <section style="text-align:center;margin-bottom:30px;">
-                <a href="/" title="mods for orbiter, home of the orb installer"><h1 style="margin-bottom:0px">orbiter-mods.com</h1></a>
-                <small style="text-decoration:underline;"><a target="_blank" href="http://orbit.medphys.ucl.ac.uk/" title="Orbiter Space Flight Simulator">orbiter</a></small>
-                <small style="text-decoration:underline;"><a href="/orb.html" title="bundled mod installs for orbiter">orb</a></small>
-                <small style="text-decoration:underline;"><a href="/downloads.html" title="orbiter goodies">downloads</a></small>
-                <small style="text-decoration:underline;"><a href="/upload.html" title="upload orbiter mods">upload</a></small>
-                <small style="text-decoration:underline;"><a target="_blank" href="https://www.reddit.com/r/orbitermods/" title="a place to talk orbiter">chat</a></small>
-            </section>
 
-            <div class="root">
-
-            </div>
+            .root > small {
+                display: block;
+                margin-left: 0;
+                margin-top: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <div class="container">
+            <a href="/" class="site-title" title="mods for orbiter, home of the orb installer">
+                <h1>Orbiter-Mods.com</h1>
+            </a>
+            <nav class="nav-links">
+                <a target="_blank" href="https://orbiter-forum.com/resources/categories/2024.31/" title="Orbiter Space Flight Simulator">Orbiter</a>
+                <a href="/orb.html" title="bundled mod installs for orbiter">Orb</a>
+                <a href="/downloads.html" title="orbiter goodies">Downloads</a>
+                <a target="_blank" href="https://orbiter-forum.com" title="a place to talk about orbiter and orbiter mods">Forum</a>
+            </nav>
         </div>
-        <script src="/bundle.js?v=420420420"></script>
-    </body>
+    </header>
+
+    <main class="main-container">
+        <div class="root">
+        </div>
+    </main>
+
+    <script src="/bundle.js?v=2420420420"></script>
+</body>
 </html>

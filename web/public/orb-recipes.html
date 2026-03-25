@@ -1,72 +1,258 @@
-<html>
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="description" content="Mods/addons for Orbiter Space Flight Simulator. A community to chat about Orbiter, and home of the orb installer.">
-        <meta name="keywords" content="Orbiter, Space Flight Simulator, Mods, orb, orb installer, addons, add-ons, bundles">
-        <meta name="robots" content="index, follow">
-        <meta name="revisit-after" content="1 day">
-        <meta name="distribution" content="global">
-        <meta name="rating" content="general">
-        <meta name="language" content="en">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>orbiter mods - orb installer</title>
-        <link rel="icon" type="image/x-icon" href="/favicon.ico">
-        <link rel="stylesheet" href="/css/chota.min.css">
-        <script src="/js/font-awesome.js"></script>
-        <style>
+    <title>How to Create Orb Bundles - Orbiter-Mods.com</title>
+    <meta name="description" content="Learn how to create Orb mod bundles for Orbiter Space Flight Simulator. Write recipes to automate mod installation.">
+    <meta name="keywords" content="Orbiter, Space Flight Simulator, Mods, orb, orb installer, addons, add-ons, bundles, recipes">
+    <meta name="robots" content="index, follow">
+    <meta name="revisit-after" content="7 days">
+    <meta name="theme-color" content="#2563eb">
+    <meta name="referrer" content="no-referrer" />
 
-            pre {
-                overflow-x: auto;
-                margin-top:0px;
-            }
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/css/chota.min.css">
+    <script src="/js/font-awesome.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
-            pre::-webkit-scrollbar {
-                background: #b3bccc;
-            }
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #3b82f6;
+            --background-color: #f8fafc;
+            --text-color: #1e293b;
+            --card-bg: #ffffff;
+            --border-color: #e2e8f0;
+            --muted-color: #64748b;
+        }
 
-            pre::-webkit-scrollbar-thumb {
-                background: #eee;
-                border-radius: 5px;
-            }
+        * { box-sizing: border-box; }
 
-            pre {
-                background: #414449;
-                color: #b3bccc;
-                padding: 15px;
-                font-size: 13pt;
-                tab-size: 4;
-                -webkit-box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.75);
-                -moz-box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.75);
-                box-shadow: 0 0 8px 0 rgba(0, 0, 0, .75);
-            }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-size: 16px;
+            line-height: 1.6;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+        }
 
-            h1 {
-                color: #14854f;
-            }
-        </style>
-        <meta name="referrer" content="no-referrer" />
-    </head>
-    <body>
-        <div class="container" style="max-width:90%;">
-            <section style="text-align:center;margin-bottom:30px;">
-                <a href="/" title="mods for orbiter, home of the orb installer"><h1 style="margin-bottom:0px">orbiter-mods.com</h1></a>
-                <small style="text-decoration:underline;"><a target="_blank" href="http://orbit.medphys.ucl.ac.uk/" title="Orbiter Space Flight Simulator">orbiter</a></small>
-                <small style="text-decoration:underline;"><a href="/orb.html" title="bundled mod installs for orbiter">orb</a></small>
-                <small style="text-decoration:underline;"><a href="/downloads.html" title="orbiter goodies">downloads</a></small>
-                <small style="text-decoration:underline;"><a href="/upload.html" title="upload orbiter mods">upload</a></small>
-                <small style="text-decoration:underline;"><a target="_blank" href="https://chat.orbiter-mods.com" title="a place to talk orbiter">chat</a></small>
-            </section>
+        /* Header */
+        .site-header {
+            background: white;
+            padding: 1.5rem 0;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
 
-            <section>
-                <h1>How to create orb bundles</h1>
-                <p>
-                    Orb is basically a tool for automatically installing bundles of add-ons. We create bundles by
-                    writing an <strong>orb recipe</strong>. Here's a simple recipe to download and install the wonderful
-                    XR2 Ravenstar by dbeachy and Coolhand and the Soundbridge addon from Face.
-                </p>
-                <pre>
+        .site-header .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .site-title {
+            text-decoration: none;
+            margin-bottom: 1rem;
+        }
+
+        .site-title h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(120deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0;
+            letter-spacing: -0.02em;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .nav-links a {
+            color: var(--text-color);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .nav-links a:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        /* Main content */
+        .main-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 2rem 3rem 2rem;
+        }
+
+        /* Content card */
+        .content-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 2.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border-color);
+            margin-bottom: 1.5rem;
+        }
+
+        .content-card h2 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--text-color);
+            margin: 0 0 1rem 0;
+        }
+
+        .content-card h3 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-color);
+            margin: 2rem 0 0.75rem 0;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .content-card h3:first-of-type {
+            border-top: none;
+            padding-top: 0;
+        }
+
+        .content-card p {
+            color: var(--text-color);
+            line-height: 1.7;
+            margin: 0.75rem 0;
+            font-size: 0.95rem;
+        }
+
+        .content-card a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .content-card a:hover {
+            text-decoration: underline;
+        }
+
+        .content-card code {
+            font-family: 'JetBrains Mono', 'Consolas', monospace;
+            background: #f1f5f9;
+            color: var(--primary-color);
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .content-card strong {
+            font-weight: 600;
+        }
+
+        /* Code blocks */
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            font-family: 'JetBrains Mono', 'Consolas', monospace;
+            font-size: 0.85rem;
+            line-height: 1.7;
+            overflow-x: auto;
+            margin: 1rem 0;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+            tab-size: 4;
+        }
+
+        pre::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        pre::-webkit-scrollbar-track {
+            background: #334155;
+        }
+
+        pre::-webkit-scrollbar-thumb {
+            background: #64748b;
+            border-radius: 3px;
+        }
+
+        /* API section labels */
+        .api-group-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            padding: 0.25rem 0.75rem;
+            background: #eff6ff;
+            color: var(--primary-color);
+            border: 1px solid #bfdbfe;
+            border-radius: 0.375rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Footer */
+        .page-footer {
+            text-align: center;
+            padding: 2rem 0;
+            color: var(--muted-color);
+            font-size: 0.875rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-container { padding: 0 1rem 2rem 1rem; }
+            .content-card { padding: 1.5rem; }
+            .site-title h1 { font-size: 1.8rem; }
+            pre { padding: 1rem; font-size: 0.8rem; }
+        }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <div class="container">
+            <a href="/" class="site-title" title="mods for orbiter, home of the orb installer">
+                <h1>Orbiter-Mods.com</h1>
+            </a>
+            <nav class="nav-links">
+                <a target="_blank" href="https://orbiter-forum.com/resources/categories/2024.31/" title="Orbiter Space Flight Simulator">Orbiter</a>
+                <a href="/orb.html" title="bundled mod installs for orbiter">Orb</a>
+                <a href="/downloads.html" title="orbiter goodies">Downloads</a>
+                <a target="_blank" href="https://orbiter-forum.com" title="a place to talk about orbiter and orbiter mods">Forum</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <section class="content-card">
+            <h2>How to Create Orb Bundles</h2>
+            <p>
+                Orb is a tool for automatically installing bundles of add-ons. We create bundles by
+                writing an <strong>orb recipe</strong>. Here's a simple recipe to download and install the wonderful
+                XR2 Ravenstar by dbeachy and Coolhand and the Soundbridge addon from Face:
+            </p>
+            <pre>
 # This is a comment! It is ignored by orb
 # You can use comments to share links and explain stuff
 
@@ -77,53 +263,55 @@ def main(orb):
     orb.install_zip('SoundBridge1.1.zip')
 def requires_fresh_install():
     return False</pre>
-                <p>
-                    You can use the <code>download_zip</code> to download any file (not just zips) and the 
-                    <code>install_zip</code> to extract the zip into orbiter root. Note, due to Orbiter Forum's
-                    Cloudflare protection, you'll need to use the special <code>download_from_of</code> to Download
-                    files from Orbiter Forum. Pay special attention to the filename, for files downloaded using 
-                    <code>download_from_of</code> it must match the file name of the file on OF.
-                </p>
-                <h1>orb API</h1>
-                <p>
-                    Orb exposes functions to help you install Orbiter mods. Here's the list of functions currently
-                    available. 
-                </p>
-                <p>
-                    These can be used to <strong>download files</strong>, including zips, rars, exes. 
-                </p>
-                <pre>
-download_zip
+            <p>
+                You can use <code>download_zip</code> to download any file (not just zips) and
+                <code>install_zip</code> to extract the zip into the Orbiter root. Due to Orbiter Forum's
+                Cloudflare protection, use the special <code>download_from_of</code> to download
+                files from Orbiter Forum. Pay special attention to the filename — for files downloaded using
+                <code>download_from_of</code>, it must match the actual file name on OF.
+            </p>
+        </section>
+
+        <section class="content-card">
+            <h2>Orb API Reference</h2>
+            <p>Orb exposes functions to help you install Orbiter mods. Here's the complete list of available functions.</p>
+
+            <h3>Download Functions</h3>
+            <p><span class="api-group-label">📥 Download</span></p>
+            <p>These can be used to download files — zips, rars, exes, and more.</p>
+            <pre>download_zip
 download_from_of</pre>
-<p>
-    These functions can be used to <strong>install rars, zips, exes and other orb bundles</strong> (you can install other bundles from your bundle).
-</p>
-<pre>
-install_rar
+
+            <h3>Install Functions</h3>
+            <p><span class="api-group-label">📦 Install</span></p>
+            <p>These functions install rars, zips, exes, and other Orb bundles (you can install other bundles from your bundle).</p>
+            <pre>install_rar
 install_zip
 install_exe
 install_orbiter_mods_experience</pre>
 
-<p>
-    These functions are used to <strong>edit Orbiter's many cfg files</strong>.
-</p>
-<pre>enable_modules
+            <h3>Configuration Functions</h3>
+            <p><span class="api-group-label">⚙️ Config</span></p>
+            <p>These functions edit Orbiter's many cfg files.</p>
+            <pre>enable_modules
 edit_cfg_file_section
 edit_cfg_file_add_line
 edit_cfg_file_remove_line</pre>
 
-<p>Orb copies all scenarios installed from mods in a bundle to a new sub-directory for easy access. These two
-    functions allow you to modify this behavior.
-</p>
-<pre>
-set_scn_blacklist # provide a list of scenarios to prevent from being copied into new scenario sub-dir created by orb
-set_scn_dir # override name of the scenario sub-dir (default is name of the bundle)</pre>
+            <h3>Scenario Functions</h3>
+            <p><span class="api-group-label">🎯 Scenarios</span></p>
+            <p>Orb copies all scenarios installed from mods in a bundle to a new sub-directory for easy access. These two functions allow you to modify this behavior.</p>
+            <pre>set_scn_blacklist   # Prevent specific scenarios from being copied into the new scenario sub-directory
+set_scn_dir         # Override name of the scenario sub-directory (default is name of the bundle)</pre>
 
-<p>
-    Take a look at the offical orbiter-mods created bundles to see how to use these functions: <a href="/orb.html">Orb bundles</a>
-</p>
-            </section>
-        </div>
-        <script src="/bundle.js?v=1"></script>
-    </body>
+            <p style="margin-top:1.5rem;">Take a look at the official bundles created by orbiter-mods to see these functions in action: <a href="/orb.html">Browse Orb bundles →</a></p>
+        </section>
+    </main>
+
+    <footer class="page-footer">
+        <p>Orbiter-Mods.com — Serving the Orbiter community</p>
+    </footer>
+
+    <script src="/bundle.js?v=2420420420"></script>
+</body>
 </html>
