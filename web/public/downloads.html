@@ -5,200 +5,220 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Downloads - Orbiter-Mods.com</title>
+    <title>Downloads — Orbiter-Mods.com</title>
     <meta name="description" content="Download Orbiter Space Flight Simulator and high-resolution textures for Earth, Moon, Mars, Mercury, Titan, and more.">
     <meta name="keywords" content="Orbiter, Space Flight Simulator, Mods, orb, orb installer, addons, add-ons, downloads, textures, high resolution">
     <meta name="robots" content="index, follow">
     <meta name="revisit-after" content="7 days">
-    <meta name="theme-color" content="#2563eb">
+    <meta name="theme-color" content="#000000">
 
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
-    <link rel="stylesheet" href="/css/chota.min.css">
-    <script src="/js/font-awesome.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
     <style>
-        :root {
-            --primary-color: #2563eb;
-            --secondary-color: #3b82f6;
-            --accent-color: #f59e0b;
-            --background-color: #f8fafc;
-            --text-color: #1e293b;
-            --card-bg: #ffffff;
-            --border-color: #e2e8f0;
-            --muted-color: #64748b;
-        }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        * { box-sizing: border-box; }
+        html { font-size: 16px; }
+
+        :root {
+            --bg: #000000;
+            --bg-elevated: #111111;
+            --bg-card: #1a1a1a;
+            --bg-card-hover: #222222;
+            --text-primary: #f5f5f7;
+            --text-secondary: #a1a1a6;
+            --text-tertiary: #6e6e73;
+            --accent: #2997ff;
+            --accent-hover: #0077ed;
+            --border: rgba(255, 255, 255, 0.08);
+            --border-hover: rgba(255, 255, 255, 0.15);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 20px;
+            --shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
+        }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            font-size: 16px;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text-primary);
             line-height: 1.6;
-            background-color: var(--background-color);
-            color: var(--text-color);
-            margin: 0;
-            padding: 0;
+            font-size: 16px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
+        a { color: var(--accent); text-decoration: none; transition: color 0.2s; }
+        a:hover { color: var(--accent-hover); }
+
         .container {
-            max-width: 1200px !important;
-            padding: 2rem;
+            max-width: 960px;
+            padding: 0 2rem;
             margin: 0 auto;
             width: 100%;
         }
 
-        /* Header */
-        .site-header {
-            background: white;
-            padding: 1.5rem 0;
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-            margin-bottom: 2rem;
+        /* ── Navigation ── */
+        .site-nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 0;
         }
 
-        .site-header .container {
+        .site-nav .container {
             display: flex;
-            flex-direction: column;
             align-items: center;
-            padding: 0 2rem;
+            justify-content: space-between;
         }
 
-        .site-title {
-            text-decoration: none;
-            margin-bottom: 1rem;
-        }
-
-        .site-title h1 {
-            font-size: 2.5rem;
-            font-weight: 800;
-            background: linear-gradient(120deg, var(--primary-color), var(--secondary-color));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin: 0;
+        .nav-brand {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-primary) !important;
+            text-decoration: none !important;
             letter-spacing: -0.02em;
         }
 
         .nav-links {
             display: flex;
-            gap: 1rem;
+            gap: 0.25rem;
             align-items: center;
-            flex-wrap: wrap;
-            justify-content: center;
         }
 
         .nav-links a {
-            color: var(--text-color);
-            text-decoration: none;
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-            transition: all 0.3s ease;
-            font-weight: 500;
+            color: var(--text-secondary);
             font-size: 0.95rem;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 100px;
+            transition: all 0.2s;
+            text-decoration: none;
         }
 
         .nav-links a:hover {
-            background-color: var(--primary-color);
-            color: white;
+            color: var(--text-primary) !important;
+            background: rgba(255, 255, 255, 0.08);
+            opacity: 1 !important;
         }
 
-        /* Page Hero */
-        .page-hero {
-            background: white;
-            border-radius: 1rem;
-            padding: 2.5rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            margin-bottom: 2rem;
+        .nav-links a.active {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* ── Page Header ── */
+        .page-header {
             text-align: center;
+            padding: 4rem 0 2rem;
         }
 
-        .page-hero h2 {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: var(--text-color);
-            margin: 0 0 0.75rem 0;
+        .page-header h1 {
+            font-size: 2.8rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            margin-bottom: 0.75rem;
+            background: linear-gradient(135deg, #ffffff, #a1a1a6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
-        .page-hero p {
-            color: var(--muted-color);
-            max-width: 700px;
+        .page-header p {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            max-width: 600px;
             margin: 0 auto;
             line-height: 1.7;
-            font-size: 1.05rem;
         }
 
-        .page-hero p a {
-            color: var(--primary-color);
-            text-decoration: none;
+        .page-header p a {
+            color: var(--accent);
             font-weight: 500;
         }
 
-        .page-hero p a:hover {
-            text-decoration: underline;
-        }
-
-        /* Download Section Cards */
+        /* ── Download Sections ── */
         .download-section {
-            background: white;
-            border-radius: 1rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
             padding: 2rem;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            border: 1px solid var(--border-color);
             margin-bottom: 1.5rem;
-            transition: all 0.3s ease;
+            transition: border-color 0.3s;
         }
 
         .download-section:hover {
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            border-color: var(--border-hover);
         }
 
         .section-header {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
-            margin-bottom: 1rem;
-            padding-bottom: 1rem;
-            border-bottom: 2px solid var(--border-color);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.25rem;
+            border-bottom: 1px solid var(--border);
         }
 
         .section-icon {
             width: 48px;
             height: 48px;
-            border-radius: 0.75rem;
+            border-radius: var(--radius-md);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             flex-shrink: 0;
         }
 
-        .section-icon.orbiter { background: linear-gradient(135deg, #2563eb, #3b82f6); }
-        .section-icon.earth { background: linear-gradient(135deg, #059669, #34d399); }
-        .section-icon.moon { background: linear-gradient(135deg, #6b7280, #9ca3af); }
-        .section-icon.mars { background: linear-gradient(135deg, #dc2626, #f87171); }
-        .section-icon.mercury { background: linear-gradient(135deg, #d97706, #fbbf24); }
-        .section-icon.titan { background: linear-gradient(135deg, #7c3aed, #a78bfa); }
-        .section-icon.minor { background: linear-gradient(135deg, #0891b2, #67e8f9); }
+        .section-icon.orbiter { background: linear-gradient(135deg, #2997ff, #0077ed); }
+        .section-icon.earth { background: linear-gradient(135deg, #30d158, #0a7d3e); }
+        .section-icon.moon { background: linear-gradient(135deg, #6e6e73, #48484a); }
+        .section-icon.mars { background: linear-gradient(135deg, #ff453a, #d70015); }
+        .section-icon.mercury { background: linear-gradient(135deg, #ff9f0a, #c77c00); }
+        .section-icon.titan { background: linear-gradient(135deg, #bf5af2, #8944ab); }
+        .section-icon.minor { background: linear-gradient(135deg, #64d2ff, #0a84ff); }
 
-        .section-title-group h3 {
-            font-size: 1.3rem;
+        .section-title h3 {
+            font-size: 1.25rem;
             font-weight: 700;
-            color: var(--text-color);
+            color: var(--text-primary);
             margin: 0;
         }
 
-        .section-title-group p {
-            color: var(--muted-color);
+        .section-title p {
+            color: var(--text-tertiary);
             font-size: 0.9rem;
-            margin: 0.25rem 0 0 0;
+            margin: 0.2rem 0 0 0;
         }
 
-        /* Download Items */
+        .section-note {
+            background: rgba(255, 159, 10, 0.08);
+            border: 1px solid rgba(255, 159, 10, 0.2);
+            border-radius: var(--radius-sm);
+            padding: 0.75rem 1rem;
+            margin-bottom: 1.25rem;
+            font-size: 0.9rem;
+            color: #ff9f0a;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.6rem;
+        }
+
+        .section-note i { margin-top: 0.15rem; flex-shrink: 0; }
+
+        /* ── Download Items ── */
         .download-list {
             display: flex;
             flex-direction: column;
-            gap: 0.75rem;
+            gap: 0.5rem;
         }
 
         .download-item {
@@ -206,16 +226,16 @@
             align-items: center;
             justify-content: space-between;
             padding: 0.875rem 1.25rem;
-            background: var(--background-color);
-            border-radius: 0.75rem;
-            border: 1px solid var(--border-color);
+            background: var(--bg-elevated);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
             transition: all 0.2s ease;
             gap: 1rem;
         }
 
         .download-item:hover {
-            border-color: var(--primary-color);
-            background: #eff6ff;
+            border-color: var(--accent);
+            background: rgba(41, 151, 255, 0.05);
         }
 
         .download-info {
@@ -227,34 +247,36 @@
         }
 
         .download-info i {
-            color: var(--primary-color);
+            color: var(--accent);
             font-size: 1rem;
             flex-shrink: 0;
+            width: 20px;
+            text-align: center;
         }
 
         .download-name {
             font-weight: 500;
-            color: var(--text-color);
+            color: var(--text-primary);
             font-size: 0.95rem;
         }
 
         .download-size {
-            color: var(--muted-color);
+            color: var(--text-tertiary);
             font-size: 0.85rem;
             font-weight: 500;
             white-space: nowrap;
             flex-shrink: 0;
         }
 
-        .download-btn {
+        .download-btn, .download-btn:visited {
             display: inline-flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.4rem;
             padding: 0.5rem 1.25rem;
-            background: linear-gradient(120deg, var(--primary-color), var(--secondary-color));
-            color: white;
-            text-decoration: none;
-            border-radius: 0.5rem;
+            background: var(--accent);
+            color: white !important;
+            text-decoration: none !important;
+            border-radius: 100px;
             font-size: 0.85rem;
             font-weight: 600;
             transition: all 0.2s ease;
@@ -263,147 +285,116 @@
         }
 
         .download-btn:hover {
+            background: var(--accent-hover);
             transform: translateY(-1px);
-            box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.3);
-            color: white;
+            color: white !important;
         }
 
-        .download-btn i {
-            font-size: 0.8rem;
-        }
+        .download-btn i { font-size: 0.8rem; }
 
-        .section-note {
-            background: #fffbeb;
-            border: 1px solid #fde68a;
-            border-radius: 0.5rem;
-            padding: 0.75rem 1rem;
-            margin-bottom: 1rem;
-            font-size: 0.9rem;
-            color: #92400e;
-            display: flex;
-            align-items: flex-start;
-            gap: 0.5rem;
-        }
-
-        .section-note i {
-            margin-top: 0.15rem;
-            flex-shrink: 0;
-        }
-
-        /* Featured download (Orbiter itself) */
-        .featured-download {
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-        }
-
+        /* Featured items */
         .featured-item {
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding: 1rem 1.25rem;
-            background: linear-gradient(135deg, #eff6ff, #dbeafe);
-            border-radius: 0.75rem;
-            border: 1px solid #bfdbfe;
+            background: rgba(41, 151, 255, 0.06);
+            border-radius: var(--radius-md);
+            border: 1px solid rgba(41, 151, 255, 0.15);
             gap: 1rem;
+            margin-bottom: 0.5rem;
         }
 
-        .featured-item .download-name {
-            font-weight: 600;
+        .featured-item:hover {
+            border-color: var(--accent);
+            background: rgba(41, 151, 255, 0.1);
         }
+
+        .featured-item .download-name { font-weight: 600; }
 
         /* Torrent badge */
         .torrent-badge {
             display: inline-flex;
             align-items: center;
             gap: 0.375rem;
-            padding: 0.25rem 0.625rem;
-            background: #f0fdf4;
-            color: #166534;
-            border: 1px solid #bbf7d0;
-            border-radius: 1rem;
+            padding: 0.2rem 0.6rem;
+            background: rgba(48, 209, 88, 0.1);
+            color: #30d158;
+            border: 1px solid rgba(48, 209, 88, 0.2);
+            border-radius: 100px;
             font-size: 0.75rem;
             font-weight: 600;
             margin-left: 0.5rem;
         }
 
-        /* Footer */
+        .instructions-link {
+            color: var(--accent) !important;
+            font-size: 0.85rem;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        /* ── Footer ── */
         .page-footer {
             text-align: center;
-            padding: 2rem 0;
-            color: var(--muted-color);
+            padding: 3rem 0;
+            color: var(--text-tertiary);
             font-size: 0.875rem;
+            border-top: 1px solid var(--border);
+            margin-top: 2rem;
         }
 
-        .page-footer a {
-            color: var(--primary-color);
-            text-decoration: none;
-        }
-
-        /* Responsive */
+        /* ── Responsive ── */
         @media (max-width: 768px) {
-            .container { padding: 1rem; }
-
-            .site-title h1 { font-size: 1.8rem; }
-
-            .download-item {
+            .container { padding: 0 1rem; }
+            .page-header h1 { font-size: 2rem; }
+            .download-item, .featured-item {
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 0.75rem;
             }
-
-            .download-btn {
-                width: 100%;
-                justify-content: center;
-            }
-
-            .featured-item {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 0.75rem;
-            }
+            .download-btn { width: 100%; justify-content: center; }
+            .nav-links a { font-size: 0.85rem; padding: 0.4rem 0.75rem; }
         }
     </style>
 </head>
 <body>
-    <header class="site-header">
+    <nav class="site-nav">
         <div class="container">
-            <a href="/" class="site-title" title="mods for orbiter, home of the orb installer">
-                <h1>Orbiter-Mods.com</h1>
-            </a>
-            <nav class="nav-links">
-                <a target="_blank" href="https://orbiter-forum.com/resources/categories/2024.31/" title="Orbiter Space Flight Simulator">Orbiter</a>
-                <a href="/orb.html" title="bundled mod installs for orbiter">Orb</a>
-                <a href="/downloads.html" title="orbiter goodies">Downloads</a>
-                <a target="_blank" href="https://orbiter-forum.com" title="a place to talk about orbiter and orbiter mods">Forum</a>
-            </nav>
+            <a href="/" class="nav-brand">Orbiter-Mods</a>
+            <div class="nav-links">
+                <a target="_blank" href="https://orbiter-forum.com/resources/categories/2024.31/">Orbiter</a>
+                <a href="/orb.html">Orb</a>
+                <a href="/downloads.html" class="active">Downloads</a>
+                <a target="_blank" href="https://orbiter-forum.com">Forum</a>
+            </div>
         </div>
-    </header>
+    </nav>
 
     <main class="container">
-        <section class="page-hero">
-            <h2>Downloads &amp; High-Res Textures</h2>
-            <p>Orbiter Space Flight Simulator is the product of <a target="_blank" href="http://www0.cs.ucl.ac.uk/staff/M.Schweiger/">Dr. Martin Schweiger</a>. It is now <a target="_blank" href="https://github.com/orbitersim/orbiter">open source</a> under the MIT license. Download Orbiter and high-resolution texture packs below.</p>
+        <section class="page-header">
+            <h1>Downloads & Textures</h1>
+            <p>Orbiter is the product of <a target="_blank" href="http://www0.cs.ucl.ac.uk/staff/M.Schweiger/">Dr. Martin Schweiger</a> and is now <a target="_blank" href="https://github.com/orbitersim/orbiter">open source</a> under the MIT license. Grab the simulator and high-res texture packs below.</p>
         </section>
 
         <!-- Orbiter Downloads -->
         <section class="download-section">
             <div class="section-header">
                 <div class="section-icon orbiter">🚀</div>
-                <div class="section-title-group">
+                <div class="section-title">
                     <h3>Orbiter Space Flight Simulator</h3>
                     <p>The core simulator — get started here</p>
                 </div>
             </div>
-            <div class="featured-download">
+            <div class="download-list">
                 <div class="featured-item">
                     <div class="download-info">
                         <i class="fas fa-rocket"></i>
-                        <span class="download-name">Orbiter 2016 Edition</span>
+                        <span class="download-name">Orbiter 2024 Edition</span>
                         <span class="download-size">Latest</span>
                     </div>
-                    <a href="/files/Orbiter2016.zip" class="download-btn" title="Orbiter Space Flight Simulator 2016 Edition">
-                        <i class="fas fa-download"></i> Download
+                    <a href="https://orbiter-forum.com/resources/categories/2024.31/" target="_blank" class="download-btn">
+                        <i class="fas fa-external-link-alt"></i> Get Orbiter
                     </a>
                 </div>
                 <div class="featured-item">
@@ -412,10 +403,10 @@
                         <span class="download-name">Orbiter 2016 — Play On Linux Edition</span>
                     </div>
                     <div style="display:flex;align-items:center;gap:0.75rem;flex-shrink:0;">
-                        <a href="/files/Orbiter2016.polApp" class="download-btn" title="Orbiter 2016 Linux">
+                        <a href="/files/Orbiter2016.polApp" class="download-btn">
                             <i class="fas fa-download"></i> Download
                         </a>
-                        <a target="_blank" href="https://orbiter-forum.com/threads/how-to-orbiter-running-in-linux-via-wine-playonlinux.40699/#post-600354" style="color:var(--primary-color);font-size:0.85rem;font-weight:500;text-decoration:none;white-space:nowrap;">Instructions →</a>
+                        <a target="_blank" href="https://orbiter-forum.com/threads/how-to-orbiter-running-in-linux-via-wine-playonlinux.40699/#post-600354" class="instructions-link">Instructions →</a>
                     </div>
                 </div>
             </div>
@@ -425,13 +416,13 @@
         <section class="download-section">
             <div class="section-header">
                 <div class="section-icon earth">🌍</div>
-                <div class="section-title-group">
+                <div class="section-title">
                     <h3>Earth — High Resolution Textures</h3>
                     <p>Clouds, elevation, surface data and more</p>
                 </div>
             </div>
             <div class="section-note">
-                <i class="fas fa-info-circle"></i>
+                <i class="fas fa-circle-info"></i>
                 <span>You don't need all textures — download only what you want and extract into your root Orbiter directory.</span>
             </div>
             <div class="download-list">
@@ -469,7 +460,7 @@
                 </div>
                 <div class="download-item">
                     <div class="download-info">
-                        <i class="fas fa-file-archive"></i>
+                        <i class="fas fa-file-zipper"></i>
                         <span class="download-name">All Earth textures via BitTorrent</span>
                         <span class="torrent-badge"><i class="fas fa-magnet"></i> Torrent</span>
                     </div>
@@ -483,13 +474,13 @@
         <section class="download-section">
             <div class="section-header">
                 <div class="section-icon moon">🌙</div>
-                <div class="section-title-group">
+                <div class="section-title">
                     <h3>Moon — High Resolution Textures</h3>
                     <p>Elevation and surface data for the Moon</p>
                 </div>
             </div>
             <div class="section-note">
-                <i class="fas fa-info-circle"></i>
+                <i class="fas fa-circle-info"></i>
                 <span>Download what you want and extract into your root Orbiter directory.</span>
             </div>
             <div class="download-list">
@@ -511,7 +502,7 @@
                 </div>
                 <div class="download-item">
                     <div class="download-info">
-                        <i class="fas fa-file-archive"></i>
+                        <i class="fas fa-file-zipper"></i>
                         <span class="download-name">All Moon textures via BitTorrent</span>
                         <span class="torrent-badge"><i class="fas fa-magnet"></i> Torrent</span>
                     </div>
@@ -525,14 +516,14 @@
         <section class="download-section">
             <div class="section-header">
                 <div class="section-icon mars">🔴</div>
-                <div class="section-title-group">
+                <div class="section-title">
                     <h3>Mars — High Resolution Textures</h3>
                     <p>Elevation and surface data for the Red Planet</p>
                 </div>
             </div>
             <div class="section-note">
-                <i class="fas fa-info-circle"></i>
-                <span>Extract both <strong>Surf.tree</strong> and <strong>Elev.tree</strong> files into <code>orbiter_root/Textures/Mars/Archive</code> folder.</span>
+                <i class="fas fa-circle-info"></i>
+                <span>Extract both <strong>Surf.tree</strong> and <strong>Elev.tree</strong> files into <code style="background:rgba(255,255,255,0.1);padding:0.1rem 0.4rem;border-radius:4px;">orbiter_root/Textures/Mars/Archive</code> folder.</span>
             </div>
             <div class="download-list">
                 <div class="download-item">
@@ -553,7 +544,7 @@
                 </div>
                 <div class="download-item">
                     <div class="download-info">
-                        <i class="fas fa-file-archive"></i>
+                        <i class="fas fa-file-zipper"></i>
                         <span class="download-name">All Mars textures via BitTorrent</span>
                         <span class="torrent-badge"><i class="fas fa-magnet"></i> Torrent</span>
                     </div>
@@ -567,13 +558,13 @@
         <section class="download-section">
             <div class="section-header">
                 <div class="section-icon mercury">☿️</div>
-                <div class="section-title-group">
+                <div class="section-title">
                     <h3>Mercury — High Resolution Textures</h3>
                     <p>Complete texture pack for Mercury</p>
                 </div>
             </div>
             <div class="section-note">
-                <i class="fas fa-info-circle"></i>
+                <i class="fas fa-circle-info"></i>
                 <span>Extract files into your <strong>orbiter_root</strong> directory.</span>
             </div>
             <div class="download-list">
@@ -592,13 +583,13 @@
         <section class="download-section">
             <div class="section-header">
                 <div class="section-icon titan">🪐</div>
-                <div class="section-title-group">
+                <div class="section-title">
                     <h3>Titan — High Resolution Textures</h3>
                     <p>Texture pack for Saturn's largest moon</p>
                 </div>
             </div>
             <div class="section-note">
-                <i class="fas fa-info-circle"></i>
+                <i class="fas fa-circle-info"></i>
                 <span>Extract files into your <strong>orbiter_root</strong> directory.</span>
             </div>
             <div class="download-list">
@@ -617,13 +608,13 @@
         <section class="download-section">
             <div class="section-header">
                 <div class="section-icon minor">☄️</div>
-                <div class="section-title-group">
+                <div class="section-title">
                     <h3>Minor Bodies — High Resolution Textures</h3>
                     <p>Asteroids, comets, and other small bodies</p>
                 </div>
             </div>
             <div class="section-note">
-                <i class="fas fa-info-circle"></i>
+                <i class="fas fa-circle-info"></i>
                 <span>Extract files into your <strong>orbiter_root</strong> directory.</span>
             </div>
             <div class="download-list">
