@@ -27,7 +27,7 @@
     <meta name="theme-color" content="#000000">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
-    <meta name="referrer" content="no-referrer" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
 
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link rel="stylesheet" href="/css/chota.min.css">
@@ -819,44 +819,23 @@
             margin-bottom: 1.5rem;
         }
 
-        .video-thumb-link {
-            display: block;
-            text-decoration: none;
-        }
-
-        .video-thumb {
+        .video-container {
             position: relative;
             width: 100%;
-            border-radius: var(--radius-lg);
+            padding-bottom: 56.25%;
+            height: 0;
             overflow: hidden;
+            border-radius: var(--radius-lg);
             background: var(--bg-elevated);
-            cursor: pointer;
-            transition: transform 0.3s ease;
         }
 
-        .video-thumb:hover {
-            transform: scale(1.01);
-        }
-
-        .video-thumb img {
-            width: 100%;
-            height: auto;
-            display: block;
-        }
-
-        .video-play-btn {
+        .video-container iframe {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            opacity: 0.85;
-            transition: all 0.3s ease;
-            filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.4));
-        }
-
-        .video-thumb:hover .video-play-btn {
-            opacity: 1;
-            transform: translate(-50%, -50%) scale(1.1);
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
         }
 
         .video-title {
@@ -1060,14 +1039,9 @@
     <div class="section">
         <section class="video-section">
             <h2>See Orb in Action</h2>
-            <a href="https://www.youtube.com/watch?v=fykluPB87C0" target="_blank" rel="noopener" class="video-thumb-link">
-                <div class="video-thumb">
-                    <img src="https://img.youtube.com/vi/fykluPB87C0/maxresdefault.jpg" alt="Orb Installer Demo" onerror="this.src='https://img.youtube.com/vi/fykluPB87C0/hqdefault.jpg'">
-                    <div class="video-play-btn">
-                        <svg width="68" height="48" viewBox="0 0 68 48"><path d="M66.52 7.74c-.78-2.93-2.49-5.41-5.42-6.19C55.79.13 34 0 34 0S12.21.13 6.9 1.55c-2.93.78-4.63 3.26-5.42 6.19C.06 13.05 0 24 0 24s.06 10.95 1.48 16.26c.78 2.93 2.49 5.41 5.42 6.19C12.21 47.87 34 48 34 48s21.79-.13 27.1-1.55c2.93-.78 4.64-3.26 5.42-6.19C67.94 34.95 68 24 68 24s-.06-10.95-1.48-16.26z" fill="#FF0000"/><path d="M45 24L27 14v20" fill="#fff"/></svg>
-                    </div>
-                </div>
-            </a>
+            <div class="video-container">
+                <iframe src="https://www.youtube.com/embed/fykluPB87C0?rel=0&modestbranding=1&origin=https://orbiter-mods.com" title="Orb Installer Demo" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="no-referrer-when-downgrade" allowfullscreen loading="lazy"></iframe>
+            </div>
             <p class="video-title">Watch how easy it is to install Orbiter and mods with Orb</p>
         </section>
     </div>
